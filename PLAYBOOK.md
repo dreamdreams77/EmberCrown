@@ -36,7 +36,7 @@ All characters, houses, and places are original.
 |---|---|
 | WASD / arrows | Move |
 | Shift | Sneak (Wren only; much harder to spot) |
-| E (hold) | Pick a lock, steal the objective, poison the cup |
+| E (hold) | Pick a lock, steal the objective, poison the cup, knock out a guard from behind |
 | Space | Dragon fire (Ashling only) |
 | Tab | Swap between Wren and Ashling |
 | Q | Smoke powder |
@@ -52,6 +52,13 @@ All characters, houses, and places are original.
 - Suspicion is a single meter. It rises faster the closer you are and falls slowly when unseen. At 100% you are caught and the mission restarts.
 - Sneaking multiplies Wren's visibility range by 0.6. The character you are *not* controlling counts as curled up, also 0.6.
 - Ashling is 1.45x more visible than Wren. Power comes with a price.
+- **Light and shadow.** Wall torches (placed along every wall that faces the viewer), lit beacons, candles, live forge vents, and Ashling's fire are light sources. Each one lights a falloff circle (torches only light the room in front of them). How lit you are scales guard sight on you from x0.82 (shadow) to x1.22 (full light). The HUD gem shows Shadow, Dim, or Lit. Not used on the flight level.
+- **Footsteps.** Outside the Abbey, running Wren (1.8 tiles) or walking Ashling (2.4 tiles) makes a step every 0.45 seconds. A guard in that radius who is facing away turns toward the sound and pauses. Sneaking is silent.
+- **Close quarters.** A guard always notices you within 0.9 tiles, unless you are Wren and sneaking.
+- **Search.** A guard who loses sight of you walks to your last seen spot, searches for 2.4 seconds, and returns to his patrol. Guards also scan left and right when they pause at a waypoint.
+- **Takedown.** Sneak up behind an unaware guard (not a boss or tower) and hold E for 0.6 seconds: he is out for 10 seconds, the same as a fire stun but quiet.
+- **Bodies.** A guard who sees a stunned comrade within 4.2 tiles raises suspicion by 0.22 and goes to check. Each stun can only be discovered once. Waking guards are groggy and look around first.
+- **Barks.** Guards say what they are doing ("What was that?", "Where did it go?", "Man down!") in speech bubbles. The monks of Thornwick keep their vow and only manage "...!".
 
 **Gadgets (per mission)**
 - Smoke powder x3: a cloud for 6 seconds that blocks sight lines.
@@ -246,6 +253,10 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 
 ## 13. Art and audio direction
 
+**As implemented (2D canvas).** Every level's floor, walls, and shadows are generated from a seeded hash, so they are textured but stable between runs: flagstones (Ashfall, Thornwick, the finale), feast-hall planks (Gallowmere), riveted iron plates (Ironvale), marble (Dunmoor's ball), rubble and scorch (Dunmoor's ruins), and a storm sea (the Drowned Spire). Walls have a stone cap and a brick face where they face the viewer, and cast soft shadows. A darkness layer with real light sources sits on top, so guard vision cones read as lantern beams. Characters are drawn sprites with walk cycles: hooded Wren, Ashling with flapping wings who grows a little with every ember gem, house-colored soldiers with spears and lanterns, robed monks with candles, the Bell-Warden with his bronze bell, the masked Candlemaker, boats and searchlight towers, and masked dancers. Particles drive fire, sparks, smoke, falling ash, embers, dust, fog, rain, and lightning; the screen shakes on tolls, blinks, and getting caught, and pulses red as suspicion rises.
+
+**Full design.**
+
 - **Look:** low-poly N64/PS1 silhouettes with modern lighting. Chunky textures, saturated torch colors, long shadows.
 - **Palette:** each house owns a color (Marrow ash-gray, Grell gold, Ostrander sea-green, Sable black, Kest iron-red, Dunmoor fog-blue).
 - **Audio:** a bass-and-percussion spy theme that bends into a horn-driven war theme as suspicion rises. Ashling's voice is gravelly and fast.
@@ -253,6 +264,8 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 ---
 
 ## 14. Prototype status and roadmap
+
+**Done (v1.1):** procedural textures, dynamic lighting, sprite characters, particles and weather, redesigned HUD and menus; light and shadow, footsteps, guard search, takedowns, body discovery, and guard barks.
 
 **Done (v1.0 prototype):** all seven missions are playable start to finish: the Drowned Spire flight level, the Thornwick Abbey boss dungeon (silence rule, sealed doors, learnable Song of Opening, Bell-Warden), Ironvale (escort, forge vents, hostage choice), Dunmoor Marsh (two time states, Song of Time pedestals, state-gated objectives), and the Candlemaker's Crown finale (candle shield, blink, houses shaping the fight, three endings); house Favor/Fear/Ruin that changes later missions; rotating searchlight towers, difficulty select (Courier, Spy, Shadow), stealth cones with line of sight, guard patrols, lures, dragon fire and beacons, ember gems, locks, gadgets, Whisper Court choice, ending screen.
 
