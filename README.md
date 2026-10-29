@@ -12,10 +12,17 @@ A stealth-action prototype: a spy and her runt dragon infiltrate feuding houses 
 |---|---|
 | WASD / arrows | Move |
 | Shift | Sneak |
-| E (hold) | Pick lock / steal / poison |
+| E (hold) | Pick lock / steal / poison / knock out a guard (sneak up behind) |
 | Space | Dragon fire |
 | Tab | Swap Wren and Ashling |
 | Q / R / F | Smoke / whisper bell / bone flute |
+
+## Stealth rules worth knowing
+
+- **Light and shadow.** Torches, beacons, candles, and forge vents light you up; guards see you up to 22% farther in full light and 18% less far in shadow. The gem in the bottom bar shows how exposed you are (Shadow, Dim, Lit). Ashling's fire lights her up too.
+- **Noise.** Running, or Ashling walking, makes footsteps that turn nearby guards around. Sneak (Shift) to stay quiet.
+- **Guards search.** A guard who loses sight of you walks to where he last saw you and looks around (`?` over his head).
+- **Bodies.** Sneak up behind an unaware guard and hold E to knock him out for 10 seconds. If another guard sees a stunned comrade, suspicion jumps and he goes to check.
 
 ## Put it on GitHub Pages
 
