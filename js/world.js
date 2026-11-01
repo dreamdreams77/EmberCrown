@@ -304,7 +304,7 @@ function updateCritters(dt){
   for(const r of G.crit){
     if(r.k==='rat'){
       let fx=0,fy=0,flee=false;
-      for(const c of chars){if(!c)continue;const d=Math.hypot(r.x-c.x,r.y-c.y);if(d<58){flee=true;fx+=(r.x-c.x)/d;fy+=(r.y-c.y)/d;}}
+      for(const c of chars){if(!c)continue;const d=Math.max(.01,Math.hypot(r.x-c.x,r.y-c.y));if(d<58){flee=true;fx+=(r.x-c.x)/d+(d<1?Math.random()-.5:0);fy+=(r.y-c.y)/d;}}
       if(flee){r.a=Math.atan2(fy,fx);r.s=125;r.t=1.5;}
       else{r.t-=dt;if(r.t<=0){r.t=.6+Math.random()*3.2;if(Math.random()<.45){r.s=0;}else{r.a+=(Math.random()-.5)*2.4;r.s=34+Math.random()*30;}}}
       if(r.s>0){

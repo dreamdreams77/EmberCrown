@@ -123,7 +123,7 @@ function hasRelic(id){return run.relics.includes(id)||!!(G&&G.gotRelics&&G.gotRe
 function setMode(m){mode=m;if(m==='title'||m==='brief'||m==='court'||m==='end')PT.length=0;if(typeof UI!=='undefined')UI.onMode(m);}
 function angDiff(a,b){let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return Math.abs(d);}
 function solidTile(tx,ty){
-  if(tx<0||ty<0||tx>=G.gw||ty>=G.gh)return true;
+  if(!(tx>=0&&ty>=0&&tx<G.gw&&ty<G.gh))return true; // also catches NaN
   if(G.flight)return false;
   const c=G.grid[ty][tx];
   if(c==='#'||c===' ')return true;

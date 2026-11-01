@@ -22,19 +22,26 @@ function degrade(){
 }
 let last=0,slow=0,frameN=0;
 const PERF={u:0,r:0,n:0};
+let errN=0;
 function frame(t){
-  const raw=(t-last)/1000||.016;last=t;
-  const dt=Math.min(.05,raw);
-  if(mode==='play'){
-    if(raw>.036)slow+=raw;else slow=Math.max(0,slow-raw*.6);
-    if(slow>1.6&&Q.tier<3){degrade();slow=0;}
-    if(G&&mouse.used)mouse.world=screenToWorld(mouse.x,mouse.y);
-    const t0=performance.now();update(dt);PERF.u+=performance.now()-t0;
+  try{
+    const raw=(t-last)/1000||.016;last=t;
+    const dt=Math.min(.05,raw);
+    if(mode==='play'){
+      if(raw>.036)slow+=raw;else slow=Math.max(0,slow-raw*.6);
+      if(slow>1.6&&Q.tier<3){degrade();slow=0;}
+      if(G&&mouse.used)mouse.world=screenToWorld(mouse.x,mouse.y);
+      const t0=performance.now();update(dt);PERF.u+=performance.now()-t0;
+    }
+    if(mode!=='pause')updateFX(dt);
+    Aud.tick(dt,G?G.alert:0,mode==='play');
+    const t1=performance.now();render(dt);PERF.r+=performance.now()-t1;PERF.n++;
+    if(++frameN%6===0)UI.tick(false);
+  }catch(e){
+    // never let one bad frame freeze the game: log it and keep the loop alive
+    console.error(e);errN++;
+    if(errN>=5&&mode==='play'){errN=0;try{pauseGame(true);}catch(_){}}
   }
-  if(mode!=='pause')updateFX(dt);
-  Aud.tick(dt,G?G.alert:0,mode==='play');
-  const t1=performance.now();render(dt);PERF.r+=performance.now()-t1;PERF.n++;
-  if(++frameN%6===0)UI.tick(false);
   requestAnimationFrame(frame);
 }
 function boot(){
