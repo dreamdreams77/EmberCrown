@@ -3,12 +3,13 @@
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 
 let mode='title',lvl=0,perk=null,G=null,diff=1;
+const attempts={};
 const HOUSE_NAMES={marrow:'Marrow',grell:'Grell',ostrander:'Ostrander',sable:'Sable',kest:'Kest',dunmoor:'Dunmoor'};
 let houses={};
 function resetHouses(){houses={};for(const k in HOUSE_NAMES)houses[k]={favor:0,fear:0,ruin:0};}
 resetHouses();
-const run={relics:[],lore:[],ranks:{},secrets:{}};      // this playthrough
-const meta={relics:[],lore:[],best:{}};                  // remembered between playthroughs (codex)
+const run={relics:[],lore:[],ranks:{},secrets:{},talents:[],cinders:0,disc:[]};      // this playthrough
+const meta={relics:[],lore:[],best:{},disc:[]};                  // remembered between playthroughs (codex)
 const stats={gems:0,caught:0,time:0,byLvl:[]};
 const keys={};
 const touch={act:false,fire:false,sneak:false,jx:0,jy:0,on:false};
@@ -82,24 +83,26 @@ const BREAK_GEMS=Math.round(BASE_GEMS*.6);
 
 /* ---------- save / settings ---------- */
 const SAVE_KEY='embercrown.save.v2',SET_KEY='embercrown.settings.v1';
-const settings={sfx:true,music:true,minimap:true,shake:true,hints:true};
+const settings={sfx:true,music:true,minimap:true,shake:true,hints:true,cinema:'full',seen:{}};
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function loadSettings(){const s=lsGet(SET_KEY);if(s)Object.assign(settings,s);
   Aud.set.sfx=settings.sfx;Aud.set.music=settings.music;}
 function saveSettings(){lsSet(SET_KEY,settings);}
-let saved=null;
+let saved=null,runStage=null;
+function persistRun(){if(runStage)writeSave(runStage.stage,runStage.next);}
 function loadSave(){
   const s=lsGet(SAVE_KEY);saved=null;
-  if(!s||s.v!==2)return null;
-  if(s.meta){meta.relics=s.meta.relics||[];meta.lore=s.meta.lore||[];meta.best=s.meta.best||{};}
+  if(!s||(s.v!==2&&s.v!==3))return null;
+  if(s.meta){meta.relics=s.meta.relics||[];meta.lore=s.meta.lore||[];meta.best=s.meta.best||{};meta.disc=s.meta.disc||[];}
   if(s.run&&!s.complete)saved=s;
   return s;
 }
 function writeSave(stage,next,complete){
-  const s={v:2,meta:{relics:meta.relics,lore:meta.lore,best:meta.best}};
+  const s={v:3,meta:{relics:meta.relics,lore:meta.lore,best:meta.best,disc:meta.disc}};
   if(complete)s.complete=true;
-  else s.run={stage,next,diff,perk,houses,stats:{gems:stats.gems,caught:stats.caught,time:stats.time,byLvl:Array.from(stats.byLvl,v=>v||0)},relics:run.relics,lore:run.lore,ranks:run.ranks,secrets:run.secrets};
+  else s.run={stage,next,diff,perk,houses,stats:{gems:stats.gems,caught:stats.caught,time:stats.time,byLvl:Array.from(stats.byLvl,v=>v||0)},relics:run.relics,lore:run.lore,ranks:run.ranks,secrets:run.secrets,talents:run.talents,cinders:run.cinders,disc:run.disc};
+  if(!complete)runStage={stage,next};
   lsSet(SAVE_KEY,s);
   saved=complete?null:s;
 }
@@ -107,14 +110,14 @@ function continueGame(){
   const s=saved;if(!s||!s.run)return false;
   const r=s.run;diff=r.diff;perk=r.perk;houses=r.houses;
   stats.gems=r.stats.gems;stats.caught=r.stats.caught;stats.time=r.stats.time;stats.byLvl=r.stats.byLvl.slice();
-  run.relics=(r.relics||[]).slice();run.lore=(r.lore||[]).slice();run.ranks=r.ranks||{};run.secrets=r.secrets||{};
+  run.relics=(r.relics||[]).slice();run.lore=(r.lore||[]).slice();run.ranks=r.ranks||{};run.secrets=r.secrets||{};run.talents=(r.talents||[]).slice();run.cinders=r.cinders||0;run.disc=(r.disc||[]).slice();runStage={stage:r.stage,next:r.next};
   if(r.stage==='court'){lvl=0;setMode('court');}else startBrief(r.next);
   return true;
 }
 function newGame(){
   stats.gems=0;stats.caught=0;stats.time=0;stats.byLvl=[];perk=null;resetHouses();
-  run.relics=[];run.lore=[];run.ranks={};run.secrets={};
-  saved=null;lsSet(SAVE_KEY,{v:2,meta:{relics:meta.relics,lore:meta.lore,best:meta.best}});
+  run.relics=[];run.lore=[];run.ranks={};run.secrets={};run.talents=[];run.cinders=0;run.disc=[];
+  saved=null;runStage=null;lsSet(SAVE_KEY,{v:3,meta:{relics:meta.relics,lore:meta.lore,best:meta.best,disc:meta.disc}});
   startBrief(0);
 }
 function hasRelic(id){return run.relics.includes(id)||!!(G&&G.gotRelics&&G.gotRelics.includes(id));}
@@ -130,6 +133,7 @@ function solidTile(tx,ty){
   const d=G.doors[tx+','+ty];return !!(d&&!d.open);
 }
 function blocked(x,y,r){
+  if(G.pblock&&G.pblock.size&&(propTile(Math.floor((x-r)/T),Math.floor((y-r)/T))||propTile(Math.floor((x+r)/T),Math.floor((y-r)/T))||propTile(Math.floor((x-r)/T),Math.floor((y+r)/T))||propTile(Math.floor((x+r)/T),Math.floor((y+r)/T))))return true;
   return solidTile(Math.floor((x-r)/T),Math.floor((y-r)/T))||solidTile(Math.floor((x+r)/T),Math.floor((y-r)/T))||
          solidTile(Math.floor((x-r)/T),Math.floor((y+r)/T))||solidTile(Math.floor((x+r)/T),Math.floor((y+r)/T));
 }
@@ -184,7 +188,7 @@ function updateFX(dt){
     if(p.dr){const f=Math.max(0,1-p.dr*dt);p.vx*=f;p.vy*=f;}
     p.s+=p.gr*dt;p.rot+=dt;
   }
-  if(G){if(G.shake>0)G.shake=Math.max(0,G.shake-dt*22);}
+  if(G){if(G.shake>0)G.shake=Math.max(0,G.shake-dt*22);if(G.hurtFlash>0)G.hurtFlash=Math.max(0,G.hurtFlash-dt);}
 }
 function shake(a){if(G&&settings.shake)G.shake=Math.max(G.shake||0,a);}
 
@@ -217,8 +221,11 @@ function loadLevel(i){
   const g={d,grid:[],items:[],doors:{},cracks:{},smoke:[],rings:[],active:'wren',alert:0,hold:0,holdT:null,
     time:0,gems:0,msg:null,msgT:0,fireSaid:false,doneSaid:false,sneak:false,gad:{...d.gadgets},exitOpen:false,flight:!!d.flight,vents:[],peds:[],ventSaid:false,gain:1,choice:null,outLines:[],
     host:d.choice?{x:0,y:0,on:false,host:true,face:0,ph:0}:null,
-    gh:d.map.length,gw:d.map[0].length,toasts:[],shake:0,intro:3.2,dirty:true,gotRelics:[],gotLore:[],
-    st:{stuns:0,detect:0,maxAlert:0,barrels:0,secrets:0},dash:{t:0,cd:0,a:0,hit:null},
+    hitstop:0,ts:1,tsT:1,punch:0,cine:null,bars:0,
+    foes:[],proj:[],pick:[],shock:[],tele:[],fx:[],cinders:0,hp:4,maxHp:4,inv:0,hurtFlash:0,
+    strike:{cd:0,combo:0,last:-9,pend:0,ang:0,cb:0},roll:{t:0,cd:0,a:0,grace:0},nova:{cd:0,pend:0},phoenixUsed:false,defeat:null,
+    gh:d.map.length,gw:d.map[0].length,toasts:[],shake:0,intro:0,dirty:true,gotRelics:[],gotLore:[],
+    st:{stuns:0,detect:0,maxAlert:0,barrels:0,secrets:0},dash:{t:0,cd:0,a:0,hit:null,ch:1,max:1,grace:0},
     cam:null,flash:null,prompt:null,crit:[],fireOn:false,secretsTotal:0,secretsFound:0,loreSeen:{}};
   const D=DIFFS[diff];
   if(!d.flight)for(const k of ['smoke','bell','flute'])g.gad[k]=Math.max(0,g.gad[k]+D[k]);
@@ -232,6 +239,7 @@ function loadLevel(i){
       else if(c==='X'){ex=[x,y];c='.';}
       else if(c==='D'){g.doors[x+','+y]={x,y,open:false};c='.';}
       else if(c==='Z'){g.doors[x+','+y]={x,y,open:false,sealed:true};c='.';}
+      else if(c==='Y'){g.doors[x+','+y]={x,y,open:false,gate:true,puzzle:true};c='.';}
       else if(c==='T'){g.peds.push({x:x*T+16,y:y*T+16});c='.';}
       else if(c==='V'){g.vents.push({x,y,ph:(x*.7+y*1.3)%4,on:false,warn:false});c='.';}
       else if(c==='k'){g.cracks[x+','+y]={x,y,p:0};g.secretsTotal++;c='#';}
@@ -268,7 +276,7 @@ function loadLevel(i){
   }
   if(d.boss){const wp=d.boss.wp,cm=d.boss.kind==='candle',bhp=cm?100-8*houseCounts().r:100;
     g.boss={x:wp[0][0]*T+16,y:wp[0][1]*T+16,wp:wp.map(p=>[p[0]*T+16,p[1]*T+16]),i:1,boss:true,kind:d.boss.kind||'warden',hp:bhp,maxhp:bhp,
-      blinkT:5,blink:null,hurt:0,dead:false,tollT:4,toll:0,ph:0,half:.62,kr:1,
+      blinkT:5,blink:null,hurt:0,dead:false,tollT:4,toll:0,ph:0,half:.62,kr:1,eng:false,st:'patrol',roar:0,deathT:0,stg:0,t:0,cd:0,tollCd:6,sumCd:10,sign:1,walk:0,p2:false,dir:0,
       face:Math.atan2(wp[1][1]-wp[0][1],wp[1][0]-wp[0][0]),stun:0,pause:0,lure:null,back:null,ret:false,seeing:false,spd:cm?46:40,rm:1,was:false,seen:null,bang:0,quest:0};
     g.guards.push(g.boss);}
   g.noiseT=0;
@@ -288,15 +296,22 @@ function loadLevel(i){
     g.guests=ts.guests.map((s,k)=>({a:[s[0][0]*T+16,s[0][1]*T+16],b:[s[1][0]*T+16,s[1][1]*T+16],ph:k*1.7,
       x:s[0][0]*T+16,y:s[0][1]*T+16,c:['#d9a441','#6aa0d9','#c06a9a','#7fc08a'][k%4]}));
   }
+  if(hasT('twin')){g.dash.max=2;g.dash.ch=2;}
+  g.maxHp=4+(hasT('heart1')?1:0)+(hasT('heart2')?1:0);g.hp=g.maxHp;
+  if(!d.flight&&hasT('pockets')){g.gad.smoke++;g.gad.bell++;}
+  buildProps(g);
+  initInteractables(g);
+  g.chand=(d.chand||[]).map(c=>({x:c[0]*T,y:c[1]*T,ph:Math.random()*6}));
   return g;
 }
 function startBrief(i){lvl=i;setMode('brief');}
 function startPlay(){
   PT.length=0;
+  attempts[lvl]=(attempts[lvl]||0)+1;
   G=loadLevel(lvl);
   setMode('play');
   Aud.S.confirm();
-  Aud.setTheme(G.d.th.music);
+  Aud.setTheme(G.d.th.music);Aud.ambient(G.d.th.bg);
   say(G.flight?'Ashling':'Wren',G.d.opening);
   if(typeof onLevelStart==='function')onLevelStart();
 }
@@ -319,8 +334,8 @@ function makeChoice(k){ // k = 1..3
   if(G.d.finale){
     if(k===3&&stats.gems<BREAK_GEMS)return;
     if(k<1||k>3)return;
-    G.choice=['puppet','burn','break'][k-1];finishLevel();
-  } else if(k===1||k===2){G.choice=k===1?'return':'leverage';finishLevel();}
+    G.choice=['puppet','burn','break'][k-1];setMode('play');beginVictory();
+  } else if(k===1||k===2){G.choice=k===1?'return':'leverage';setMode('play');beginVictory();}
 }
 function continueFromWin(){
   if(lvl===0)setMode('court');
@@ -344,11 +359,12 @@ function press(k){
   else if(mode==='end'&&k==='enter')toTitle();
   else if(mode==='pause'&&(k==='escape'||k==='p'||k==='enter'))pauseGame(false);
   else if(mode==='play'&&(k==='escape'||k==='p'))pauseGame(true);
+  else if(mode==='play'&&G.cine)skipCine();
   else if(mode==='play')playPress(k);
   if(k==='m'){settings.sfx=!settings.sfx;settings.music=settings.sfx;Aud.setOpt('sfx',settings.sfx);Aud.setOpt('music',settings.music);saveSettings();if(typeof UI!=='undefined')UI.refresh();}
 }
 function toTitle(){
-  Aud.fire(false);Aud.setTheme({root:73,mode:'minor',tempo:.6});
+  Aud.fire(false);Aud.ambient(null);Aud.setTheme({root:73,mode:'minor',tempo:.6});
   G=null;PT.length=0;setMode('title');
 }
 function playPress(k){
@@ -356,7 +372,10 @@ function playPress(k){
   else if(k==='q')useSmoke();
   else if(k==='r')useBell();
   else if(k==='f')useFlute();
-  else if(k==='shift')dashPress();
+  else if(k==='shift'){if(G.active==='wren'){if(G.time-(G.lastShift||-9)<.3)rollPress();G.lastShift=G.time;}else dashPress();}
+  else if(k==='c')rollPress();
+  else if(k===' '&&G.active==='wren')strikePress();
+  else if(k==='e'&&G.active==='ash'&&!G.flight)novaPress();
   else if(k==='n'){settings.minimap=!settings.minimap;saveSettings();}
 }
 function swapChar(){
@@ -371,12 +390,13 @@ function useSmoke(){
 }
 function lureNear(x,y,r,noise){
   for(const g of G.guards){
-    if(g.stun>0||(noise&&g.boss))continue;
+    if(g.stun>0||(noise&&g.boss)||g.eng)continue;
     if(Math.hypot(g.x-x,g.y-y)<r&&los(g.x,g.y,x,y)){
       if(!g.lure&&!g.ret)g.back={x:g.x,y:g.y};
       g.lure={x,y,t:3};g.ret=false;g.quest=1.4;
     }
   }
+  for(const f of G.foes||[]){if(f.state!=='dead'&&Math.hypot(f.x-x,f.y-y)<r*.8)f.lure={x,y,t:3};}
 }
 function useBell(){
   if(G.active!=='wren'||G.gad.bell<=0)return;
@@ -400,7 +420,7 @@ function useFlute(){
   }
   let best=null,bd=3*T;
   for(const k in G.doors){
-    const d=G.doors[k];if(d.open)continue;
+    const d=G.doors[k];if(d.open||d.gate)continue;
     const dd=Math.hypot(d.x*T+16-G.wren.x,d.y*T+16-G.wren.y);
     if(dd<bd){bd=dd;best=d;}
   }
@@ -412,10 +432,12 @@ function useFlute(){
   lureNear(G.wren.x,G.wren.y,8*T);
   say('Ashling','Subtle. Real subtle.');
 }
+function dashCD(){return hasRelic('forgeheart')?1.7:2.6;}
 function dashPress(){
-  if(G.active!=='ash'||G.dash.t>0||G.dash.cd>0)return;
+  if(G.active!=='ash'||G.dash.t>0||G.dash.ch<=0||G.cine)return;
   const A=G.ash;
-  G.dash.t=.22;G.dash.cd=hasRelic('forgeheart')?1.7:2.6;G.dash.a=A.face;G.dash.hit=new Set();
+  G.dash.ch--;if(G.dash.cd<=0)G.dash.cd=dashCD();
+  G.dash.t=.22;G.dash.a=A.face;G.dash.hit=new Set();
   Aud.S.dash();burst(A.x,A.y,10,'#ffb060',90,.4,2.5,{add:true});
 }
 function openCrack(c){
@@ -456,6 +478,8 @@ function stepGuard(g,dt){
   if(moveG(g,w[0],w[1],dt,g.spd)){g.i=(g.i+1)%g.wp.length;g.pause=.6;}
 }
 function completeTarget(t){
+  if(t.kind==='insp'){readInspect(t.ref);return;}
+  if(t.kind==='chest'){openChest(t.ref);return;}
   if(t.kind==='door'){t.ref.open=true;Aud.S.open();
     burst(t.ref.x*T+16,t.ref.y*T+16,10,'#c9a06a',50,.6,2.5,{k:'smoke',gr:4});return;}
   const it=t.ref;it.done=true;
@@ -491,9 +515,9 @@ function completeTarget(t){
 function findTarget(A){
   let tgt=null,bd=1e9;
   for(const k in G.doors){
-    const d=G.doors[k];if(d.open||d.sealed)continue;
+    const d=G.doors[k];if(d.open||d.sealed||d.gate)continue;
     const dd=Math.hypot(d.x*T+16-A.x,d.y*T+16-A.y);
-    if(dd<44&&dd<bd){bd=dd;tgt={kind:'door',ref:d,need:.9,x:d.x*T+16,y:d.y*T+16,label:'Pick lock'};}
+    if(dd<44&&dd<bd){bd=dd;tgt={kind:'door',ref:d,need:.9*(hasT('quick')?.7:1),x:d.x*T+16,y:d.y*T+16,label:'Pick lock'};}
   }
   for(const it of G.items){
     if('OPLHC'.includes(it.type)&&!it.done&&
@@ -501,9 +525,11 @@ function findTarget(A){
       const dd=Math.hypot(it.x-A.x,it.y-A.y);
       if(dd<34&&dd<bd){bd=dd;
         const lab={O:G.d.song?'Take the ledger':lvl===0?'Steal the egg':G.d.timeshift?'Take the signet':'Swap the seal',P:G.flight?'Drop the letter':G.d.timeshift?'Plant the treaty':'Poison the cup',L:'Learn the Song',H:'Free Perrin',C:'Snuff the candle'}[it.type];
-        tgt={kind:'item',ref:it,need:it.type==='H'?1.6:it.type==='C'?.8:1.2,x:it.x,y:it.y,label:lab};}
+        tgt={kind:'item',ref:it,need:(it.type==='H'?1.6:it.type==='C'?.8:1.2)*(hasT('quick')?.7:1),x:it.x,y:it.y,label:lab};}
     }
   }
+  for(const n of G.insp||[]){if(n.done)continue;const dd=Math.hypot(n.x-A.x,n.y-A.y);if(dd<36&&dd<bd){bd=dd;tgt={kind:'insp',ref:n,need:.55,x:n.x,y:n.y,label:'Examine'};}}
+  for(const ch of G.chests||[]){if(ch.open)continue;const dd=Math.hypot(ch.x-A.x,ch.y-A.y);if(dd<38&&dd<bd){bd=dd;tgt={kind:'chest',ref:ch,need:1,x:ch.x,y:ch.y,label:'Open chest'};}}
   return tgt;
 }
 function explode(it){
@@ -519,11 +545,14 @@ function explode(it){
   for(const g of G.guards){
     if(g.spin)continue;
     if(Math.hypot(g.x-x,g.y-y)<R&&los(x,y,g.x,g.y)){
-      if(g.boss){if(g.kind!=='candle'||G.candlesLit===0){g.hp-=10;g.hurt=.3;floatText(g.x,g.y-24,'-10','#ff8a60',13);}continue;}
+      if(g.boss){bossHit(g,{type:'barrel',sx:x,sy:y});continue;}
       g.stun=Math.max(g.stun,g.kind==='brute'?2:4.5);hit++;G.st.stuns++;
       floatText(g.x,g.y-20,'STUNNED','#ffd27a');
     }
   }
+  for(const f of G.foes)if(f.state!=='dead'&&Math.hypot(f.x-x,f.y-y)<R){const a=Math.atan2(f.y-y,f.x-x);damageFoe(f,3,{kx:Math.cos(a)*300,ky:Math.sin(a)*300,stagger:true,sx:x,sy:y,back:true});}
+  for(const pp of G.pots)if(pp.hp>0&&Math.hypot(pp.x*T+16-x,pp.y*T+16-y)<R)breakPot(pp);
+  igniteNear(x,y,R);
   for(const o of G.items)if(o.type==='o'&&!o.done&&Math.hypot(o.x-x,o.y-y)<2.6*T)o.fuse=.28;
   for(const k in G.cracks){const c=G.cracks[k];if(Math.hypot(c.x*T+16-x,c.y*T+16-y)<2.4*T){openCrack(c);}}
   if(!G.flight&&Math.hypot(G.wren.x-x,G.wren.y-y)<1.5*T){G.alert=Math.min(.95,G.alert+.3);say('Wren','Too close. That stung.');}
@@ -552,6 +581,7 @@ function collectItem(it,by){
     Aud.S.relic();burst(x,y,60,'#ffe9a0',170,1.6,3,{add:true,g:-20,dr:.8});G.rings.push({x,y,t:1.2,r:140,c:'255,230,150'});
     G.flash={t:.5,c:'255,235,170'};shake(4);
     G.relicNow=RELICS[key];
+    if(G.trial&&G.trial.state==='idle')startTrial();
     toast('RELIC: '+RELICS[key].name,RELICS[key].desc,'#ffe9a0');
   } else if(it.type==='s'&&it.lore){
     G.gotLore.push(it.lore.t);if(it.secret)G.secretsFound++;
@@ -560,12 +590,14 @@ function collectItem(it,by){
   }
 }
 function update(dt){
-  G.time+=dt;stats.time+=dt;
-  if(G.intro>0)G.intro-=dt;
+  G.time+=dt;
+  if(G.cine){stepCine(dt);return;}
+  stats.time+=dt;
   G.candlesLit=G.items.filter(i=>i.type==='C'&&!i.done).length;
   const A=G.active==='wren'?G.wren:G.ash;
   const dashing=G.dash.t>0;
   G.dash.cd=Math.max(0,G.dash.cd-dt);
+  if(G.dash.ch<G.dash.max&&G.dash.cd<=0){G.dash.ch++;if(G.dash.ch<G.dash.max)G.dash.cd=dashCD();}
   let mx0=(keys['d']||keys['arrowright']?1:0)-(keys['a']||keys['arrowleft']?1:0);
   let my0=(keys['s']||keys['arrowdown']?1:0)-(keys['w']||keys['arrowup']?1:0);
   let jm=0;
@@ -593,16 +625,30 @@ function update(dt){
       if(g.spin||dd.hit.has(g))continue;
       if(Math.hypot(g.x-A.x,g.y-A.y)<(g.boss?26:22)){
         dd.hit.add(g);
-        if(g.kind==='brute'||(g.boss&&g.kind==='candle'&&G.candlesLit>0)){
+        if(g.boss){
+          if(!bossHit(g,{type:'dash',sx:A.x,sy:A.y})){Aud.S.deflect();burst(g.x,g.y,10,'#cfd6e6',100,.3,1.6,{add:true});floatText(g.x,g.y-26,'BLOCKED','#cfd6e6',10);}
+          dd.t=0;
+        } else if(g.kind==='brute'){
           Aud.S.deflect();burst(g.x,g.y,10,'#cfd6e6',100,.3,1.6,{add:true});dd.t=0;G.alert=Math.min(.95,G.alert+.08);floatText(g.x,g.y-22,'BLOCKED','#cfd6e6',10);
-        } else if(g.boss){g.hp-=8;g.hurt=.2;Aud.S.hit();shake(5);floatText(g.x,g.y-26,'-8','#ff8a60',13);
-          if(g.hp<=0){g.hp=0;g.dead=true;g.stun=1e9;}
         } else if(g.stun<=0){
           g.stun=hasRelic('forgeheart')?4:2.8;G.st.stuns++;G.alert=Math.min(.95,G.alert+.08);
           Aud.S.hit();shake(4);burst(g.x,g.y,14,'#ffd27a',130,.4,2,{add:true});floatText(g.x,g.y-20,'STUNNED','#ffd27a');
         }
       }
     }
+    for(const f of G.foes){
+      if(f.state==='dead'||dd.hit.has(f))continue;
+      if(Math.hypot(f.x-A.x,f.y-A.y)<f.r+16){dd.hit.add(f);damageFoe(f,hasRelic('forgeheart')?2:1,{kx:Math.cos(dd.a)*320,ky:Math.sin(dd.a)*320,hs:.06,pn:.5,sh:5,stagger:true,sx:A.x,sy:A.y});}
+    }
+    for(const pp of G.pots)if(pp.hp>0&&Math.hypot(pp.x*T+16-A.x,pp.y*T+16-A.y)<22)breakPot(pp);
+    for(const it of G.items)if(it.type==='o'&&!it.done&&it.fuse<0&&Math.hypot(it.x-A.x,it.y-A.y)<22)it.fuse=.2;
+    moving=true;
+  } else if(G.roll.t>0&&G.active==='wren'){
+    const rr_=G.roll;rr_.t-=dt;
+    const sp=270*dt,nx=A.x+Math.cos(rr_.a)*sp,ny=A.y+Math.sin(rr_.a)*sp;
+    if(!blocked(nx,A.y,8))A.x=nx;if(!blocked(A.x,ny,8))A.y=ny;
+    A.face=rr_.a;if(Math.random()<.6)pt(A.x,A.y+4,(Math.random()-.5)*20,(Math.random()-.5)*20,.4,3,'rgba(150,140,125,.6)',{k:'smoke',gr:5});
+    if(rr_.t<=0)rr_.grace=.12;
     moving=true;
   } else if(mx0||my0){
     const l=Math.hypot(mx0,my0),mx=mx0/l,my=my0/l;
@@ -625,7 +671,10 @@ function update(dt){
       G.rings.push({x:O.x,y:O.y,t:.4,r:30,c:'180,120,255'});
     }
   }
-  // idle follower sways toward its partner a little (cosmetic, no collision effect)
+  applyKnockback(G.wren,dt);applyKnockback(G.ash,dt);
+  if(moving)G.lastMoveT=G.time;
+  trackMotion(G.wren,dt);trackMotion(G.ash,dt);easeFace(G.wren,dt,16);easeFace(G.ash,dt,16);
+  for(const gg of G.guards)easeFace(gg,dt,12);
   // hostage follows Wren
   if(G.host&&G.host.on){
     const h=G.host,w=G.wren,hd=Math.hypot(w.x-h.x,w.y-h.y);
@@ -680,7 +729,7 @@ function update(dt){
   const firing=G.active==='ash'&&fireHeld&&!dashing;
   if(firing!==G.fireOn){G.fireOn=firing;Aud.fire(firing);}
   if(firing){
-    const a=G.ash,range=62+Math.min(stats.gems,12)*8+(hasRelic('stormglass')?14:0);
+    const a=G.ash,range=62+Math.min(stats.gems,12)*8+(hasRelic('stormglass')?14:0)+(hasT('lung')?18:0);
     G.fireRange=range;
     for(let i=0;i<3;i++){
       const dd=Math.random()*range,sp=(Math.random()-.5)*.7,an=a.face+sp;
@@ -693,23 +742,18 @@ function update(dt){
       if(g.stun>0||!inCone(g.x,g.y))continue;
       const behind=angDiff(Math.atan2(a.y-g.y,a.x-g.x),g.face)>1.3;
       if(g.boss){
-        if(g.kind==='candle'&&G.candlesLit>0){
-          g.hurt=.1;
-          if(!G.shieldSaid){G.shieldSaid=true;say('Ashling','My fire slides right off. The candles are shielding him!');}
-        } else if(behind){
-          const was=g.hp;g.hp-=22*dt;g.hurt=.15;
-          if(Math.floor(was/10)!==Math.floor(g.hp/10)){Aud.S.hit();floatText(g.x+(Math.random()-.5)*20,g.y-26,'-10','#ff8a60',12);}
-          if(g.hp<=0){g.hp=0;g.dead=true;g.stun=1e9;shake(10);Aud.S.boom();burst(g.x,g.y,50,'#ffb040',200,1.2,4,{add:true});
-            if(g.kind==='candle')say('Candlemaker','Burn it, crown it, break it. I was always one step ahead.');
-            else say('Ashling','The bell is quiet. So is he. Mostly.');}
-        } else G.alert=Math.min(.95,G.alert+.5*dt);
+        bossHit(g,{type:'fire',dt:dt,sx:a.x,sy:a.y});
       } else if(g.kind==='brute'){
         if(behind){g.stun=4;G.st.stuns++;G.alert=Math.min(.95,G.alert+.15);Aud.S.stun();floatText(g.x,g.y-22,'STUNNED','#ffd27a');}
         else{G.alert=Math.min(.95,G.alert+.5*dt);g.hurt=.1;
           if(Math.random()<dt*8){Aud.S.deflect();burst(g.x+Math.cos(g.face)*10,g.y+Math.sin(g.face)*10,3,'#cfd6e6',90,.25,1.4,{add:true});}
           if(!G.bruteSaid){G.bruteSaid=true;say('Ashling','The shield eats my fire! Get behind him.');}}
-      } else {g.stun=5;G.st.stuns++;G.alert=Math.min(.95,G.alert+.15);Aud.S.stun();floatText(g.x,g.y-20,'STUNNED','#ffd27a');}
+      } else {g.stun=5+(hasT('searing')?2:0);g.ko=false;G.st.stuns++;G.alert=Math.min(.95,G.alert+.15);Aud.S.stun();floatText(g.x,g.y-20,'STUNNED','#ffd27a');}
     }
+    for(const f of foesInCone(a,range,.6))damageFoe(f,1.7*dt*(hasT('searing')?1.4:1),{fire:true,sx:a.x,sy:a.y});
+    for(const pp of G.pots)if(pp.hp>0&&inCone(pp.x*T+16,pp.y*T+16))breakPot(pp);
+    for(const b of G.braz||[]){if(!b.lit&&inCone(b.x,b.y)){b.p+=dt;if(Math.random()<dt*16)pt(b.x+rrand(-8,8),b.y-6,0,-20,.4,2,'#ffb060',{add:true});if(b.p>=.6)lightBrazier(b);}else if(!b.lit)b.p=Math.max(0,b.p-dt*.5);}
+    G.proj=G.proj.filter(o=>!(inCone(o.x,o.y)&&(burst(o.x,o.y,5,'#ffb060',70,.25,1.6,{add:true}),true)));
     for(const it of G.items){
       if(it.type==='B'&&!it.done&&inCone(it.x,it.y)){
         it.p+=dt;
@@ -741,12 +785,13 @@ function update(dt){
   if(G.host&&G.host.on)targets.push(G.host);
   for(const g of G.guards){
     g.seeing=false;
+    if(g.eng){g.was=false;continue;}
     if(g.bang>0)g.bang-=dt;if(g.quest>0)g.quest-=dt;
     if(g.stun>0){g.was=false;continue;}
     for(const t of targets){
       const isActive=t.host?true:(t===G.wren)===(G.active==='wren');
       let mul=(t===G.ash?1.45:1)*(isActive?1:.6)*G.rangeMul;
-      if(t===G.wren&&G.sneak)mul*=.6;
+      if(t===G.wren&&G.sneak)mul*=hasT('cloak')?.45:.6;
       const range=5.2*T*mul*(g.rm||1)*(g.kr||1),dx=t.x-g.x,dy=t.y-g.y,dist=Math.hypot(dx,dy);
       let see=dist<range&&(dist<T*.9||angDiff(Math.atan2(dy,dx),g.face)<(g.half||.62))&&los(g.x,g.y,t.x,t.y);
       if(!see&&g.kind==='hound'&&dist<2.5*T*mul&&los(g.x,g.y,t.x,t.y))see=true; // the nose knows
@@ -766,10 +811,10 @@ function update(dt){
   if(best>0)G.alert+=best*dt*G.gain;else G.alert-=dt*.22*G.decay;
   G.alert=Math.max(0,G.alert);
   G.st.maxAlert=Math.max(G.st.maxAlert,Math.min(1,G.alert));
-  for(const g of G.guards)stepGuard(g,dt);
+  for(const g of G.guards){if(!g.eng)stepGuard(g,dt);}
   // Bell-Warden: the bell tolls; whoever you control must stand still when it lands
   const B=G.boss;
-  if(B){
+  if(B&&!B.eng){
     if(B.hurt>0)B.hurt-=dt;
     if(B.kind==='candle'&&!B.dead){
       B.blinkT-=dt;
@@ -799,6 +844,7 @@ function update(dt){
         if(B.toll<=0&&moving&&Math.hypot(A.x-B.x,A.y-B.y)<7*T){G.alert+=.3;say('Wren','It heard me move.');}}
     }
   }
+  stepCombat(dt);
   // timers
   G.smoke=G.smoke.filter(s=>(s.t-=dt)>0);
   G.rings=G.rings.filter(r=>(r.t-=dt)>0);
@@ -814,7 +860,7 @@ function update(dt){
   const ex=G.flight?G.ash:G.wren;
   if(G.exitOpen&&(G.flight||G.active==='wren')&&Math.hypot(ex.x-G.exit.x,ex.y-G.exit.y)<20
      &&(!G.host||Math.hypot(G.host.x-G.exit.x,G.host.y-G.exit.y)<90)){
-    if(G.d.choice||G.d.finale){setMode('choice');Aud.fire(false);}else finishLevel();
+    if(G.d.choice||G.d.finale){setMode('choice');Aud.fire(false);}else beginVictory();
   }
   if(G.alert>=1){
     setMode('lose');stats.caught++;Aud.fire(false);Aud.S.lost();shake(9);
@@ -839,6 +885,9 @@ function finishLevel(){
   run.secrets[lvl]=Math.max(run.secrets[lvl]||0,G.secretsFound);
   for(const r of G.gotRelics){if(!run.relics.includes(r))run.relics.push(r);if(!meta.relics.includes(r))meta.relics.push(r);}
   for(const t of G.gotLore){if(!run.lore.includes(t))run.lore.push(t);if(!meta.lore.includes(t))meta.lore.push(t);}
+  const bonus={S:150,A:100,B:60,C:30}[G.rank]||0,secB=G.secretsFound*25+G.gotRelics.length*50;
+  G.reward={loot:G.cinders,rank:cinderValue(bonus),secrets:cinderValue(secB)};
+  run.cinders+=G.reward.loot+G.reward.rank+G.reward.secrets;
   const last=lvl+1>=LEVELS.length;
   if(last)writeSave(null,null,true);
   else writeSave(lvl===0?'court':'brief',lvl+1);

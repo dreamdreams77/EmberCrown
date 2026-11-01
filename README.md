@@ -11,39 +11,46 @@ A stealth-action prototype: a spy and her runt dragon infiltrate feuding houses 
 | Action | Keyboard / mouse | Touch |
 |---|---|---|
 | Move | WASD / arrows | Drag the left side of the screen (floating joystick) |
-| Sneak (Wren) / Ember Dash (Ashling) | Shift | SNEAK toggle / DASH (same button) |
-| Pick lock, steal, poison (hold) | E, or left-click as Wren | ACT (hold) |
-| Dragon fire (hold) | Space, or left-click as Ashling (aim with the mouse) | FIRE (hold) |
+| Strike (Wren) / Fire (Ashling) | Space, or left-click (aim with the mouse) | STRIKE / FIRE (hold) |
+| Sneak / roll (Wren), Dash (Ashling) | Shift (tap twice, or C, to roll) | SNEAK toggle (double-tap to roll) / DASH |
+| Interact: pick, steal, open, examine (hold) | E | ACT (hold) |
+| Ember Nova (Ashling, after learning it) | E | NOVA (the ACT button) |
 | Swap Wren and Ashling | Tab, or right-click | SWAP |
 | Smoke / whisper bell / bone flute | Q / R / F, or click the slot | SMOKE / BELL / FLUTE |
-| Pause, mute, minimap | Esc or P, M, N | Pause button, pause menu |
+| Wide scouting view | hold Z | tap the minimap |
+| Pause, mute, minimap | Esc or P, M, N | Pause button |
 
-The layout adapts to phones, tablets and desktops: portrait phones get a dedicated control panel under the game view, landscape devices overlay thumb controls at the corners, and the camera zooms and follows the active character on small screens.
+The camera follows the action close-up on every screen size and leans toward threats. Portrait phones get a control panel under the game view, landscape devices overlay thumb controls at the corners.
 
 ## What's in the game
 
-- **Seven missions** with three endings and three difficulties (Courier, Spy, Shadow), driven by each house's Favor, Fear and Ruin.
-- **Lit, animated world.** Baked stone, wood, marble and forge floors; torch-lit walls with banners and windows; dynamic lighting and shadows; sea, fog, embers and ash; rats, bats and gulls.
-- **Secrets.** Cracked walls hide annex rooms with ember caches, lore scrolls and one permanent **relic** per mission. Burn a crack with Ashling's fire, or dash into it.
-- **Ember Dash.** Ashling's charge stuns a guard, shatters cracks and chips bosses.
-- **Oil barrels.** Fire sets them off: a loud blast that stuns nearby guards and can open cracks.
-- **Guard types.** Hounds smell you at close range, archers see far through a narrow cone, shielded brutes only fall to fire from behind. Guards now investigate where they last saw you.
-- **Progression.** Ember gems extend fire range, relics grant lasting bonuses, missions are ranked S to C, and the Codex records relics and lore.
-- **Saves.** Progress, houses, relics and settings persist in `localStorage`; Continue picks up at the next mission.
-- **Audio.** Procedural music and effects (WebAudio), no asset files. Toggle in the pause menu.
+- **Seven missions**, three endings, three difficulties (Courier, Spy, Shadow). Stealth is still the core: guards see in cones, hounds smell, archers snipe, brutes carry shields.
+- **Cinematics.** Every mission opens with a fly-over of its objectives, bosses make a dramatic entrance and fall in slow motion, and each mission ends on a victory sequence.
+- **Action combat.** Wren strikes in a three-hit combo, takes guards down silently from behind, and rolls through danger. Ashling breathes fire, dashes (with invulnerability), and learns Ember Nova. Enemies telegraph every attack: Cinderlings lunge, Ashwisps fire orbs, Hollow Husks slam the ground. You have hearts, i-frames, knockback and hit-stop.
+- **Boss fights.** The Bell-Warden slams, charges and tolls; the Candlemaker blinks, slashes, fires volleys and summons wisps while his candles shield him. Both have two phases and a stagger window that rewards good timing.
+- **Furnished, lit worlds.** Auto-dressed rooms with tables, benches, bookcases, anvils, statues and breakable pots; chandeliers, rafters and doorway lintels in the foreground; a parallax scenery backdrop beyond the walls; distinct atmosphere in every area.
+- **Exploration.** Each mission has a hidden **vault**: burn or dash through a cracked wall, light three braziers with Ashling's fire to open the inner gate, take the relic, survive the guardian trial, then open the reward chest. Examine glinting remains for story fragments; the Codex records everything.
+- **Progression.** Cinders (from pots, foes, chests, secrets and rank) buy permanent talents at the **Ember Forge**: 12 upgrades across Wren, Ashling and shared branches, including extra hearts, Twin Dash, Ember Nova and Phoenix Spark. Relics, ember gems and S-C mission ranks still count.
+- **Saves.** Progress, talents, cinders, relics and settings persist in `localStorage` (older saves keep working). Cinders and relics are only banked when a mission is completed.
+- **Audio.** Procedural music, ambient beds per area, and combat intensity layers. No asset files.
 
 ## Project layout
 
 ```
 index.html        page shell and touch control markup
-style.css         responsive layout, menus, touch controls
-js/data.js        missions, maps (with hidden annexes), relics, lore
-js/audio.js       procedural music and sound effects
-js/game.js        rules: stealth, gadgets, combat, saves
-js/render.js      baked tile layer, lighting, characters
-js/world.js       props, particles, ambience, world draw pass
-js/hud.js         HUD, minimap, animated title scene
-js/ui.js          menus, pause, codex, touch and mouse input
+style.css         responsive layout, menus, touch controls, Forge
+js/data.js        missions, maps and vault generator, relics, lore
+js/audio.js       procedural music, ambience and sound effects
+js/game.js        rules: stealth, gadgets, saves, main update
+js/render.js      camera, baked tile layer, lighting, guards
+js/cine.js        cinematic director (intro, boss, victory)
+js/props.js       furniture placement and art, foreground, vault interactables
+js/talents.js     Ember Forge talents
+js/combat.js      hearts, foes, projectiles, strikes, bosses
+js/actors.js      Wren, Ashling, foes, bosses, combat effects
+js/world.js       props, particles, ambience, parallax, world draw pass
+js/hud.js         HUD, minimap, screen effects, title scene
+js/ui.js          menus, Forge, pause, codex, touch and mouse input
 js/main.js        boot, main loop, adaptive quality
 ```
 

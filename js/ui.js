@@ -32,6 +32,14 @@ const TIPS=[
  'When a guard loses you they go to look. Break line of sight and move away quietly.',
  'The idle partner counts as curled up: much harder to spot. Swap before you scout.'
 ];
+const DOWNQ=[['Wren: Ow.','Ashling: That is your plan? Getting hit?'],['Wren: I had it under control.','Ashling: You were on the floor.'],['Ashling: Dodge. The word is dodge.','Wren: I know the word.']];
+const CTIPS=[
+ 'Telegraphs glow red before every big attack. Dash (Ashling) or roll (Wren, double-tap Shift or press C) through them: you are invulnerable while rolling.',
+ 'Enemies stagger after a heavy attack. That is your opening: hit them hard while they are dazed.',
+ 'Hold fire on a Cinderling and it never gets to lunge. Wisps die to a single dash.',
+ 'Smoke breaks line of sight, so foes lose track of you. A thrown bell pulls them away.',
+ 'Hollow Husks block most damage from the front. Slip behind them, or wait for the slam recovery.',
+ 'Spend cinders at the Ember Forge: extra hearts and Ember Nova make fights far easier.'];
 const QUIPS=[['Wren: ...that went poorly.','Ashling: I said nothing. Loudly.'],['Wren: They saw the dragon.','Ashling: They saw a very small, very menacing dragon.'],['Wren: Again?','Ashling: I had a plan. It involved less running.']];
 
 const UI=(()=>{
@@ -49,7 +57,9 @@ const UI=(()=>{
   }
   function onClick(e){
     const b=e.target.closest('[data-a]');if(!b||b.disabled)return;
-    Aud.init();b.blur();act(b.dataset.a,b);
+    Aud.init();b.blur();
+    if(b.dataset.a.startsWith('buy:')){if(buyTalent(b.dataset.a.slice(4))){const m=modal;if(m)m.firstChild.innerHTML=forgeHTML();}else Aud.S.back();return;}
+    act(b.dataset.a,b);
   }
   function diffChips(){return DIFFS.map((d,i)=>'<button type="button" tabindex="-1" class="chip'+(i===diff?' on':'')+'" data-a="diff'+i+'"><b>'+(i+1)+'</b> '+d.name+'</button>').join('');}
   function act(a,b){
@@ -66,7 +76,8 @@ const UI=(()=>{
       case'restart':pauseGame(false);startPlay();break;
       case'how':openModal(howHTML());break;
       case'codex':openModal(codexHTML());break;
-      case'close':closeModal();break;
+      case'close':closeModal();persistRun();if(mode==='brief'||mode==='win')show(mode);break;
+      case'forge':openModal(forgeHTML());break;
       case'sfx':settings.sfx=!settings.sfx;Aud.setOpt('sfx',settings.sfx);saveSettings();refresh();break;
       case'music':settings.music=!settings.music;Aud.setOpt('music',settings.music);saveSettings();refresh();break;
       case'minimap':settings.minimap=!settings.minimap;saveSettings();refresh();break;
@@ -87,13 +98,15 @@ const UI=(()=>{
   function howHTML(){
     return'<h2>How to play</h2><div class="howgrid">'+
     '<div><h3>Keyboard &amp; mouse</h3><ul>'+
-    '<li><kbd>WASD</kbd> / arrows &mdash; move</li><li><kbd>Shift</kbd> &mdash; sneak (Wren) / Ember Dash (Ashling)</li>'+
-    '<li><kbd>E</kbd> or left-click &mdash; hold to pick, steal, poison</li><li><kbd>Space</kbd> or left-click &mdash; Ashling breathes fire (aim with the mouse)</li>'+
-    '<li><kbd>Tab</kbd> or right-click &mdash; swap Wren and Ashling</li><li><kbd>Q</kbd> smoke &nbsp;<kbd>R</kbd> whisper bell &nbsp;<kbd>F</kbd> bone flute</li>'+
+    '<li><kbd>WASD</kbd> / arrows &mdash; move</li><li><kbd>Space</kbd> &mdash; Wren strikes (hit from behind to take a guard down silently); Ashling breathes fire</li>'+
+    '<li><kbd>Shift</kbd> &mdash; Wren sneaks (tap twice to roll, or <kbd>C</kbd>); Ashling dashes</li>'+
+    '<li><kbd>E</kbd> &mdash; hold to pick, steal, open, examine; Ashling: Ember Nova once learned</li>'+
+    '<li>Mouse: left-click strikes / fires toward the cursor; right-click swaps. <kbd>Tab</kbd> swaps too</li>'+
+    '<li><kbd>Q</kbd> smoke &nbsp;<kbd>R</kbd> whisper bell &nbsp;<kbd>F</kbd> bone flute &nbsp;<kbd>Z</kbd> hold for a wide view</li>'+
     '<li><kbd>Esc</kbd> pause &nbsp;<kbd>M</kbd> mute &nbsp;<kbd>N</kbd> minimap</li></ul></div>'+
-    '<div><h3>Touch</h3><ul><li>Drag the left side to move.</li><li><b>ACT</b> hold to interact. <b>FIRE</b> hold to breathe fire.</li>'+
-    '<li><b>SNEAK</b> toggles (Wren); the same button becomes <b>DASH</b> for Ashling.</li><li><b>SWAP</b> changes character. Gadget buttons show how many you have left.</li></ul></div>'+
-    '<div class="wide"><h3>The goal</h3><p>Stay out of the yellow cones. Do not let Suspicion fill. Burn beacons with Ashling, steal with Wren. Hunt for cracked walls, lore scrolls and relics &mdash; secrets reward you with permanent powers.</p></div></div>'+
+    '<div><h3>Touch</h3><ul><li>Drag the left side to move. Tap the minimap for a wide scouting view.</li><li><b>STRIKE</b> (Wren) / <b>FIRE</b> (Ashling, hold). <b>ACT</b> holds to interact; for Ashling it becomes <b>NOVA</b>.</li>'+
+    '<li><b>SNEAK</b> toggles; double-tap it to roll. For Ashling it becomes <b>DASH</b>.</li><li><b>SWAP</b> changes character. Gadget buttons show remaining uses.</li></ul></div>'+
+    '<div class="wide"><h3>The goal</h3><p>Stay out of the yellow cones. Do not let Suspicion fill. Burn beacons with Ashling, steal with Wren. Learn enemy attack tells (red telegraphs), dodge with roll or dash, and spend cinders at the Ember Forge between missions. Hunt cracked walls, vault trials, relics and lore.</p></div></div>'+
     btn('Close','close','primary');
   }
   function codexHTML(){
@@ -101,8 +114,17 @@ const UI=(()=>{
       return'<div class="cx '+(have?'':'locked')+'">'+ricon(have?r.icon:'')+'<div><b>'+(have?r.name:'Unknown relic')+'</b><span>'+(have?r.desc:'Hidden behind a cracked wall somewhere.')+'</span></div></div>';}).join('');
     const lore=LORE.map((l,i)=>l.map(s=>{const have=meta.lore.includes(s.t);
       return'<div class="cx lore '+(have?'':'locked')+'"><div><b>'+(have?s.t:'???')+'</b><span>'+(have?s.x:'Found in '+LEVELS[i].name+'.')+'</span></div></div>';}).join('')).join('');
-    return'<h2>Codex</h2><div class="codex"><h3>Relics</h3>'+rl+'<h3>Lore</h3>'+lore+'</div>'+btn('Close','close','primary');
+    const disc=meta.disc.length?meta.disc.map(t=>'<div class="cx lore"><div><b>'+t+'</b></div></div>').join(''):'<div class="cx lore locked"><div><b>???</b><span>Examine the glinting bones and notes you find in each level.</span></div></div>';
+    return'<h2>Codex</h2><div class="codex"><h3>Relics</h3>'+rl+'<h3>Lore</h3>'+lore+'<h3>Discoveries ('+meta.disc.length+')</h3>'+disc+'</div>'+btn('Close','close','primary');
   }
+  function forgeHTML(){
+    const col=(br,title)=>'<div class="fcol"><h3>'+title+'</h3>'+TALENTS.filter(t=>t.branch===br).map(t=>{
+      const own=hasT(t.id),rq=talentReq(t),locked=!own&&rq&&!hasT(rq),aff=canBuy(t);
+      const st=own?'own':locked?'locked':aff?'buy':'poor';
+      return'<button type="button" tabindex="-1" class="tal '+st+'" data-a="buy:'+t.id+'"><b>'+t.name+'</b><span>'+t.desc+'</span><i>'+(own?'Learned':locked?'Needs '+TALENTS.find(x=>x.id===rq).name:t.cost+' cinders')+'</i></button>';}).join('')+'</div>';
+    return'<h2>The Ember Forge</h2><p class="forgec">'+run.cinders+' cinders</p><div class="forge">'+col('wren','Wren')+col('ash','Ashling')+col('both','Shared')+'</div>'+btn('Close','close','primary');
+  }
+  function forgeBadge(){return anyAffordable()?' <em class="dot"></em>':'';}
   function openModal(html){
     closeModal();
     const m=document.createElement('div');m.className='modal';m.innerHTML='<div class="card">'+html+'</div>';
@@ -133,7 +155,7 @@ const UI=(()=>{
         let fin='';if(d.finale){const hc=houseCounts();fin='<div class="stand"><span>Favor sends +'+Math.min(3,hc.f)+' whisper bells &middot; Fear stands down '+Math.min(3,hc.e)+' guards &middot; Ruin: he starts at '+(100-8*hc.r)+' HP</span></div>';}
         const rel=run.relics.length?'<div class="relrow">'+run.relics.map(k=>'<span title="'+RELICS[k].name+'">'+ricon(RELICS[k].icon)+'</span>').join('')+'</div>':'';
         screen('brief','<div class="bleft">'+sigil(d.sigil)+'<div class="mnum">Mission '+(lvl+1)+' of '+LEVELS.length+'</div><h2>'+d.name+'</h2><div class="house">'+d.house+'</div>'+rel+'</div>'+
-        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+btn('Begin mission','begin','primary big')+'<p class="foot">press <kbd>Enter</kbd></p></div>');
+        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+btn('Begin mission','begin','primary big')+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+'<p class="foot">press <kbd>Enter</kbd></p></div>');
       },
       court(){
         screen('court','<h2>The Whisper Court</h2><p class="lead">Before Gallowmere you may turn one servant of House Grell.</p><div class="cards">'+
@@ -163,11 +185,14 @@ const UI=(()=>{
         '<div><b>'+G.gems+' / '+tot+'</b><span>Ember gems</span></div><div><b>'+fmt(G.time)+'</b><span>Time</span></div>'+
         '<div><b>'+G.secretsFound+' / '+G.secretsTotal+'</b><span>Secrets</span></div><div><b>'+G.st.stuns+'</b><span>Guards stunned</span></div></div></div>'+
         relic+'<div class="outl">'+G.outLines.map(l=>'<p>'+l+'</p>').join('')+'</div>'+
-        '<p class="small">Total gems: '+stats.gems+' (more gems, longer dragon fire)</p>'+btn('Continue','next','primary big')+'<p class="foot">press <kbd>Enter</kbd></p>');
+        '<div class="cinrow"><b>+'+(G.reward.loot+G.reward.rank+G.reward.secrets)+' cinders</b><span>loot '+G.reward.loot+' &middot; rank '+G.reward.rank+' &middot; secrets '+G.reward.secrets+'</span></div>'+
+        '<p class="small">Total gems: '+stats.gems+' (more gems, longer dragon fire) &middot; Foes defeated: '+(G.st.kills||0)+' &middot; Takedowns: '+(G.st.takedowns||0)+'</p>'+
+        '<div class="row">'+btn('Ember Forge'+forgeBadge(),'forge','ghost')+btn('Continue','next','primary big')+'</div><p class="foot">press <kbd>Enter</kbd></p>');
       },
       lose(){
-        const q=QUIPS[Math.floor(Math.random()*QUIPS.length)],tip=TIPS[Math.floor(Math.random()*TIPS.length)];
-        screen('lose over','<h2 style="color:#ff6a5a">CAUGHT</h2><p class="lead">'+q[0]+'<br>'+q[1]+'</p><p class="tip"><b>Tip.</b> '+tip+'</p>'+
+        const down=G&&G.defeat==='down';
+        const q=down?DOWNQ[Math.floor(Math.random()*DOWNQ.length)]:QUIPS[Math.floor(Math.random()*QUIPS.length)],tip=(down?CTIPS:TIPS)[Math.floor(Math.random()*(down?CTIPS:TIPS).length)];
+        screen('lose over','<h2 style="color:#ff6a5a">'+(down?'OVERWHELMED':'CAUGHT')+'</h2><p class="lead">'+q[0]+'<br>'+q[1]+'</p><p class="tip"><b>Tip.</b> '+tip+'</p>'+
         '<div class="row">'+btn('Retry mission','retry','primary big')+btn('Quit to title','title','ghost')+'</div><p class="foot">press <kbd>Enter</kbd></p>');
       },
       pause(){
@@ -217,12 +242,14 @@ const UI=(()=>{
       const down=e=>{
         e.preventDefault();Aud.init();
         if(mode!=='play')return;
+        if(G&&G.cine){skipCine();return;}
         try{b.setPointerCapture(e.pointerId);}catch(_){}
         b.classList.add('down');
         if(navigator.vibrate)try{navigator.vibrate(8);}catch(_){}
         switch(a){
-          case'act':touch.act=true;break;case'fire':touch.fire=true;break;
-          case'shift':if(G.active==='wren'){touch.sneak=!touch.sneak;}else dashPress();break;
+          case'act':if(G.active==='ash'&&!G.flight)novaPress();else touch.act=true;break;
+          case'fire':if(G.active==='wren'&&!G.flight)strikePress();else touch.fire=true;break;
+          case'shift':if(G.active==='wren'){touch.sneak=!touch.sneak;if(G.time-(G.lastShift||-9)<.32)rollPress();G.lastShift=G.time;}else dashPress();break;
           case'swap':swapChar();break;case'smoke':useSmoke();break;case'bell':useBell();break;case'flute':useFlute();break;
         }
         tick(true);
@@ -243,7 +270,7 @@ const UI=(()=>{
   function tick(force){
     if(mode!=='play'||!G)return;
     const wr=G.active==='wren';
-    const st=[wr,G.ash.on,G.flight,G.gad.smoke,G.gad.bell,G.gad.flute,G.dash.cd>0,touch.sneak,G.exitOpen].join();
+    const st=[wr,G.ash.on,G.flight,G.gad.smoke,G.gad.bell,G.gad.flute,G.dash.ch,G.nova.cd>0,touch.sneak,G.exitOpen,hasT('nova')].join();
     if(!force&&st===T_.last)return;T_.last=st;
     const set=(a,dis,badge,label)=>{
       const b=document.querySelector('#btns [data-act="'+a+'"]');if(!b)return;
@@ -251,14 +278,15 @@ const UI=(()=>{
       if(badge!==undefined){const i=b.querySelector('i');if(i)i.textContent=badge;}
       if(label){const s=b.querySelector('span');if(s&&s.textContent!==label)s.textContent=label;}
     };
-    set('act',!(wr||G.flight));
-    set('fire',wr&&!G.flight||!G.ash.on&&!G.flight);
+    const gA=G.ash.on&&!G.flight;
+    set('act',G.flight?false:(wr?false:!hasT('nova')||G.nova.cd>0),undefined,wr||G.flight?'ACT':'NOVA');
+    set('fire',G.flight?false:(!wr&&!G.ash.on),undefined,wr&&!G.flight?'STRIKE':'FIRE');
     set('swap',!G.ash.on||G.flight);
     set('smoke',!wr||G.gad.smoke<=0||G.flight,G.gad.smoke);
     set('bell',!wr||G.gad.bell<=0||G.flight,G.gad.bell);
     set('flute',!wr||G.gad.flute<=0||G.flight,G.gad.flute>50?'♪':G.gad.flute);
     const sh=document.querySelector('#btns [data-act="shift"]');
-    if(sh){sh.querySelector('span').textContent=wr?'SNEAK':'DASH';sh.classList.toggle('dis',!wr&&G.dash.cd>0);sh.classList.toggle('latched',wr&&touch.sneak);}
+    if(sh){sh.querySelector('span').textContent=wr?'SNEAK':'DASH';sh.classList.toggle('dis',!wr&&G.dash.ch<=0);sh.classList.toggle('latched',wr&&touch.sneak);}
     document.querySelectorAll('#btns .gad').forEach(g=>g.style.display=G.flight?'none':'');
   }
   /* ---------- mouse on canvas ---------- */
@@ -273,12 +301,16 @@ const UI=(()=>{
     cv.addEventListener('pointerdown',e=>{
       Aud.init();
       if(mode!=='play')return;
+      if(G&&G.cine){skipCine();return;}
       const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;
       if(G)mouse.world=screenToWorld(mouse.x,mouse.y);
       if(e.pointerType!=='mouse')return;
       for(const h of HIT)if(mouse.x>=h.x&&mouse.x<=h.x+h.w&&mouse.y>=h.y&&mouse.y<=h.y+h.h){Aud.S.click();h.fn();return;}
       if(e.button===2){swapChar();return;}
-      if(e.button===0){mouse.down=true;try{cv.setPointerCapture(e.pointerId);}catch(_){}}
+      if(e.button===0){
+        if(G.active==='wren'&&!G.prompt){mouse.world=screenToWorld(mouse.x,mouse.y);strikePress();return;}
+        mouse.down=true;try{cv.setPointerCapture(e.pointerId);}catch(_){}
+      }
     });
     const up=()=>{mouse.down=false;};
     cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);

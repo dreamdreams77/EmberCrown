@@ -187,3 +187,18 @@ h1{font-size:clamp(34px,11vmin,104px);letter-spacing:.1em;line-height:1;backgrou
   .win,.lose,.end{gap:6px}
 }
 @media (prefers-reduced-motion:reduce){.screen>*,h1,.crown{animation:none!important}}
+
+/* forge */
+.forgec{font:700 clamp(18px,3.4vmin,26px) var(--head);color:#ffd27a;text-align:center;width:100%}
+.forge{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.fcol{display:flex;flex-direction:column;gap:8px}.fcol h3{text-align:center}
+.tal{font:inherit;color:inherit;text-align:left;background:linear-gradient(#2a1d34,#1a1222);border:1px solid rgba(240,180,76,.35);border-radius:10px;padding:8px 10px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-height:48px;touch-action:manipulation;transition:transform .1s,border-color .15s}
+.tal b{font:700 clamp(12px,2vmin,14px) var(--head);color:var(--gold)}.tal span{font-size:clamp(10px,1.7vmin,12px);color:#cdbfd6;line-height:1.35}.tal i{font-style:normal;font:600 11px var(--head);color:#ffd27a;margin-top:2px}
+.tal.buy{border-color:var(--gold);box-shadow:0 0 14px rgba(240,180,76,.3)}.tal.buy:hover{transform:translateY(-2px)}
+.tal.poor{opacity:.7}.tal.poor i{color:#e08a7a}.tal.locked{opacity:.4}.tal.own{border-color:rgba(123,224,138,.6);background:linear-gradient(#1d3326,#12201a)}.tal.own i{color:var(--green)}
+@media (max-width:700px){.forge{grid-template-columns:1fr}.tal{padding:7px 9px}}
+.cinrow{display:flex;flex-direction:column;align-items:center}.cinrow b{font:700 clamp(16px,3vmin,22px) var(--head);color:#ffd27a}.cinrow span{font-size:12px;color:var(--muted)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ffd27a;margin-left:6px;box-shadow:0 0 8px #ffd27a;vertical-align:middle}
+
+body.cine #pausebtn{display:none!important}body.cine #touch{visibility:hidden}
+@media (max-height:620px){.win{gap:6px}.win .rank{font-size:40px}.win .outl p{font-size:11px}.win .rankrow{gap:12px}}

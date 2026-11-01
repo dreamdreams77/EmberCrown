@@ -3,6 +3,8 @@
 function onLevelStart(){
   V.ww=G.gw*T;V.wh=G.gh*T;
   layout();camUpdate(0,true);initCritters();G.fog=null;touch.sneak=false;
+  G.iris={st:performance.now(),dur:1100,dir:1};
+  introCine(attempts[lvl]>1);
   UI.tick(true);
 }
 function render(dt){
@@ -11,7 +13,9 @@ function render(dt){
     camUpdate(dt);
     if(mode==='play'){spawnAmbient(dt);updateCritters(dt);}
     drawWorld();
-    if(mode==='play'||mode==='pause'||mode==='choice')drawHud();
+    drawFx();
+    if((mode==='play'||mode==='pause'||mode==='choice')&&!(G.cine&&G.bars>.35))drawHud();
+    if(G.cine||G.bars>.02)drawCine();
   } else drawScene(dt);
 }
 function degrade(){
@@ -31,12 +35,19 @@ function frame(t){
       if(raw>.036)slow+=raw;else slow=Math.max(0,slow-raw*.6);
       if(slow>1.6&&Q.tier<3){degrade();slow=0;}
       if(G&&mouse.used)mouse.world=screenToWorld(mouse.x,mouse.y);
-      const t0=performance.now();update(dt);PERF.u+=performance.now()-t0;
+      V.wide=!!(keys['z']||V.wideT>0);if(V.wideT>0)V.wideT-=dt;
+      let sdt=dt;
+      if(G){
+        if(G.hitstop>0){G.hitstop-=dt;sdt=0;}
+        else sdt=dt*G.ts;
+        G.ts+=(G.tsT-G.ts)*Math.min(1,dt*7);
+      }
+      const t0=performance.now();if(sdt>0)update(sdt);PERF.u+=performance.now()-t0;
     }
-    if(mode!=='pause')updateFX(dt);
+    if(mode!=='pause'){updateFX(dt);if(G)G.bars+=((G.cine?1:0)-G.bars)*Math.min(1,dt*6);}
     Aud.tick(dt,G?G.alert:0,mode==='play');
     const t1=performance.now();render(dt);PERF.r+=performance.now()-t1;PERF.n++;
-    if(++frameN%6===0)UI.tick(false);
+    if(++frameN%6===0){UI.tick(false);const cn=!!(G&&G.cine&&mode==='play');if(cn!==document.body.classList.contains('cine'))document.body.classList.toggle('cine',cn);}
   }catch(e){
     // never let one bad frame freeze the game: log it and keep the loop alive
     console.error(e);errN++;

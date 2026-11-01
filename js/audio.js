@@ -100,6 +100,7 @@ const Aud=(()=>{
     tension+=((playing?alert:0)-tension)*Math.min(1,dt*2);
     if(drone)drone.lp.frequency.value=380+tension*900;
     if(!playing)return;
+    combatTick(dt);
     noteT-=dt;
     if(noteT<=0){
       noteT=(2.4+Math.random()*3.2)/theme.tempo;
@@ -146,7 +147,43 @@ const Aud=(()=>{
     blink(){tone(900,.25,'sine',.1,{to:200});},
     boom(){noise(.7,500,.35,{to:50});tone(110,.5,'sine',.3,{to:35});},
     ember(){tone(1100+Math.random()*400,.05,'sine',.02);},
+    pot(){noise(.25,1800,.16,{type:'bandpass'});tone(300,.12,'triangle',.08,{to:150});},
+    heart(){[523,659,784].forEach((f,i)=>tone(f,.25,'sine',.12,{delay:i*.06}));},
+    cinder(){tone(1500+Math.random()*300,.06,'sine',.05);},
+    hurt(){tone(180,.3,'sawtooth',.2,{to:60});noise(.2,900,.18,{to:150});},
+    swing(){noise(.12,2600,.1,{type:'highpass',to:900});},
+    slash(){noise(.16,3200,.14,{type:'bandpass',to:1200});tone(700,.09,'triangle',.06,{to:300});},
+    foeDie(){noise(.4,1500,.15,{to:200});tone(400,.3,'triangle',.08,{to:120});},
+    slam(){noise(.5,400,.4,{to:60});tone(70,.5,'sine',.4,{to:35});},
+    wind(){tone(180,.5,'sawtooth',.06,{to:420});},
+    orb(){tone(500,.25,'sine',.1,{to:900});noise(.1,2000,.05,{type:'highpass'});},
+    nova(){tone(150,.8,'sine',.3,{to:600});noise(.7,1200,.25,{to:100});[440,660,880].forEach((f,i)=>tone(f,.6,'triangle',.07,{delay:i*.05}));},
+    chest(){[330,415,523,659,880].forEach((f,i)=>tone(f,.4,'triangle',.1,{delay:i*.07}));},
+    brazier(){noise(.4,1500,.18,{type:'highpass',to:600});tone(220,.4,'sine',.1,{to:440});},
+    gate(){tone(110,.7,'sawtooth',.14,{to:70});noise(.7,300,.14);},
+    roar(){tone(90,1.2,'sawtooth',.28,{to:55});tone(135,1.1,'sawtooth',.18,{to:80});noise(1,600,.2,{to:100});},
     sting(){[220,277,330].forEach((f,i)=>tone(f,1.2,'sawtooth',.06,{delay:i*.02,atk:.1}));}
   };
-  return {init,setTheme,tick,fire,setOpt,set,S,resume(){if(ac&&ac.state==='suspended')ac.resume();}};
+  /* ---------- ambient beds: wind, sea, forge rumble, marsh hush ---------- */
+  let amb=null;
+  const AMBS={night:[420,.5,.07,.04],dusk:[600,.6,.09,.035],moon:[300,.5,.06,.05],sea:[500,.4,.16,.07],forge:[110,.9,.2,.09],marsh:[900,.7,.1,.025],crown:[200,.8,.05,.04]};
+  function ambient(kind){
+    if(amb){const o=amb;amb=null;try{o.g.gain.cancelScheduledValues(ac.currentTime);o.g.gain.linearRampToValueAtTime(0,ac.currentTime+1);setTimeout(()=>{try{o.src.stop();o.lfo.stop();}catch(e){}},1200);}catch(e){}}
+    if(!ok()||!kind||!AMBS[kind])return;
+    const [f,q,lf,vol]=AMBS[kind];
+    const src=ac.createBufferSource();src.buffer=noiseBuf;src.loop=true;
+    const flt=ac.createBiquadFilter();flt.type=kind==='forge'?'lowpass':'bandpass';flt.frequency.value=f;flt.Q.value=q;
+    const g=ac.createGain();g.gain.value=0;
+    const lfo=ac.createOscillator(),lg=ac.createGain();lfo.frequency.value=lf;lg.gain.value=vol*.6;lfo.connect(lg);lg.connect(g.gain);
+    src.connect(flt);flt.connect(g);g.connect(musG);src.start();lfo.start();
+    g.gain.linearRampToValueAtTime(vol,ac.currentTime+2);
+    amb={src,lfo,g};
+  }
+  let combat=0,cT=0;
+  function setCombat(v){combat=v;}
+  function combatTick(dt){
+    if(!ok()||!set.music||combat<=.05)return;
+    cT-=dt;if(cT<=0){cT=.5-combat*.18;thump(.12+combat*.2);if(combat>.6&&Math.random()<.5)setTimeout(()=>thump(.1),cT*500);}
+  }
+  return {init,setTheme,tick,fire,setOpt,set,S,setCombat,combatTick,ambient,resume(){if(ac&&ac.state==='suspended')ac.resume();}};
 })();

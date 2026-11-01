@@ -289,3 +289,25 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 **Ranking.** Missions are scored from peak suspicion, times spotted, time taken and secrets found: S, A, B or C.
 
 **Presentation.** Dynamic lighting from torches, candles, vents, beacons, gems and the characters; screen shake and floating combat text; alert (`!`) and curious (`?`) markers over guards; interaction prompts; a fog-of-war minimap that pings objectives.
+
+---
+
+## 10. Combat, bosses, vaults and the Forge
+
+**Hearts and damage.** The team shares 4 hearts (up to 6 with talents). A hit costs 1 heart (slams and the Warden's phase-2 slam cost 2 in damage terms), grants 1.15 s of invulnerability, and knocks the active character back. Rolling (Wren) and dashing (Ashling) are fully invulnerable. Hearts reach zero: *Overwhelmed*, retry the mission. Reaching 100% suspicion still means *Caught*, as before.
+
+**Wren.** Strike: 3-hit combo (third hit is heavier). Hitting an unaware guard from behind is a silent *takedown* (9 s KO, 16 s with Silent Blade). Facing or alerted guards are only staggered and the noise draws others. Shielded brutes block frontal strikes. Roll: 0.3 s, i-frames, 0.85 s cooldown.
+
+**Ashling.** Fire (damages foes, burns beacons, lights braziers, destroys fire orbs), Ember Dash (2.6 s, charges with Twin Dash), Ember Nova (84 unit radius, 6 s cooldown, unlocked at the Forge).
+
+**Foes.** *Cinderling*: 2 HP, winds up for 0.46 s then lunges; vulnerable while recovering. *Ashwisp*: 2 HP, hovers and fires orbs after a 0.62 s charge. *Hollow Husk*: 6 HP, 0.95 s slam with a ground telegraph, takes half damage from the front, dazed while recovering. Smoke breaks their line of sight and whisper bells pull them away.
+
+**Bosses.** Both stay stealth puzzles until they notice you (or you hit them), then a cinematic introduces the fight. 100 HP, a second phase at 50%, and damage rules that reward reading the pattern:
+- *Bell-Warden*: slam (telegraphed circle + shockwaves), charge (telegraphed line; crashing into a wall dazes him for 2.2 s), bell toll (stand still or take damage). He can only be burned from behind or while dazed.
+- *Candlemaker*: shielded while any candle burns. Volleys, blink-strikes with a cone telegraph, phase-2 orb rings, and summoned wisps. Snuff the candles, then punish the stagger after each blink-strike.
+
+**Vaults.** A 9x7 wing behind each cracked wall (not in the flight mission): left chamber has 3 unlit braziers (Ashling's fire), pots and an inspect point; the gate at the centre opens when all three burn. The relic chamber holds the relic, an ember cache and a lore scroll; taking the relic seals the vault and starts two waves of guardians suited to the area. Clearing them opens the gate and spawns a chest.
+
+**Cinders and talents.** Cinders come from pots, foes, chests, examined story points, secrets and mission rank (S 150, A 100, B 60, C 30), and are banked when the mission is completed. Twelve talents, 90-320 cinders each: Quick Fingers, Deep Pockets, Silent Blade, Shadow Cloak; Dragon's Lung, Searing Flame, Twin Dash, Ember Nova; Stout Heart I and II, Scavenger, Phoenix Spark.
+
+**Presentation.** Letterboxed fly-over intros (skippable), boss entrance and defeat cinematics with slow motion, a victory fireworks sequence, hit-stop, zoom punch, screen shake, iris transitions, per-area colour grading and a parallax scenery backdrop.
