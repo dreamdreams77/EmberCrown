@@ -30,7 +30,7 @@ All characters, houses, and places are original.
 
 ---
 
-## 3. Controls (prototype)
+## 3. Controls
 
 | Key | Action |
 |---|---|
@@ -269,3 +269,23 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 - Guard patrols leave a gap of at least 2 seconds.
 - No fail state from fire alone.
 - A visible signpost for every objective in the first 10 seconds.
+
+---
+
+## 9. Depth systems added after the prototype
+
+**Secrets and discovery**
+- Each mission hides one annex room behind a *cracked wall* (`k` in the map data). Ashling opens it by holding fire on it for about a second, or by dashing into it. Explosions also break cracks.
+- Annexes hold an *ember cache* (+3 gems; the Break-the-Throne gem requirement still counts only regular gems), a lore scroll, and the mission's **relic**.
+- Relics are permanent for the playthrough and carry into later missions: Cat's-Paw Boots (faster sneaking), Grell's Gilded Purse (+1 bell), Stormglass Lens (+14 fire reach), Hush Cowl (-10% suspicion gain), Forgeheart Ember (faster, longer-stunning dash), Veyra's Silver Mask (+20% suspicion decay), Hallow Candle-Stub (+1 smoke).
+- Lore scrolls are logged in the Codex, which also remembers relics across playthroughs.
+
+**Combat and encounters**
+- *Ember Dash* (Shift as Ashling): a short charge, 2.6 s cooldown. Stuns ordinary guards, is blocked by brutes and the Candlemaker's candle shield, chips the Bell-Warden for 8, shatters cracked walls.
+- *Oil barrels* (`o`): ignite with fire. Blast radius 2.7 tiles stuns guards (brutes 2 s, others 4.5 s), hurts Wren if she is within 1.5 tiles, lures every guard within 9 tiles, and chains to neighbouring barrels.
+- *Guard types* (assigned per mission): **hound** (fast, short wide cone, smells within 2.5 tiles through any facing), **archer** (1.45x range, narrow 40 degree cone, slower), **brute** (shield: fire only stuns from behind, 4 s).
+- Guards who lose sight of you walk to your last seen position for about 1.6 s before returning to their patrol.
+
+**Ranking.** Missions are scored from peak suspicion, times spotted, time taken and secrets found: S, A, B or C.
+
+**Presentation.** Dynamic lighting from torches, candles, vents, beacons, gems and the characters; screen shake and floating combat text; alert (`!`) and curious (`?`) markers over guards; interaction prompts; a fog-of-war minimap that pings objectives.
