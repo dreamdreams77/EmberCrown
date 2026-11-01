@@ -311,7 +311,7 @@ function resolveStrike(){
   const inArc=(o,r)=>{const dx=o.x-A.x,dy=o.y-A.y;return Math.hypot(dx,dy)<reach+(r||0)&&angDiff(Math.atan2(dy,dx),ang)<1.15;};
   G.fx.push({k:'slash',x:A.x,y:A.y,a:ang,t:.2,t0:.2,big:cb===2,col:'200,230,255'});
   for(const g of G.guards){
-    if(g.spin||g.dead||g.boss||!inArc(g,6))continue;
+    if(g.spin||g.dead||g.boss||!inArc(g,13))continue;
     const behind=angDiff(Math.atan2(A.y-g.y,A.x-g.x),g.face)>1.5,unaware=!g.seeing&&g.stun<=0;
     hit++;
     if(unaware&&behind&&!g.lure){ // silent takedown

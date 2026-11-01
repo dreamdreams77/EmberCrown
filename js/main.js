@@ -32,7 +32,7 @@ function frame(t){
     const raw=(t-last)/1000||.016;last=t;
     const dt=Math.min(.05,raw);
     if(mode==='play'){
-      if(raw>.036)slow+=raw;else slow=Math.max(0,slow-raw*.6);
+      if(raw>.036)slow+=Math.min(raw,.08);else slow=Math.max(0,slow-raw*.6);
       if(slow>1.6&&Q.tier<3){degrade();slow=0;}
       if(G&&mouse.used)mouse.world=screenToWorld(mouse.x,mouse.y);
       V.wide=!!(keys['z']||V.wideT>0);if(V.wideT>0)V.wideT-=dt;

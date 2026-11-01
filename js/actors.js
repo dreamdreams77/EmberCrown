@@ -231,10 +231,10 @@ function drawFoe(f){
 function drawTelegraphs(){
   const c=ctx;
   for(const z of G.tele){
-    const u=clamp(1-z.t/z.t0,0,1),a=.15+.3*u+(Math.sin(G.time*30)*.04*u);
+    const u=clamp(1-z.t/z.t0,0,1),a=.10+.17*u+(Math.sin(G.time*30)*.03*u);
     if(z.t<0)continue;
-    c.fillStyle='rgba('+z.col+','+a+')';c.strokeStyle='rgba('+z.col+','+(.5+.4*u)+')';c.lineWidth=2;
-    if(z.type==='circle'){circ(c,z.x,z.y,z.r);c.fill();c.stroke();c.fillStyle='rgba('+z.col+','+(.25+.3*u)+')';circ(c,z.x,z.y,z.r*u);c.fill();}
+    c.fillStyle='rgba('+z.col+','+a+')';c.strokeStyle='rgba('+z.col+','+(.6+.4*u)+')';c.lineWidth=2.4;
+    if(z.type==='circle'){circ(c,z.x,z.y,z.r);c.fill();c.stroke();c.fillStyle='rgba('+z.col+','+(.14+.16*u)+')';circ(c,z.x,z.y,z.r*u);c.fill();}
     else if(z.type==='line'){
       c.save();c.translate(z.x,z.y);c.rotate(z.a);
       c.fillRect(0,-z.w/2,z.len,z.w);c.strokeRect(0,-z.w/2,z.len,z.w);c.fillStyle='rgba('+z.col+','+(.25+.3*u)+')';c.fillRect(0,-z.w/2,z.len*u,z.w);c.restore();
