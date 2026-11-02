@@ -311,3 +311,21 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 **Cinders and talents.** Cinders come from pots, foes, chests, examined story points, secrets and mission rank (S 150, A 100, B 60, C 30), and are banked when the mission is completed. Twelve talents, 90-320 cinders each: Quick Fingers, Deep Pockets, Silent Blade, Shadow Cloak; Dragon's Lung, Searing Flame, Twin Dash, Ember Nova; Stout Heart I and II, Scavenger, Phoenix Spark.
 
 **Presentation.** Letterboxed fly-over intros (skippable), boss entrance and defeat cinematics with slow motion, a victory fireworks sequence, hit-stop, zoom punch, screen shake, iris transitions, per-area colour grading and a parallax scenery backdrop.
+
+## 11. Audit and refinement pass
+
+**Fair start.** Guards that spawn within six tiles of Wren are reseated at their farthest waypoint, and every mission opens with 2.2 s of grace followed by a 1.6 s detection ramp, so standing still at the start can no longer lose the mission.
+
+**Foe behaviour.** Foes path around walls (BFS) instead of freezing without line of sight, spawn only on open floor, and take turns: one Cinderling lunges at a time while others circle, and Ashwisp volleys never overlap. The Husk is slower to recover from its slam, and the slam hits once.
+
+**Bosses.**
+- *Bell-Warden*: kite him from range and he performs a telegraphed **Leap Slam** with a landing marker. Phase-1 rings are visual only, phase-2 rings hurt. Phase 2 summons one add and drops two hearts.
+- *Candlemaker*: every orb is preceded by a lane telegraph, volleys are slower, summons come later and the shielded phase opens calmly. **Snuffing a candle** staggers him and drops a heart, so the shield phase pays out.
+
+**Look.** Soft flashlight cones, per-room floor patterns/tints and auto-placed rugs, prop variants and new furniture per area, 13 story-point illustrations, and a distinct style per vault (floor tint, rune, flame colour, dressing).
+
+**Visible upgrades.** Ashling visibly grows with ember gems, Searing Flame turns the fire white-blue, Shadow Cloak adds a shimmer aura around Wren.
+
+**Economy (estimate).** A single casual run of a mission banks roughly 110 cinders, enough for the cheapest talent (90) after mission 1. Casual play across all seven missions earns about 730 of the 2040 needed for the whole tree. Full vault and trial clears with S rank bring it all within about four missions.
+
+**Performance.** Visible-rect blits, a DPR pixel budget (lower on touch devices), cached HUD overlays and minimap, and adaptive quality tiers. All performance figures were gathered in headless Chromium, not on a real phone.
