@@ -2,7 +2,7 @@
 
 A stealth-action prototype: a spy and her runt dragon infiltrate feuding houses to stop an engineered war. Inspired by the feel of N64 and PS1 classics, with all-new characters.
 
-**Play:** open `index.html` in any modern browser (keyboard required). No build step or dependencies.
+**Play:** open `index.html` in any modern browser (keyboard required). No build step or dependencies (the storybook typeface loads from Google Fonts when online, and falls back to Georgia offline).
 
 **Design doc:** see [PLAYBOOK.md](PLAYBOOK.md).
 
