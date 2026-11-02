@@ -42,6 +42,7 @@ All characters, houses, and places are original.
 | Q | Smoke powder |
 | R | Whisper bell |
 | F | Bone flute: opens the nearest door, but is loud |
+| M | Cycle sound: all on, effects only, off (also the speaker icon, top right) |
 
 **Touch.** Drag anywhere to walk (under 36 units from the anchor sneaks, beyond runs; the anchor follows the thumb up to 66 units). Hold still within 7 units of the anchor next to a target to interact. A second finger held down breathes fire as Ashling; a quick second-finger tap swaps when Shiloh is active. The gadget tags in the bottom bar are tappable. A faint gold ring appears under the thumb only while touching. Portrait phones get a "turn sideways" prompt.
 
@@ -266,6 +267,8 @@ Player 1 is Shiloh. Player 2 is Ashling. Each has their own camera. Objectives r
 - **Look:** low-poly N64/PS1 silhouettes with modern lighting. Chunky textures, saturated torch colors, long shadows.
 - **Palette:** each house owns a color (Marrow ash-gray, Grell gold, Ostrander sea-green, Sable black, Kest iron-red, Dunmoor fog-blue).
 - **Audio:** a bass-and-percussion spy theme that bends into a horn-driven war theme as suspicion rises. Ashling's voice is gravelly and fast.
+
+**Audio as implemented.** Everything is generated with the Web Audio API. Each mission has its own theme: Ashfall Keep (sparse plucks over a drone), Gallowmere (a sinister waltz in a Phrygian-dominant mode), the Drowned Spire (floating harp arpeggios over a sea swell), Thornwick Abbey (a near-silent choir pad and rare bells), Ironvale (a saw-bass riff with anvil hits), Dunmoor Marsh (an elegant string waltz in the ball that slows into a detuned bell lament in the ruins when time shifts), and the finale (strings, a deep heartbeat drum, and choir motifs that build as each candle is snuffed). As suspicion rises, the music adds a kick, hats, snare, and horn stabs, and past 55% a heartbeat joins in. Sound effects cover footsteps (softer when sneaking), lockpicking ticks, doors, gems, objectives, smoke, the whisper bell, the flute, the Song of Time, dragon fire (a continuous roar with crackles), guard alerts and voices (each guard has their own pitch, panned and attenuated by position), takedowns, stuns, the Warden's toll, the Candlemaker's blink, forge vents, thunder, and short stingers for victory, capture, and the endings. Characters speak with a short babble in their own register.
 
 ---
 

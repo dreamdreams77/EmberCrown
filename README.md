@@ -16,6 +16,11 @@ A stealth-action prototype: a spy and her runt dragon infiltrate feuding houses 
 | Space | Dragon fire |
 | Tab | Swap Shiloh and Ashling |
 | Q / R / F | Smoke / whisper bell / bone flute |
+| M | Sound on, effects only, off |
+
+## Sound
+
+All sound is synthesized in the browser (no audio files): effects for footsteps, locks, gems, fire, guard voices, bells and thunder, plus a different theme for each mission that builds drums and horns as suspicion rises. Press **M** (or tap the speaker in the top-right corner) to cycle **sound on, sound effects only, sound off**. Your choice is remembered. Browsers only start audio after your first key press or tap.
 
 ## Touch controls
 
