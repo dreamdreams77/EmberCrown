@@ -37,7 +37,7 @@ function mkVault(orient,crack,inspect,waves){
   return{annex:{ox,oy,rows},info:{
     braz:T_([[1,1],[4,1],[4,5]]),pots:T_([[1,5],[2,1]]),inspect:[...tr(3,5),inspect[0],inspect[1]],
     spawns:T_([[2,2],[3,4],[2,4],[3,2]]),gate:tr(5,3),outer:tr(0,3),chest:tr(6,1),keep,waves,
-    rect:[...tr(1,1),...tr(7,5)],center:tr(3,3),inner:tr(6,3)}};
+    rect:[...tr(1,1),...tr(7,5)],center:tr(3,3),inner:tr(6,3),deco:T_([[2,2],[3,4],[1,3],[3,2],[2,4],[4,3]])}};
 }
 const VW=[['cinder','cinder'],['cinder','cinder','cinder']];
 

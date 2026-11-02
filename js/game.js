@@ -496,6 +496,7 @@ function completeTarget(t){
     const left=G.items.filter(i=>i.type==='C'&&!i.done).length;
     G.rings.push({x:it.x,y:it.y,t:.5,r:50,c:'200,200,255'});Aud.S.snuff();
     burst(it.x,it.y-8,12,'#8a8a96',30,1.2,5,{k:'smoke',g:-30,gr:6});
+    G.candlesLit=left;candleSnuffed(G.boss);
     say('Wren',left?'Snuffed. '+left+' to go.':'The last candle. Now he has nowhere to hide.');
   } else if(it.type==='L'){
     G.song=true;G.gad.flute=999;
@@ -740,7 +741,7 @@ function update(dt){
       const dd=Math.random()*range,sp=(Math.random()-.5)*.7,an=a.face+sp;
       const sx=a.x+Math.cos(a.face)*9,sy=a.y+Math.sin(a.face)*9;
       const v=(range/.5)*(.55+Math.random()*.45);
-      pt(sx,sy,Math.cos(an)*v,Math.sin(an)*v,Math.min(.55,range/v),4+Math.random()*4,Math.random()<.5?'#ff8a2a':'#ffd060',{add:true,gr:9,dr:.4});
+      pt(sx,sy,Math.cos(an)*v,Math.sin(an)*v,Math.min(.55,range/v),4+Math.random()*4,(hasT('searing')?['#ff8a2a','#fff0c8','#9fd8ff']:['#ff8a2a','#ffd060'])[Math.random()*(hasT('searing')?3:2)|0],{add:true,gr:9,dr:.4});
     }
     const inCone=(x,y)=>{const dx=x-a.x,dy=y-a.y;return Math.hypot(dx,dy)<range&&angDiff(Math.atan2(dy,dx),a.face)<.6&&los(a.x,a.y,x,y);};
     for(const g of G.guards){

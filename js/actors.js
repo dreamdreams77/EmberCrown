@@ -32,6 +32,7 @@ function drawWren(w,active){
   const blink=G.inv>0&&Math.floor(G.time*16)%2===0;
   c.globalAlpha=blink?.35:1;
   shadowAt(w.x,w.y+4,roll>=0?8:10,5.5,.38);
+  if(hasT('cloak')){c.globalCompositeOperation='lighter';c.fillStyle='rgba(150,110,255,'+(.10+.05*Math.sin(G.time*3)+(sneak?.08:0))+')';circ(c,w.x,w.y,17);c.fill();c.globalCompositeOperation='source-over';}
   const tr=w.trail||[];
   // flowing cloak tail along the path just walked
   if(roll<0&&mv&&tr.length>5){
@@ -317,8 +318,9 @@ function drawBoss(g){
   const toll=tollP*3;
   const collapse=dead?Math.min(1,dt_/1.2):0;
   c.globalAlpha=dead?Math.max(0,1-Math.max(0,dt_-1)/1.6):1;
-  shadowAt(g.x,g.y+10,26,12,.42);
-  c.save();c.translate(g.x,g.y);c.rotate(f);
+  const lift=st==='leap'?Math.sin((g.leapU||0)*Math.PI)*46:0,crouch=st==='windLeap'?.12*Math.min(1,1-g.t/(g.p2?.75:.95)):0;
+  shadowAt(g.x,g.y+10,26*(1-lift/140),12*(1-lift/140),.42-lift/200);
+  c.save();c.translate(g.x,g.y-lift);c.rotate(f);c.scale(1+lift/260-crouch*-1,1-crouch);
   let sx=1+roar*.15,sy=1+roar*.15,lean=0;
   if(st==='windCharge'){sx=1.05;sy=.92;lean=-.06;}
   if(st==='charge'){sx=1.18;sy=.88;}

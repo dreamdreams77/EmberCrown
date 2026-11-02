@@ -134,7 +134,7 @@ function stepProjectiles(dt){
 function stepShocks(dt){
   for(let i=G.shock.length-1;i>=0;i--){
     const s=G.shock[i];if(s.delay>0){s.delay-=dt;continue;}s.r+=s.spd*dt;
-    if(!s.hit)for(const t of teamChars()){
+    if(!s.hit&&s.dmg>0)for(const t of teamChars()){
       const d=Math.hypot(t.c.x-s.x,t.c.y-s.y);
       if(Math.abs(d-s.r)<s.w*.5+t.r*.5&&hurtTeam(s.dmg,s.x,s.y)){s.hit=true;}
     }
@@ -149,14 +149,23 @@ function stepShocks(dt){
 const FOEDEF={
   cinder:{hp:2,r:9,spd:94,name:'Cinderling'},
   wisp:{hp:2,r:8,spd:66,name:'Ashwisp'},
-  husk:{hp:6,r:13,spd:46,name:'Hollow Husk'}
+  husk:{hp:6,r:13,spd:42,name:'Hollow Husk'}
 };
 function blockedFly(x,y,r){
   return solidTile(Math.floor((x-r)/T),Math.floor((y-r)/T))||solidTile(Math.floor((x+r)/T),Math.floor((y-r)/T))||
          solidTile(Math.floor((x-r)/T),Math.floor((y+r)/T))||solidTile(Math.floor((x+r)/T),Math.floor((y+r)/T));
 }
+function freeSpot(x,y,r){ // nearest open floor to (x,y)
+  if(!blocked(x,y,r))return[x,y];
+  for(let ring=1;ring<10;ring++)for(let k=0;k<ring*8;k++){
+    const a=k/(ring*8)*6.2832,nx=x+Math.cos(a)*ring*10,ny=y+Math.sin(a)*ring*10;
+    if(!blocked(nx,ny,r))return[nx,ny];
+  }
+  return[G.wren.x,G.wren.y];
+}
 function spawnFoe(kind,x,y,o){
   const d=FOEDEF[kind],A=activeChar();
+  [x,y]=freeSpot(x,y,d.r*.8+2);
   const f=Object.assign({kind,x,y,r:d.r,hp:d.hp,max:d.hp,face:Math.atan2(A.y-y,A.x-x),vf:0,state:'spawn',t:.7,cd:1+Math.random(),hitT:0,kx:0,ky:0,age:0,
     ph:Math.random()*6,last:null,lost:0,vuln:0,dir:0,ph2:0,lure:null,burst:0,flyH:0},o||{});
   f.vf=f.face;
@@ -171,6 +180,27 @@ function moveFoe(f,dx,dy,dt){
   const nx=f.x+dx*dt,ny=f.y+dy*dt;
   if(!bl(nx,f.y,f.r*.8))f.x=nx;
   if(!bl(f.x,ny,f.r*.8))f.y=ny;
+}
+/* breadth-first path over open tiles, used when a foe cannot see its target */
+function foePath(f,tx,ty){
+  const gw=G.gw,gh=G.gh,fly=f.kind==='wisp';
+  const sx=Math.floor(f.x/T),sy=Math.floor(f.y/T),ex=Math.floor(tx/T),ey=Math.floor(ty/T);
+  const ok=(x,y)=>x>=0&&y>=0&&x<gw&&y<gh&&!solidTile(x,y)&&(fly||!propTile(x,y));
+  if(sx===ex&&sy===ey)return[];
+  const prev=new Map(),q=[[sx,sy]];prev.set(sx+sy*256,-1);
+  let found=false;
+  for(let qi=0;qi<q.length&&qi<900;qi++){
+    const [x,y]=q[qi];
+    if(x===ex&&y===ey){found=true;break;}
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const nx=x+dx,ny=y+dy,k=nx+ny*256;
+      if(!prev.has(k)&&ok(nx,ny)){prev.set(k,x+y*256);q.push([nx,ny]);}
+    }
+  }
+  if(!found)return[];
+  const path=[];let k=ex+ey*256;
+  while(k!==sx+sy*256&&k!==-1){path.unshift([(k%256)*T+16,Math.floor(k/256)*T+16]);k=prev.get(k);}
+  return path;
 }
 function foeTarget(f){
   const L=teamChars();let best=L[0],bd=1e9;
@@ -188,18 +218,26 @@ function stepFoes(dt){
     const sees=los(f.x,f.y,tg.x,tg.y);
     if(sees){f.last={x:tg.x,y:tg.y};f.lost=0;}else f.lost+=dt;
     if(f.lure){f.lure.t-=dt;if(f.lure.t<=0)f.lure=null;}
-    const goal=f.lure&&!sees?f.lure:(sees?{x:tg.x,y:tg.y}:f.last);
+    let goal=f.lure&&!sees?f.lure:(sees?{x:tg.x,y:tg.y}:f.last);
+    if(!sees&&!f.lure&&f.lost<6){ // hunt around corners
+      f.pathT=(f.pathT||0)-dt;
+      if(f.pathT<=0||!f.path){f.pathT=.45;f.path=foePath(f,tg.x,tg.y);}
+      while(f.path&&f.path.length&&Math.hypot(f.path[0][0]-f.x,f.path[0][1]-f.y)<8)f.path.shift();
+      if(f.path&&f.path.length)goal={x:f.path[0][0],y:f.path[0][1]};
+    }
     const spd=FOEDEF[f.kind].spd*(G.boss&&G.boss.p2?1.08:1);
     const gx=goal?goal.x-f.x:0,gy=goal?goal.y-f.y:0,gd=Math.hypot(gx,gy)||1;
     if(f.state==='stagger'){f.t-=dt;if(f.t<=0)f.state='chase';continue;}
     if(f.kind==='cinder'){
       if(f.state==='chase'){
         f.face=sees?ang:Math.atan2(gy,gx);
+        // only one cinderling commits to a lunge at a time; the others circle and wait their turn
+        const busy=G.foes.some(o=>o!==f&&o.kind==='cinder'&&(o.state==='wind'||o.state==='lunge'));
         if(goal&&gd>6){
-          const px=-gy/gd,py=gx/gd,w=Math.sin(f.age*3+f.ph)*28;
-          moveFoe(f,gx/gd*spd+px*w,gy/gd*spd+py*w,dt);
+          if(busy&&sees&&dist<86){const so=Math.sin(f.ph)>0?1:-1;moveFoe(f,-dy/dist*so*spd*.8+dx/dist*(dist<72?-spd*.5:0),dx/dist*so*spd*.8+dy/dist*(dist<72?-spd*.5:0),dt);}
+          else{const px=-gy/gd,py=gx/gd,w=Math.sin(f.age*3+f.ph)*28;moveFoe(f,gx/gd*spd+px*w,gy/gd*spd+py*w,dt);}
         }
-        if(sees&&dist<62&&f.cd<=0){f.state='wind';f.t=.46;f.dir=ang;Aud.S.wind();tele({type:'line',x:f.x,y:f.y,a:ang,len:84,w:18,t:.46,t0:.46});}
+        if(sees&&dist<62&&f.cd<=0&&!busy){f.state='wind';f.t=.46;f.dir=ang;Aud.S.wind();tele({type:'line',x:f.x,y:f.y,a:ang,len:84,w:18,t:.46,t0:.46});}
       } else if(f.state==='wind'){
         f.t-=dt;f.face=f.dir;
         if(f.t<=0){f.state='lunge';f.t=.26;Aud.S.swing();}
@@ -222,7 +260,7 @@ function stepFoes(dt){
         else if(dist>want+50||!sees){mx=(goal?gx/gd:0)*spd;my=(goal?gy/gd:0)*spd;}
         const so=Math.sin(f.age*.9+f.ph)>0?1:-1;mx+=-dy/dist*so*38;my+=dx/dist*so*38;
         moveFoe(f,mx,my,dt);
-        if(sees&&f.cd<=0&&dist<260){f.state='charge';f.t=.62;Aud.S.wind();}
+        if(sees&&f.cd<=0&&dist<260&&!G.foes.some(o=>o!==f&&o.kind==='wisp'&&o.state==='charge')){f.state='charge';f.t=.62;Aud.S.wind();}
       } else if(f.state==='charge'){
         f.t-=dt;
         if(f.t<=0){
@@ -240,10 +278,11 @@ function stepFoes(dt){
         f.t-=dt;
         if(f.t<=0){
           const cx=f.x+Math.cos(f.dir)*40,cy=f.y+Math.sin(f.dir)*40;
-          for(const t of teamChars())if(Math.hypot(t.c.x-cx,t.c.y-cy)<62+t.r*.4)hurtTeam(1,cx,cy);
-          shockwave(cx,cy,110,200,1);Aud.S.slam();shake(9);hitstop(.05);
+          let direct=false;
+          for(const t of teamChars())if(Math.hypot(t.c.x-cx,t.c.y-cy)<62+t.r*.4&&hurtTeam(1,cx,cy))direct=true;
+          shockwave(cx,cy,110,200,1,{hit:direct,r:40});Aud.S.slam();shake(9);hitstop(.05);
           burst(cx,cy,22,'#6a5a4a',130,.8,5,{k:'smoke',gr:10,dr:1.4});burst(cx,cy,16,'#ffb060',160,.5,2.4,{add:true});
-          f.state='recover';f.t=1.35;f.vuln=1.35;f.cd=1.6;
+          f.state='recover';f.t=1.4;f.vuln=1.4;f.cd=2.4;
         }
       } else if(f.state==='recover'){f.t-=dt;if(f.t<=0)f.state='chase';}
     }
@@ -405,7 +444,7 @@ const BOSSINFO={
 };
 function bossEngage(B,quiet){
   if(B.eng||B.dead)return;
-  B.eng=true;B.st='roar';B.t=1.4;B.stg=0;B.tollCd=6;B.cd=2;B.sumCd=10;B.sign=1;B.walk=0;B.lure=null;B.ret=false;B.blink=null;B.p2=false;
+  B.eng=true;B.st='roar';B.t=1.4;B.stg=0;B.tollCd=7;B.cd=4.5;B.sumCd=18;B.far=0;B.sign=1;B.walk=0;B.lure=null;B.ret=false;B.blink=null;B.p2=false;
   G.alert=Math.min(G.alert,.15);
   const info=BOSSINFO[B.kind==='candle'?'candle':'warden'];
   if(quiet)return;
@@ -451,12 +490,21 @@ function bossDeath(B){
     }
   });
 }
+/* snuffing a candle makes the Candlemaker flinch: progress and breathing room in one */
+function candleSnuffed(B){
+  if(!B||B.dead||!B.eng||B.kind!=='candle')return;
+  B.st='stagger';B.t=1.1;B.hurt=.25;B.blink=null;G.tele.length=0;
+  G.rings.push({x:B.x,y:B.y,t:.6,r:90,c:'200,200,255'});burst(B.x,B.y,18,'#c8c8ff',110,.6,2.4,{add:true});
+  floatText(B.x,B.y-34,G.candlesLit>0?'THE FLAME GUTTERS':'THE LAST FLAME DIES','#c8c8ff',12);Aud.S.deflect();
+  const snuffed=5-G.candlesLit;if(snuffed===3||Math.random()<.35){const A=G.wren;spawnPick('heart',A.x+rrand(-20,20),A.y+rrand(-20,20),1);}
+}
 function bossPhase2(B){
   if(B.p2)return;B.p2=true;
   G.rings.push({x:B.x,y:B.y,t:.9,r:200,c:'255,120,60'});shake(10);Aud.S.roar();
   burst(B.x,B.y,40,'#ff7a3a',180,.8,3,{add:true});
   toast('The '+(B.kind==='candle'?'Candlemaker':'Warden')+' grows desperate','He fights harder, and calls for help.','#ff9a4a');
-  if(B.kind!=='candle'||true){for(let i=0;i<2;i++){const a=Math.random()*6.28;spawnFoe('cinder',B.x+Math.cos(a)*70,B.y+Math.sin(a)*70);}}
+  for(let i=0;i<2;i++){const A=activeChar();spawnPick('heart',A.x+rrand(-30,30),A.y+rrand(-30,30),1);}
+  {const a=Math.random()*6.28;spawnFoe(B.kind==='candle'?'wisp':'cinder',B.x+Math.cos(a)*70,B.y+Math.sin(a)*70);}
 }
 function bossVuln(B){return B.stg>0;}
 function bossHit(B,o){
@@ -524,20 +572,41 @@ function wardenAI(B,A,dt){
     case'roar':B.t-=dt;if(B.t<=0){B.st='idle';B.t=.6;}break;
     case'idle':
       B.t-=dt;B.face=ang;
+      B.far=d>3.4*T?(B.far||0)+dt:0;
       if(d>96){B.walk+=dt*6;bossMove(B,dx/d*(p2?66:52),dy/d*(p2?66:52),dt);}
       if(B.t<=0){
         if(B.tollCd<=0){B.st='toll';B.t=.95;B.tollCd=p2?7:10;Aud.S.toll();G.rings.push({x:B.x,y:B.y,t:.95,r:7*T,c:'255,200,80'});B.movedAt=G.time;}
         else if(d<3.2*T&&Math.random()<.8){B.st='windSlam';B.t=p2?.7:.9;B.dir=ang;Aud.S.wind();tele({type:'circle',x:B.x+Math.cos(ang)*46,y:B.y+Math.sin(ang)*46,r:68,t:B.t,t0:B.t});}
+        else if(d>2.8*T&&(B.far>2.2||(B.cd<=0&&Math.random()<(p2?.5:.38)))){ // leap slam: lands exactly where you stand now
+          B.far=0;B.st='windLeap';B.t=p2?.75:.95;B.lx=A.x;B.ly=A.y;B.sx=B.x;B.sy=B.y;B.cd=1.8;Aud.S.wind();
+          tele({type:'circle',x:B.lx,y:B.ly,r:58,t:B.t,t0:B.t});
+        }
         else if(d>2.8*T&&B.cd<=0){B.st='windCharge';B.t=p2?.65:.85;B.dir=ang;Aud.S.wind();tele({type:'line',x:B.x,y:B.y,a:ang,len:280,w:34,t:B.t,t0:B.t});}
         else B.t=.35;
       }
       break;
+    case'windLeap':
+      B.t-=dt;B.face=Math.atan2(B.ly-B.y,B.lx-B.x);
+      if(B.t<=0){B.st='leap';B.t=.4;B.t0=.4;Aud.S.roar();}
+      break;
+    case'leap':{
+      B.t-=dt;const u=1-clamp(B.t/B.t0,0,1),e=ease(u);
+      B.x=B.sx+(B.lx-B.sx)*e;B.y=B.sy+(B.ly-B.sy)*e;B.leapU=u;
+      if(B.t<=0){
+        B.leapU=0;
+        if(blocked(B.x,B.y,13)){const sp=freeSpot(B.x,B.y,13);B.x=sp[0];B.y=sp[1];}
+        for(const t of teamChars())if(Math.hypot(t.c.x-B.x,t.c.y-B.y)<58+t.r*.3)hurtTeam(1,B.x,B.y);
+        shockwave(B.x,B.y,p2?190:130,p2?180:230,p2?1:0,{r:50});Aud.S.slam();shake(14);hitstop(.07);G.rings.push({x:B.x,y:B.y,t:.5,r:100,c:'255,230,170'});
+        burst(B.x,B.y,30,'#6a5a4a',170,.9,6,{k:'smoke',gr:10,dr:1.3});burst(B.x,B.y,22,'#ffb060',190,.5,2.6,{add:true});
+        B.st='stagger';B.t=1.5;B.stg=1.5;
+      }
+      break;}
     case'windSlam':
       B.t-=dt;if(B.t>.25)B.face=B.dir=ang;
       if(B.t<=0){
         const cx=B.x+Math.cos(B.dir)*46,cy=B.y+Math.sin(B.dir)*46;
-        for(const t of teamChars())if(Math.hypot(t.c.x-cx,t.c.y-cy)<68+t.r*.3)hurtTeam(p2?2:1,cx,cy);
-        shockwave(cx,cy,p2?200:140,230,1);if(p2)shockwave(cx,cy,230,230,1,{delay:.35});
+        for(const t of teamChars())if(Math.hypot(t.c.x-cx,t.c.y-cy)<68+t.r*.3)hurtTeam(1,cx,cy);
+        shockwave(cx,cy,p2?200:130,p2?180:230,p2?1:0);if(p2)shockwave(cx,cy,230,180,1,{delay:.5});
         Aud.S.slam();shake(13);hitstop(.07);G.rings.push({x:cx,y:cy,t:.5,r:90,c:'255,230,170'});
         burst(cx,cy,28,'#6a5a4a',160,.9,6,{k:'smoke',gr:10,dr:1.3});burst(cx,cy,22,'#ffb060',190,.5,2.6,{add:true});
         for(const k in G.cracks){const c=G.cracks[k];if(Math.hypot(c.x*T+16-cx,c.y*T+16-cy)<80)openCrack(c);}
@@ -565,17 +634,22 @@ function wardenAI(B,A,dt){
       B.t-=dt;
       if(B.t<=0){
         if(G.time-(G.lastMoveT||-9)<.3&&d<7*T)hurtTeam(1,B.x,B.y);
-        if(p2&&foesAlive()<3){const a=Math.random()*6.28;spawnFoe('cinder',B.x+Math.cos(a)*60,B.y+Math.sin(a)*60);}
+        if(p2&&foesAlive()<1){const a=Math.random()*6.28;spawnFoe('cinder',B.x+Math.cos(a)*60,B.y+Math.sin(a)*60);}
         B.st='idle';B.t=.5;
       }
       break;
     case'stagger':B.t-=dt;if(B.t<=0){B.st='idle';B.t=.5;}break;
   }
 }
+/* each orb of a volley travels along a warning lane that is drawn before it fires */
+function candleLanes(B,ang,p2){
+  B.aim=ang;const n=p2?5:3;
+  for(let k=0;k<n;k++)tele({type:'line',x:B.x,y:B.y,a:ang+(k-(n-1)/2)*(p2?.26:.34),len:330,w:12,t:B.t,t0:B.t,col:'255,150,60'});
+}
 function candleAI(B,A,dt){
   const dx=A.x-B.x,dy=A.y-B.y,d=Math.hypot(dx,dy)||1,ang=Math.atan2(dy,dx),p2=B.p2,shielded=G.candlesLit>0;
   switch(B.st){
-    case'roar':B.t-=dt;if(B.t<=0){B.st='float';B.t=.8;}break;
+    case'roar':B.t-=dt;if(B.t<=0){B.st='float';B.t=2.6;}break;
     case'float':{
       B.t-=dt;B.face=ang;
       const want=165,rad=(d-want)*.9,tx=-dy/d*B.sign*46,ty=dx/d*B.sign*46;
@@ -583,20 +657,20 @@ function candleAI(B,A,dt){
       if(Math.random()<dt*.25)B.sign*=-1;
       if(B.t<=0){
         const r=Math.random();
-        if(B.sumCd<=0&&foesAlive()<2&&(shielded||p2)){B.st='summon';B.t=1;B.sumCd=14;Aud.S.wind();}
-        else if(r<.42){B.st='volleyWind';B.t=p2?.55:.7;Aud.S.wind();}
-        else if(r<.78){
+        if(B.sumCd<=0&&foesAlive()<(p2?2:1)&&((shielded&&G.candlesLit<=3)||p2)){B.st='summon';B.t=1;B.sumCd=20;Aud.S.wind();}
+        else if(r<(shielded?.62:.42)){B.st='volleyWind';B.t=p2?.65:.8;Aud.S.wind();candleLanes(B,ang,p2);}
+        else if(r<(shielded?.9:.78)){
           for(let n=0;n<30;n++){const a=Math.random()*6.283,rr=(1.7+Math.random()*1.2)*T,x=A.x+Math.cos(a)*rr,y=A.y+Math.sin(a)*rr;
             if(!blocked(x,y,12)){B.blink={x,y,t:1.05};G.rings.push({x,y,t:1.05,r:40,c:'255,120,60'});Aud.S.blink();break;}}
           B.st=B.blink?'blinkWind':'volleyWind';B.t=B.blink?1.05:.7;
-        } else if(p2){B.st='ringWind';B.t=.85;Aud.S.wind();}
-        else{B.st='volleyWind';B.t=.7;}
+        } else if(p2){B.st='ringWind';B.t=.95;Aud.S.wind();B.off=Math.random()*6.28;for(let k=0;k<8;k++)tele({type:'line',x:B.x,y:B.y,a:B.off+k*.7854,len:230,w:10,t:B.t,t0:B.t,col:'255,150,60'});}
+        else{B.st='volleyWind';B.t=.8;candleLanes(B,ang,p2);}
       }
       break;}
     case'volleyWind':
-      B.t-=dt;B.face=ang;
+      B.t-=dt;B.face=B.aim;
       if(Math.random()<dt*20)pt(B.x+Math.cos(B.vf)*16,B.y+Math.sin(B.vf)*16,0,0,.3,3,'#ffb040',{add:true});
-      if(B.t<=0){const n=p2?5:3;for(let k=0;k<n;k++)fireOrb(B.x,B.y,ang+(k-(n-1)/2)*(p2?.26:.34),150+(p2?25:0));Aud.S.orb();B.st='float';B.t=p2?.95:1.35;}
+      if(B.t<=0){const n=p2?5:3;for(let k=0;k<n;k++)fireOrb(B.x,B.y,B.aim+(k-(n-1)/2)*(p2?.26:.34),(shielded?104:132)+(p2?20:0));Aud.S.orb();B.st='float';B.t=shielded?3.2:(p2?1.5:2.1);}
       break;
     case'blinkWind':
       B.t-=dt;
@@ -617,7 +691,7 @@ function candleAI(B,A,dt){
       break;
     case'ringWind':
       B.t-=dt;
-      if(B.t<=0){const off=Math.random()*6.28;for(let k=0;k<8;k++)fireOrb(B.x,B.y,off+k*.7854,115,{curve:.35});Aud.S.orb();B.st='float';B.t=1.6;}
+      if(B.t<=0){const off=B.off||0;for(let k=0;k<8;k++)fireOrb(B.x,B.y,off+k*.7854,100);Aud.S.orb();B.st='float';B.t=2.0;}
       break;
     case'summon':
       B.t-=dt;if(Math.random()<dt*30)pt(B.x+rrand(-30,30),B.y+rrand(-30,30),0,-30,.6,2,'#ffb040',{add:true});

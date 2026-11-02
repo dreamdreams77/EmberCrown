@@ -460,7 +460,7 @@ function drawWorld(){
   if(G.guests&&G.state==='ball')for(const s of G.guests)ents.push([s.y,big(s,()=>drawGuest(s),1.2)]);
   if(G.host&&G.host.on)ents.push([G.host.y,big(G.host,()=>drawHost(G.host),1.22)]);
   if(!G.wren.hidden)ents.push([G.wren.y,big(G.wren,()=>drawWren(G.wren,G.active==='wren'),1.25)]);
-  if(G.ash.on)ents.push([G.ash.y+(G.flight?30:0),big(G.ash,()=>drawAsh(G.ash,G.active==='ash'),G.flight?1:1.22)]);
+  if(G.ash.on)ents.push([G.ash.y+(G.flight?30:0),big(G.ash,()=>drawAsh(G.ash,G.active==='ash'),G.flight?1:1.22*(1+Math.min(12,stats.gems)*.016))]);
   ents.sort((a,b)=>a[0]-b[0]);
   drawDarkness();
   drawSmokeClouds();

@@ -120,14 +120,26 @@ function isW(x,y){const r=G.grid[y];return!r||r[x]===undefined||r[x]==='#'||r[x]
 function isVoid(x,y){const r=G.grid[y];return!r||r[x]===undefined||r[x]===' ';}
 
 function floorTile(c,x,y,p,fs,rnd,th){
-  const px=x*T,py=y*T,alt=(x+y)%2,base=alt?p.f1:p.f2;
+  const px=x*T,py=y*T,alt=(x+y)%2,rm=G.rooms&&G.roomOf&&G.roomOf[y][x]>=0?G.rooms[G.roomOf[y][x]]:null,rv=rm?rm.v:0;
+  let base=alt?p.f1:p.f2;if(rm&&rm.tint!==1)base=jitHex(base,rm.tint);
   c.fillStyle=base;c.fillRect(px,py,T,T);
   if(fs==='stone'||fs==='ruin'||fs==='rubble'){
-    // quarter slabs with bevel
-    for(let i=0;i<2;i++)for(let j=0;j<2;j++){
-      const v=.9+rnd()*.28;c.fillStyle=sh(base,v,.55);c.fillRect(px+i*16+1,py+j*16+1,14,14);
+    if(rv===1){ // one big flagstone with a bevelled inlay
+      c.fillStyle=sh(base,.95+rnd()*.15,.6);c.fillRect(px+2,py+2,T-4,T-4);
+      c.strokeStyle='rgba(0,0,0,.32)';c.lineWidth=1.4;c.strokeRect(px+1,py+1,T-2,T-2);
+      c.strokeStyle='rgba(255,255,255,.06)';c.lineWidth=1;c.strokeRect(px+5.5,py+5.5,T-11,T-11);
+    } else if(rv===2){ // running-bond brick
+      for(let j=0;j<4;j++){const off=(j%2)*8;for(let i=-1;i<3;i++){c.fillStyle=sh(base,.88+rnd()*.26,.6);c.fillRect(px+off+i*16+1,py+j*8+1,14,6);}}
+      c.fillStyle='rgba(0,0,0,.3)';for(let j=1;j<=4;j++)c.fillRect(px,py+j*8-1,T,1.2);
+    } else if(rv===3){ // cobbles
+      c.fillStyle='rgba(0,0,0,.22)';c.fillRect(px,py,T,T);
+      for(let i=0;i<9;i++){const cx=px+4+(i%3)*10+rnd()*3,cy=py+4+Math.floor(i/3)*10+rnd()*3;c.fillStyle=sh(base,1+rnd()*.5,.9);ell(c,cx,cy,4.4,3.8,rnd());c.fill();c.fillStyle='rgba(255,255,255,.07)';ell(c,cx-1,cy-1,2,1.4,0);c.fill();}
+    } else {
+      for(let i=0;i<2;i++)for(let j=0;j<2;j++){
+        const v=.9+rnd()*.28;c.fillStyle=sh(base,v,.55);c.fillRect(px+i*16+1,py+j*16+1,14,14);
+      }
+      c.fillStyle='rgba(0,0,0,.30)';c.fillRect(px,py+15,T,2);c.fillRect(px+15,py,2,T);
     }
-    c.fillStyle='rgba(0,0,0,.30)';c.fillRect(px,py+15,T,2);c.fillRect(px+15,py,2,T);
     c.fillStyle='rgba(255,255,255,.045)';c.fillRect(px,py,T,1);c.fillRect(px,py,1,T);
     c.fillStyle='rgba(0,0,0,.35)';c.fillRect(px,py+T-1,T,1);c.fillRect(px+T-1,py,1,T);
     for(let i=0;i<5;i++){c.fillStyle=rnd()<.5?'rgba(255,255,255,.05)':'rgba(0,0,0,.16)';c.fillRect(px+rnd()*T,py+rnd()*T,1+rnd()*2.4,1+rnd()*1.6);}
@@ -139,7 +151,10 @@ function floorTile(c,x,y,p,fs,rnd,th){
     if(fs==='rubble'&&rnd()<.10){c.fillStyle=sh('#6a5a4a',.7+rnd()*.4);c.beginPath();const bx=px+6+rnd()*18,by=py+6+rnd()*18;c.moveTo(bx,by);c.lineTo(bx+4+rnd()*4,by+1);c.lineTo(bx+2,by+4+rnd()*3);c.fill();}
     if(fs==='ruin'&&rnd()<.05){c.fillStyle='rgba(255,200,100,.05)';c.fillRect(px,py,T,T);}
   } else if(fs==='wood'){
-    for(let j=0;j<4;j++){
+    if(rv%2===1){ // planks run the other way in this room
+      for(let j=0;j<4;j++){c.fillStyle=sh(base,.88+rnd()*.3,.9);c.fillRect(px+j*8,py,8,T);c.fillStyle='rgba(0,0,0,.34)';c.fillRect(px+j*8+7,py,1,T);c.fillStyle='rgba(255,230,190,.10)';c.fillRect(px+j*8,py,1,T);
+        const sy=py+((rnd()*T)|0);c.fillStyle='rgba(0,0,0,.28)';c.fillRect(px+j*8,sy,7,1);}
+    } else for(let j=0;j<4;j++){
       c.fillStyle=sh(base,.88+rnd()*.3,.9);c.fillRect(px,py+j*8,T,8);
       c.fillStyle='rgba(0,0,0,.34)';c.fillRect(px,py+j*8+7,T,1);
       const sx=px+((rnd()*T)|0);c.fillStyle='rgba(0,0,0,.28)';c.fillRect(sx,py+j*8,1,7);
@@ -148,18 +163,19 @@ function floorTile(c,x,y,p,fs,rnd,th){
     }
     c.fillStyle='rgba(0,0,0,.4)';c.fillRect(px+2,py+3,1.4,1.4);c.fillRect(px+T-3,py+11,1.4,1.4);c.fillRect(px+4,py+19,1.4,1.4);c.fillRect(px+T-5,py+27,1.4,1.4);
   } else if(fs==='marble'){
-    c.fillStyle=alt?'rgba(255,255,255,.06)':'rgba(0,0,0,.16)';c.fillRect(px,py,T,T);
+    c.fillStyle=rv%2?'rgba(255,255,255,.03)':alt?'rgba(255,255,255,.05)':'rgba(0,0,0,.13)';c.fillRect(px,py,T,T);
     const gr=c.createLinearGradient(px,py,px+T,py+T);gr.addColorStop(0,'rgba(255,255,255,.12)');gr.addColorStop(.5,'rgba(255,255,255,0)');gr.addColorStop(1,'rgba(0,0,0,.18)');
     c.fillStyle=gr;c.fillRect(px,py,T,T);
-    c.strokeStyle='rgba(225,195,120,.16)';c.lineWidth=1;c.strokeRect(px+.5,py+.5,T-1,T-1);
+    c.strokeStyle='rgba(225,195,120,.10)';c.lineWidth=1;c.strokeRect(px+.5,py+.5,T-1,T-1);
     c.strokeStyle='rgba(255,255,255,.07)';c.beginPath();c.moveTo(px+rnd()*T,py);c.quadraticCurveTo(px+rnd()*T,py+16,px+rnd()*T,py+T);c.stroke();
-    if(!alt){c.fillStyle='rgba(225,195,120,.18)';c.beginPath();c.moveTo(px+16,py+10);c.lineTo(px+22,py+16);c.lineTo(px+16,py+22);c.lineTo(px+10,py+16);c.fill();}
+    if(!alt&&rv%2===0){c.fillStyle='rgba(225,195,120,.09)';c.beginPath();c.moveTo(px+16,py+10);c.lineTo(px+22,py+16);c.lineTo(px+16,py+22);c.lineTo(px+10,py+16);c.fill();}
   } else if(fs==='forge'){
     c.fillStyle=sh(base,.9+rnd()*.25,.8);c.fillRect(px+1,py+1,T-2,T-2);
     c.strokeStyle='rgba(0,0,0,.5)';c.lineWidth=1.5;c.strokeRect(px+.75,py+.75,T-1.5,T-1.5);
     c.strokeStyle='rgba(255,170,110,.07)';c.lineWidth=1;c.beginPath();c.moveTo(px+2,py+2);c.lineTo(px+T-2,py+2);c.stroke();
     c.fillStyle='rgba(20,10,8,.8)';for(const [ox,oy] of [[4,4],[T-4,4],[4,T-4],[T-4,T-4]]){circ(c,px+ox,py+oy,1.5);c.fill();}
     c.fillStyle='rgba(255,190,130,.14)';for(const [ox,oy] of [[4,4],[T-4,4]]){circ(c,px+ox-.4,py+oy-.4,.8);c.fill();}
+    if(rv===1){c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=1.6;for(let k=4;k<T;k+=6){c.beginPath();c.moveTo(px+k,py+2);c.lineTo(px+k,py+T-2);c.moveTo(px+2,py+k);c.lineTo(px+T-2,py+k);c.stroke();}c.fillStyle='rgba(255,90,20,.10)';c.fillRect(px+3,py+3,T-6,T-6);}
     if(rnd()<.13){
       c.strokeStyle='rgba(255,90,20,.20)';c.lineWidth=4;c.beginPath();let cx=px+4,cy=py+8+rnd()*16;c.moveTo(cx,cy);
       for(let i=0;i<4;i++){cx+=6+rnd()*3;cy+=(rnd()-.5)*10;c.lineTo(cx,cy);}c.stroke();
@@ -237,6 +253,7 @@ function bakeStatic(){
   const fs=G.flight?'sea':ruin?'rubble':th.floor;
   c.clearRect(0,0,W,H);
   G.torches=[];G.beams=[];
+  computeRooms();
   // floors
   for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){
     if(isVoid(x,y))continue;
@@ -260,12 +277,15 @@ function bakeStatic(){
   // vault: carved runes and a violet tint
   if(G.d.vault){
     const v=G.d.vault,a=v.rect,x0=Math.min(a[0],a[2])*T,y0=Math.min(a[1],a[3])*T,x1=(Math.max(a[0],a[2])+1)*T,y1=(Math.max(a[1],a[3])+1)*T;
-    c.fillStyle='rgba(70,30,110,.22)';c.fillRect(x0,y0,x1-x0,y1-y0);
+    const vs=vstyle();
+    c.fillStyle=vs.tint;c.fillRect(x0,y0,x1-x0,y1-y0);
     for(const [cx,cy,R] of [[v.center[0],v.center[1],46],[v.inner[0],v.inner[1],26]]){
-      const px=cx*T+16,py=cy*T+16;c.strokeStyle='rgba(190,150,255,.4)';c.lineWidth=1.6;circ(c,px,py,R);c.stroke();circ(c,px,py,R-8);c.stroke();
+      const px=cx*T+16,py=cy*T+16;c.strokeStyle='rgba('+vs.rune+',.4)';c.lineWidth=1.6;circ(c,px,py,R);c.stroke();circ(c,px,py,R-8);c.stroke();
       for(let i=0;i<8;i++){const an=i/8*6.283;c.beginPath();c.moveTo(px+Math.cos(an)*(R-8),py+Math.sin(an)*(R-8));c.lineTo(px+Math.cos(an)*R,py+Math.sin(an)*R);c.stroke();}
     }
   }
+  if(!ruin&&!G.flight)autoRugs(c,th,rnd);
+  if(G.d.vault){const st=VSTYLE_OF[G.d.vault.inspect[2]]||'candle',dr=mulberry(555+lvl);for(const [dx,dy] of G.d.vault.deco||[])drawVaultDeco(c,st,dx,dy,dr);}
   // rune circle
   if(G.d.finale){
     const cx=12.5*T,cy=7.5*T;
@@ -397,7 +417,7 @@ function collectLights(){
     else if('gGrs'.includes(it.type)){add(it.x,it.y,it.type==='r'?70:it.type==='G'?54:30,.7,it.type==='s'?'255,235,200':'255,170,60',.6);}
     else if('OPLH'.includes(it.type)){add(it.x,it.y,50,.55,'255,225,150',.45);}
   }
-  for(const b of G.braz||[]){if(b.lit)add(b.x,b.y-4,105,.9,'255,150,60',.7);else add(b.x,b.y-2,32,.4,'150,100,230',.45);}
+  for(const b of G.braz||[]){if(b.lit)add(b.x,b.y-4,105,.9,G.d.vault?vstyle().flame:'255,150,60',.7);else add(b.x,b.y-2,32,.4,'150,100,230',.45);}
   for(const ch of G.chests||[])if(!ch.open)add(ch.x,ch.y,60,.6,'255,210,120',.5);
   for(const n of G.insp||[])if(!n.done)add(n.x,n.y,34,.45,'255,230,160',.4);
   for(const v of G.vents)if(v.on)add(v.x*T+16,v.y*T+16,86,.9,'255,110,30',.8);else if(v.warn)add(v.x*T+16,v.y*T+16,40,.5,'255,110,30',.4);
@@ -595,31 +615,38 @@ function drawMarkers(g){
     c.fillStyle='#3a2a10';c.font='bold 13px '+BODY;c.textAlign='center';c.fillText('?',0,5);c.textAlign='left';c.restore();
   }
 }
+const CONE_N=14;
 function visPoly(g,range,half){
   const pts=[[g.x,g.y]];
-  for(let i=0;i<=20;i++){
-    const a=g.face-half+half*2*i/20;let r=0;
-    for(;r<range;r+=6)if(solidTile(Math.floor((g.x+Math.cos(a)*r)/T),Math.floor((g.y+Math.sin(a)*r)/T)))break;
-    pts.push([g.x+Math.cos(a)*r,g.y+Math.sin(a)*r]);
+  for(let i=0;i<=CONE_N;i++){
+    const a=g.face-half+half*2*i/CONE_N,ca=Math.cos(a),sa=Math.sin(a);let r=0;
+    for(;r<range;r+=8)if(solidTile(Math.floor((g.x+ca*r)/T),Math.floor((g.y+sa*r)/T)))break;
+    pts.push([g.x+ca*Math.min(r,range),g.y+sa*Math.min(r,range)]);
   }
   return pts;
 }
+/* A flashlight-style beam: soft outer falloff, a brighter core, only a whisper of an outline. */
 function drawCones(){
   const c=ctx;
   for(const g of G.guards){
     if(g.stun>0||g.dead||g.eng)continue;
     const range=5.2*T*G.rangeMul*(g.rm||1)*(g.kr||1);
     const pts=visPoly(g,range,g.half||.62);
-    const seeing=g.seeing;
-    const gr=c.createRadialGradient(g.x,g.y,4,g.x,g.y,range);
-    if(seeing){gr.addColorStop(0,'rgba(255,60,50,.42)');gr.addColorStop(1,'rgba(255,60,50,.10)');}
-    else if(g.lure||g.ret){gr.addColorStop(0,'rgba(255,200,80,.30)');gr.addColorStop(1,'rgba(255,200,80,.06)');}
-    else{gr.addColorStop(0,'rgba(255,238,140,.27)');gr.addColorStop(1,'rgba(255,238,140,.05)');}
+    const seeing=g.seeing,alert=g.lure||g.ret;
+    const col=seeing?'255,84,62':alert?'255,196,96':'255,238,176';
+    const a0=seeing?.36:alert?.26:.2,a1=seeing?.12:.075;
+    const gr=c.createRadialGradient(g.x,g.y,6,g.x,g.y,range);
+    gr.addColorStop(0,'rgba('+col+','+a0+')');gr.addColorStop(.55,'rgba('+col+','+(a0*.5)+')');gr.addColorStop(1,'rgba('+col+','+a1+')');
     c.fillStyle=gr;c.beginPath();pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.closePath();c.fill();
-    c.strokeStyle=seeing?'rgba(255,90,80,.5)':'rgba(255,240,170,.22)';c.lineWidth=1;c.stroke();
+    // bright core down the middle of the beam
+    const mid=1+(CONE_N>>1),lo=mid-3,hi=mid+3;
+    const gc=c.createRadialGradient(g.x,g.y,4,g.x,g.y,range*.9);
+    gc.addColorStop(0,'rgba('+col+','+(seeing?.22:.14)+')');gc.addColorStop(1,'rgba('+col+',0)');
+    c.fillStyle=gc;c.beginPath();c.moveTo(g.x,g.y);for(let i=lo;i<=hi;i++)c.lineTo(pts[i][0],pts[i][1]);c.closePath();c.fill();
+    // faint rim, stronger once you are seen
+    c.strokeStyle='rgba('+col+','+(seeing?.5:.12)+')';c.lineWidth=seeing?1.4:1;c.stroke();
     if(g.kind==='hound'){ // scent radius
       c.strokeStyle='rgba(255,150,80,.2)';c.setLineDash([3,4]);circ(c,g.x,g.y,2.5*T*G.rangeMul);c.stroke();c.setLineDash([]);
     }
   }
-  // searchlight beams
 }
