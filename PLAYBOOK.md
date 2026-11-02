@@ -43,6 +43,8 @@ All characters, houses, and places are original.
 | R | Whisper bell |
 | F | Bone flute: opens the nearest door, but is loud |
 
+**Touch.** Drag anywhere to walk (under 36 units from the anchor sneaks, beyond runs; the anchor follows the thumb up to 66 units). Hold still within 7 units of the anchor next to a target to interact. A second finger held down breathes fire as Ashling; a quick second-finger tap swaps when Wren is active. The gadget tags in the bottom bar are tappable. A faint gold ring appears under the thumb only while touching. Portrait phones get a "turn sideways" prompt.
+
 ---
 
 ## 4. Core rules (as implemented)

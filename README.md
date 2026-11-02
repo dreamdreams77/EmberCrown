@@ -17,6 +17,18 @@ A stealth-action prototype: a spy and her runt dragon infiltrate feuding houses 
 | Tab | Swap Wren and Ashling |
 | Q / R / F | Smoke / whisper bell / bone flute |
 
+## Touch controls
+
+Nothing is drawn over the playfield. Turn the phone sideways, then:
+
+- **Walk:** drag anywhere. A short drag sneaks, a long drag runs; the anchor follows your thumb.
+- **Interact (lock, steal, poison, knock out):** stand next to it and hold your finger still.
+- **Dragon fire:** while playing Ashling, hold a second finger down.
+- **Swap / gadgets:** tap Tab, Q, R, or F in the bar at the bottom. With Wren active, a quick second-finger tap also swaps.
+- **Menus:** tap to continue, or tap a numbered choice.
+
+Keyboard and touch both work at the same time.
+
 ## Stealth rules worth knowing
 
 - **Light and shadow.** Torches, beacons, candles, and forge vents light you up; guards see you up to 22% farther in full light and 18% less far in shadow. The gem in the bottom bar shows how exposed you are (Shadow, Dim, Lit). Ashling's fire lights her up too.
