@@ -14,7 +14,7 @@ A stealth-action prototype: a spy and her runt dragon infiltrate feuding houses 
 | Shift | Sneak |
 | E (hold) | Pick lock / steal / poison / knock out a guard (sneak up behind) |
 | Space | Dragon fire |
-| Tab | Swap Wren and Ashling |
+| Tab | Swap Shiloh and Ashling |
 | Q / R / F | Smoke / whisper bell / bone flute |
 
 ## Touch controls
@@ -24,7 +24,7 @@ Nothing is drawn over the playfield. Turn the phone sideways, then:
 - **Walk:** drag anywhere. A short drag sneaks, a long drag runs; the anchor follows your thumb.
 - **Interact (lock, steal, poison, knock out):** stand next to it and hold your finger still.
 - **Dragon fire:** while playing Ashling, hold a second finger down.
-- **Swap / gadgets:** tap Tab, Q, R, or F in the bar at the bottom. With Wren active, a quick second-finger tap also swaps.
+- **Swap / gadgets:** tap Tab, Q, R, or F in the bar at the bottom. With Shiloh active, a quick second-finger tap also swaps.
 - **Menus:** tap to continue, or tap a numbered choice.
 
 Keyboard and touch both work at the same time.

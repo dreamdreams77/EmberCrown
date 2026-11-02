@@ -6,12 +6,12 @@
 
 ## 1. Pitch
 
-A third-person stealth-action adventure. You play **Wren Sallow**, a disgraced courier turned spy, and **Ashling**, a runt dragon hatched from the egg she stole. Together you infiltrate the strongholds of seven feuding houses to stop a war that someone is engineering.
+A third-person stealth-action adventure. You play **Shiloh Sallow**, a disgraced courier turned spy, and **Ashling**, a runt dragon hatched from the egg she stole. Together you infiltrate the strongholds of seven feuding houses to stop a war that someone is engineering.
 
 **Design pillars**
 
 1. **Mission-based infiltration.** Every castle is a self-contained mission with objectives that change by difficulty.
-2. **Two bodies, one plan.** Wren is quiet and clever. Ashling is loud, fast, and fireproof. Good plans use both.
+2. **Two bodies, one plan.** Shiloh is quiet and clever. Ashling is loud, fast, and fireproof. Good plans use both.
 3. **Everyone is playing someone.** Bribes, blackmail, and poison move the houses. Houses can rise, betray you, or fall.
 4. **Castles are dungeons.** Locked doors, learned songs, bosses, and places that change over time.
 
@@ -35,15 +35,15 @@ All characters, houses, and places are original.
 | Key | Action |
 |---|---|
 | WASD / arrows | Move |
-| Shift | Sneak (Wren only; much harder to spot) |
+| Shift | Sneak (Shiloh only; much harder to spot) |
 | E (hold) | Pick a lock, steal the objective, poison the cup, knock out a guard from behind |
 | Space | Dragon fire (Ashling only) |
-| Tab | Swap between Wren and Ashling |
+| Tab | Swap between Shiloh and Ashling |
 | Q | Smoke powder |
 | R | Whisper bell |
 | F | Bone flute: opens the nearest door, but is loud |
 
-**Touch.** Drag anywhere to walk (under 36 units from the anchor sneaks, beyond runs; the anchor follows the thumb up to 66 units). Hold still within 7 units of the anchor next to a target to interact. A second finger held down breathes fire as Ashling; a quick second-finger tap swaps when Wren is active. The gadget tags in the bottom bar are tappable. A faint gold ring appears under the thumb only while touching. Portrait phones get a "turn sideways" prompt.
+**Touch.** Drag anywhere to walk (under 36 units from the anchor sneaks, beyond runs; the anchor follows the thumb up to 66 units). Hold still within 7 units of the anchor next to a target to interact. A second finger held down breathes fire as Ashling; a quick second-finger tap swaps when Shiloh is active. The gadget tags in the bottom bar are tappable. A faint gold ring appears under the thumb only while touching. Portrait phones get a "turn sideways" prompt.
 
 ---
 
@@ -52,11 +52,11 @@ All characters, houses, and places are original.
 **Stealth**
 - Guards see in a cone (about 70 degrees) up to 5.2 tiles. Walls, closed doors, and smoke block sight.
 - Suspicion is a single meter. It rises faster the closer you are and falls slowly when unseen. At 100% you are caught and the mission restarts.
-- Sneaking multiplies Wren's visibility range by 0.6. The character you are *not* controlling counts as curled up, also 0.6.
-- Ashling is 1.45x more visible than Wren. Power comes with a price.
+- Sneaking multiplies Shiloh's visibility range by 0.6. The character you are *not* controlling counts as curled up, also 0.6.
+- Ashling is 1.45x more visible than Shiloh. Power comes with a price.
 - **Light and shadow.** Wall torches (placed along every wall that faces the viewer), lit beacons, candles, live forge vents, and Ashling's fire are light sources. Each one lights a falloff circle (torches only light the room in front of them). How lit you are scales guard sight on you from x0.82 (shadow) to x1.22 (full light). The HUD gem shows Shadow, Dim, or Lit. Not used on the flight level.
-- **Footsteps.** Outside the Abbey, running Wren (1.8 tiles) or walking Ashling (2.4 tiles) makes a step every 0.45 seconds. A guard in that radius who is facing away turns toward the sound and pauses. Sneaking is silent.
-- **Close quarters.** A guard always notices you within 0.9 tiles, unless you are Wren and sneaking.
+- **Footsteps.** Outside the Abbey, running Shiloh (1.8 tiles) or walking Ashling (2.4 tiles) makes a step every 0.45 seconds. A guard in that radius who is facing away turns toward the sound and pauses. Sneaking is silent.
+- **Close quarters.** A guard always notices you within 0.9 tiles, unless you are Shiloh and sneaking.
 - **Search.** A guard who loses sight of you walks to your last seen spot, searches for 2.4 seconds, and returns to his patrol. Guards also scan left and right when they pause at a waypoint.
 - **Takedown.** Sneak up behind an unaware guard (not a boss or tower) and hold E for 0.6 seconds: he is out for 10 seconds, the same as a fire stun but quiet.
 - **Bodies.** A guard who sees a stunned comrade within 4.2 tiles raises suspicion by 0.22 and goes to check. Each stun can only be discovered once. Waking guards are groggy and look around first.
@@ -68,7 +68,7 @@ All characters, houses, and places are original.
 - Bone flute x1: opens the nearest door within 3 tiles, but lures guards within 8 tiles to you.
 
 **Ashling**
-- Faster than Wren (135 vs 92 px/s).
+- Faster than Shiloh (135 vs 92 px/s).
 - Fire stuns a guard for 5 seconds and adds a little suspicion. Fire reach grows with ember gems (+8 px per gem, capped at 12).
 - Fire is the only way to burn signal beacons (hold the flame on it for 1 second).
 - If the two are more than 7.5 tiles apart, the tether pulls the idle one to the active one.
@@ -80,10 +80,10 @@ Between missions you pick one servant of the next house to turn: bribe the stewa
 
 ## 5. Cast
 
-- **Wren Sallow.** Raised a courier's orphan. She once delivered a letter that started a border war and was blamed for it. The Hollow Crown gave her a second chance. Dry, observant, bad at trusting anyone.
+- **Shiloh Sallow.** Raised a courier's orphan. She once delivered a letter that started a border war and was blamed for it. The Hollow Crown gave her a second chance. Dry, observant, bad at trusting anyone.
 - **Ashling.** Hatched too early, so he is small and insecure and covers it with sarcasm. Starts with sparks, grows into a storm.
 - **Lady Veyra Dunmoor.** Rules the northern marshes. Believes a short, controlled war will prevent a longer one. Gracious, patient, wrong.
-- **The Candlemaker.** A masked assassin and a former Hollow Crown agent trained by the same mentor as Wren. Always one step ahead.
+- **The Candlemaker.** A masked assassin and a former Hollow Crown agent trained by the same mentor as Shiloh. Always one step ahead.
 - **Lord Tobias Grell.** A cowardly warlord who belongs to whoever flattered him last.
 - **Mother Quill.** The Hollow Crown's quartermaster. Hands out gadgets and secrets, and may be hiding her own agenda.
 
@@ -121,21 +121,21 @@ Each mission has three difficulties. Higher ones add objectives and tighten the 
 3. **The Drowned Spire** (flight level, playable)
    - You fly Ashling alone over a sea fortress; walls and water do not block you or sight lines.
    - Five rotating searchlight towers and one patrol boat (slightly shorter sight than land guards).
-   - Objectives: burn four signal beacons with fire (hold 1 second) and drop Wren's forged letters at two war rooms (hold E).
-   - Wren hides offscreen, so gadgets are unavailable. Land on the green pad to finish.
+   - Objectives: burn four signal beacons with fire (hold 1 second) and drop Shiloh's forged letters at two war rooms (hold E).
+   - Shiloh hides offscreen, so gadgets are unavailable. Land on the green pad to finish.
 
 4. **Thornwick Abbey** (dungeon with a boss, playable)
-   - *Silence is law:* moving without sneaking makes noise (Wren 4 tiles, Ashling 5) that draws monks who have a clear line to you.
+   - *Silence is law:* moving without sneaking makes noise (Shiloh 4 tiles, Ashling 5) that draws monks who have a clear line to you.
    - Find the lectern and hold E to learn the **Song of Opening**. Until then the flute is silent. After, F opens any door within 3 tiles, including **sealed doors** (purple rune) that lockpicking cannot open, and it never runs out (still loud).
    - The sealed door leads to the bell hall, where the **Bell-Warden** patrols with the abbot's ledger behind him.
-   - *Boss rules:* he is deaf to footsteps but not to the whisper bell, so Wren lures him and Ashling burns him from behind. Fire only hurts from behind (about 4.5 seconds of flame to win, health does not regrow). Fire into his front only raises suspicion.
+   - *Boss rules:* he is deaf to footsteps but not to the whisper bell, so Shiloh lures him and Ashling burns him from behind. Fire only hurts from behind (about 4.5 seconds of flame to win, health does not regrow). Fire into his front only raises suspicion.
    - *Toll:* every 6 seconds his bell tolls (a gold ring telegraphs it for 0.9 seconds). Whoever you control must stand still if within 7 tiles, or suspicion jumps.
    - Objectives: learn the Song, take the ledger, silence the Warden. The exit opens when all three are done.
 
 5. **Ironvale** (escort and choice, playable)
-   - Pick the cell lock (hold E on the door), then hold E on **Perrin Ostrander**, heir of the Drowned Spire, to free him. He follows Wren and guards can see him too.
+   - Pick the cell lock (hold E on the door), then hold E on **Perrin Ostrander**, heir of the Drowned Spire, to free him. He follows Shiloh and guards can see him too.
    - Burn the muster beacon with Ashling, then walk Perrin to the gate. The exit needs him close.
-   - **Forge vents** burst into flame on a cycle (they glow orange just before). Standing on a live vent makes Wren suspicious fast. Ashling is immune.
+   - **Forge vents** burst into flame on a cycle (they glow orange just before). Standing on a live vent makes Shiloh suspicious fast. Ashling is immune.
    - **The choice:** return Perrin to House Ostrander (Favor) or hold him as leverage (Fear). Kest gains Fear either way.
 
 **Difficulty (implemented as tuning; extra objectives still planned)**
@@ -154,8 +154,8 @@ Each mission has three difficulties. Higher ones add objectives and tighten the 
    - Results: Dunmoor gets +Ruin and +Fear.
 
 7. **The Candlemaker's Crown** (finale, playable)
-   - A ruined hall of extinct House Hallow, lit by five candles. The Candlemaker, a former Hollow Crown agent trained by Wren's own mentor, patrols it.
-   - **Candles:** snuff all five (hold E, Wren only). While any candle burns he is shielded and Ashling's fire does nothing. The hall gets darker with each one snuffed.
+   - A ruined hall of extinct House Hallow, lit by five candles. The Candlemaker, a former Hollow Crown agent trained by Shiloh's own mentor, patrols it.
+   - **Candles:** snuff all five (hold E, Shiloh only). While any candle burns he is shielded and Ashling's fire does nothing. The hall gets darker with each one snuffed.
    - **The boss:** like the Bell-Warden, fire only hurts him from behind (22 health per second), and the whisper bell lures him. His signature is the **blink**: every 8 seconds he marks a spot 1.6 to 3 tiles from whoever you control (a pulsing orange ring), then appears there 1.3 seconds later facing you. If you are still within about 2 tiles, suspicion jumps. Move off the ring.
    - **Your houses shape the fight** (the briefing screen shows the numbers):
      - Each house with Favor sends help: +1 whisper bell (up to +3).
@@ -182,7 +182,7 @@ The ending screen shows the ending title, a short epilogue, ember gems, times ca
 | 0 | Hatchling | Sparks, short flame |
 | 6 | Fledgling | Glide over pits and low walls |
 | 14 | Wyrmling | Charge attack: smashes brittle doors |
-| 24 | Drake | Wide flame; can carry Wren across gaps |
+| 24 | Drake | Wide flame; can carry Shiloh across gaps |
 | 36 | Dragon | Full flame; unlocks the finale ending choice |
 
 The prototype implements flame reach only, plus the finale gate: the **Break the throne** ending needs 20 of the 33 gems in the game (60%). The thresholds above are the full-game design and will be rescaled to the final gem count.
@@ -240,7 +240,7 @@ The bone flute's Song of Time switches state at special pedestals. Objects you m
 | Song | Effect |
 |---|---|
 | Opening | Opens sealed doors (implemented: learn it in Thornwick Abbey, F near a door) |
-| Calling | Summons Ashling to Wren's position (planned) |
+| Calling | Summons Ashling to Shiloh's position (planned) |
 | Hush | Muffles footsteps for 10 seconds (planned) |
 | Time | Switches feast and ruin states (implemented: F at a pedestal in Dunmoor Marsh) |
 | Ember | Ignites braziers and beacons from a distance (planned) |
@@ -249,17 +249,17 @@ The bone flute's Song of Time switches state at special pedestals. Objects you m
 
 ## 12. Split-screen co-op (planned)
 
-Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives require both, such as Ashling distracting guards while Wren steals. Suspicion is shared.
+Player 1 is Shiloh. Player 2 is Ashling. Each has their own camera. Objectives require both, such as Ashling distracting guards while Shiloh steals. Suspicion is shared.
 
 ---
 
 ## 13. Art and audio direction
 
-**As implemented (2D canvas), pressed clay.** The world is modelled like hand-pressed clay lit from the upper left. Floors are puffy slabs (cobbles, wide planks, riveted plates, marble tiles) with a bevel, a soft gradient, tiny specks, and embossed fingerprint swirls; walls are rounded stone blocks with a brick front where they face the viewer; the Drowned Spire's sea is stacked, overlapping lens-shaped plates. Every character and prop is built from shaded ellipses with a specular dab, a soft violet outline, and a shared clay grain masked onto the silhouette. The darkness is deep plum, torches and lanterns pool warm light into it, and guard cones are soft beams with a pencil edge. The HUD, messages, and all menus are gold-trimmed plum plaques with embossed swirls and cream type (IM Fell English). The title screen animates: the crown sways and glows, and Ashling flies across the plaque trailing embers. Wren and Ashling have upright heads too. Wren (hood, bangs, freckles, scarf) is dry and smirking when calm, narrows her eyes when sneaking, sticks her tongue out and looks at the target while picking or stealing, grows worried then panicked (sweat drop) as suspicion climbs, beams when she grabs a gem, and dozes with a little "zz" while you control Ashling. Ashling (horns, frills, freckled snout) wears a smug half-lidded smirk, shows a fang, breathes fire with an open mouth and angry brows, goes wide-eyed when you are nearly caught, grins when he finds a gem, and sleeps with a smoke puff and "zz" when idle. Both talk with moving mouths while their line is on screen. Every soldier and monk has an upright clay head that always faces the viewer, with eyes that look where the guard is facing and a face that reacts: calm, suspicious (narrowed eyes, one raised brow, flat mouth) while investigating, alert (wide red eyes, angry brows, shouting mouth) when they see you, startled (arched brows, round mouth) at a body, groggy (droopy eyes, wobbly mouth) for a moment after waking, and knocked out (X eyes, lolling tongue). Their mouths move while they bark, and each guard has individual features such as a mustache, scar, big nose or freckles. Characters squash and stretch along their facing as they walk and breathe a little when idle, and they have faces that react: guards' eyes widen and turn red with angry brows when they spot you, squint with one raised brow when searching, and show X eyes when out cold; Wren's eyes widen as suspicion climbs and narrow when sneaking. Details: Perrin wears broken shackles, the Bell-Warden has a beard and a gold stole, and the Candlemaker's mask eyes glow ember-orange. Renders at 2x on large or high-DPI screens and drops to 1x automatically if a machine cannot keep up.
+**As implemented (2D canvas), pressed clay.** The world is modelled like hand-pressed clay lit from the upper left. Floors are puffy slabs (cobbles, wide planks, riveted plates, marble tiles) with a bevel, a soft gradient, tiny specks, and embossed fingerprint swirls; walls are rounded stone blocks with a brick front where they face the viewer; the Drowned Spire's sea is stacked, overlapping lens-shaped plates. Every character and prop is built from shaded ellipses with a specular dab, a soft violet outline, and a shared clay grain masked onto the silhouette. The darkness is deep plum, torches and lanterns pool warm light into it, and guard cones are soft beams with a pencil edge. The HUD, messages, and all menus are gold-trimmed plum plaques with embossed swirls and cream type (IM Fell English). The title screen animates: the crown sways and glows, and Ashling flies across the plaque trailing embers. Shiloh and Ashling have upright heads too. Shiloh (hood, bangs, freckles, scarf) is dry and smirking when calm, narrows her eyes when sneaking, sticks her tongue out and looks at the target while picking or stealing, grows worried then panicked (sweat drop) as suspicion climbs, beams when she grabs a gem, and dozes with a little "zz" while you control Ashling. Ashling (horns, frills, freckled snout) wears a smug half-lidded smirk, shows a fang, breathes fire with an open mouth and angry brows, goes wide-eyed when you are nearly caught, grins when he finds a gem, and sleeps with a smoke puff and "zz" when idle. Both talk with moving mouths while their line is on screen. Every soldier and monk has an upright clay head that always faces the viewer, with eyes that look where the guard is facing and a face that reacts: calm, suspicious (narrowed eyes, one raised brow, flat mouth) while investigating, alert (wide red eyes, angry brows, shouting mouth) when they see you, startled (arched brows, round mouth) at a body, groggy (droopy eyes, wobbly mouth) for a moment after waking, and knocked out (X eyes, lolling tongue). Their mouths move while they bark, and each guard has individual features such as a mustache, scar, big nose or freckles. Characters squash and stretch along their facing as they walk and breathe a little when idle, and they have faces that react: guards' eyes widen and turn red with angry brows when they spot you, squint with one raised brow when searching, and show X eyes when out cold; Shiloh's eyes widen as suspicion climbs and narrow when sneaking. Details: Perrin wears broken shackles, the Bell-Warden has a beard and a gold stole, and the Candlemaker's mask eyes glow ember-orange. Renders at 2x on large or high-DPI screens and drops to 1x automatically if a machine cannot keep up.
 
 **Earlier ink-and-wash pass (replaced).** Watercolor washes with wobbly, boiling pen lines, hatched shadows, and parchment UI.
 
-**Earlier pass (still underneath).** Every level's floor, walls, and shadows are generated from a seeded hash, so they are textured but stable between runs: flagstones (Ashfall, Thornwick, the finale), feast-hall planks (Gallowmere), riveted iron plates (Ironvale), marble (Dunmoor's ball), rubble and scorch (Dunmoor's ruins), and a storm sea (the Drowned Spire). Walls have a stone cap and a brick face where they face the viewer, and cast soft shadows. A darkness layer with real light sources sits on top, so guard vision cones read as lantern beams. Characters are drawn sprites with walk cycles: hooded Wren, Ashling with flapping wings who grows a little with every ember gem, house-colored soldiers with spears and lanterns, robed monks with candles, the Bell-Warden with his bronze bell, the masked Candlemaker, boats and searchlight towers, and masked dancers. Particles drive fire, sparks, smoke, falling ash, embers, dust, fog, rain, and lightning; the screen shakes on tolls, blinks, and getting caught, and pulses red as suspicion rises.
+**Earlier pass (still underneath).** Every level's floor, walls, and shadows are generated from a seeded hash, so they are textured but stable between runs: flagstones (Ashfall, Thornwick, the finale), feast-hall planks (Gallowmere), riveted iron plates (Ironvale), marble (Dunmoor's ball), rubble and scorch (Dunmoor's ruins), and a storm sea (the Drowned Spire). Walls have a stone cap and a brick face where they face the viewer, and cast soft shadows. A darkness layer with real light sources sits on top, so guard vision cones read as lantern beams. Characters are drawn sprites with walk cycles: hooded Shiloh, Ashling with flapping wings who grows a little with every ember gem, house-colored soldiers with spears and lanterns, robed monks with candles, the Bell-Warden with his bronze bell, the masked Candlemaker, boats and searchlight towers, and masked dancers. Particles drive fire, sparks, smoke, falling ash, embers, dust, fog, rain, and lightning; the screen shakes on tolls, blinks, and getting caught, and pulses red as suspicion rises.
 
 **Full design.**
 

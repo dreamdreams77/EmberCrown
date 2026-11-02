@@ -22,7 +22,7 @@ canvas{width:min(100vw,calc(100vh * 800 / 480));width:min(100vw,calc(100dvh * 80
 <div id="turn"><div class="ph"></div><div>Turn your phone sideways to play</div><button id="turnok">Play anyway</button></div>
 <script>
 'use strict';
-/* EMBERCROWN - prototype, Chapter I. Keyboard only. */
+/* EMBERCROWN, prototype, Chapter I. Keyboard only. */
 const T=32,GW=25,GH=15;
 const cv=document.getElementById('c');const MAINCTX=cv.getContext('2d');let ctx=MAINCTX;
 // render at 2x on big or high-DPI screens so the pen lines stay crisp when the canvas is scaled up
@@ -91,8 +91,8 @@ const LEVELS=[
   [[2,12],[22,12]]]},
 {name:'The Drowned Spire',house:'House Ostrander',flight:true,
  pal:{f1:'#10303a',f2:'#123540',w:'#3f6f6a',wt:'#6fa89a',amb:.5,tab:'#2f6f8a',weather:'rain'},
- intro:['A sea fortress of bells and searchlights. Wren hides on the rocks.','This one is a flight. You are Ashling, carrying her forged letters.','Burn all four signal beacons. Drop the letters in two war rooms (hold E).','Fly over walls and water. Searchlights sweep; boats patrol.','','Land on the green pad when done.'],
- opening:'Wren is hiding. I do the flying. Try not to look smug.',
+ intro:['A sea fortress of bells and searchlights. Shiloh hides on the rocks.','This one is a flight. You are Ashling, carrying her forged letters.','Burn all four signal beacons. Drop the letters in two war rooms (hold E).','Fly over walls and water. Searchlights sweep; boats patrol.','','Land on the green pad when done.'],
+ opening:'Shiloh is hiding. I do the flying. Try not to look smug.',
  labels:{P:'Plant the forged letters',B:'Burn the four beacons'},
  gadgets:{smoke:0,bell:0,flute:0},
  map:[
@@ -148,7 +148,7 @@ const LEVELS=[
  boss:{wp:[[16,3],[21,3],[21,7],[16,7]]}},
 {name:'Ironvale',house:'House Kest',choice:true,
  pal:{f1:'#2e2420',f2:'#2e2420',w:'#5a3a34',wt:'#7a4e44',amb:.45,torch:7,tab:'#8a4a2a',floor:'iron',weather:'embers'},
- intro:['House Kest holds Perrin Ostrander, heir to the Drowned Spire, in its foundry cells.','Pick the cell lock (hold E on his door, then on him), burn the muster beacon,','and walk him to the gate. Forge vents belch fire on a cycle:','Ashling is fireproof. Wren is not.','','At the gate you decide what to do with him. The houses are watching.'],
+ intro:['House Kest holds Perrin Ostrander, heir to the Drowned Spire, in its foundry cells.','Pick the cell lock (hold E on his door, then on him), burn the muster beacon,','and walk him to the gate. Forge vents belch fire on a cycle:','Ashling is fireproof. Shiloh is not.','','At the gate you decide what to do with him. The houses are watching.'],
  opening:'Foundry heat. Watch the vents, and keep Perrin close.',
  labels:{H:'Free Perrin Ostrander',B:'Burn the muster beacon'},
  gadgets:{smoke:3,bell:3,flute:1},
@@ -296,7 +296,7 @@ function finaleEnding(choice){
     return{title:'Ending: The Puppet Crown',col:'#c8b4ff',
       lines:['House '+HOUSE_NAMES[best]+' wears the crown, and every string runs back to the Hollow Crown.',
         R.e>=4?'The houses obey because they are afraid, not because they agree.':'The houses go along with it. Peace holds, for now.',
-        R.f>=2?'A few of them even thank you. Wren does not sleep well anyway.':'Wren holds the strings and does not sleep well.'],
+        R.f>=2?'A few of them even thank you. Shiloh does not sleep well anyway.':'Shiloh holds the strings and does not sleep well.'],
       sum:'House '+HOUSE_NAMES[best]+': crowned, +1 Fear.'};
   }
   if(choice==='burn'){
@@ -311,7 +311,7 @@ function finaleEnding(choice){
   return{title:'Ending: The Broken Throne',col:'#7be08a',
     lines:['Ashling, full grown, shatters the throne. No crown is left to fight over.',
       R.f>=3?'The houses you helped meet in the rubble and draft a charter. It holds.':'The houses scramble for order. It is a hard winter, but nobody has a crown to steal.',
-      'Wren sends one last letter. This time she knows what it says.'],
+      'Shiloh sends one last letter. This time she knows what it says.'],
     sum:'Every house: +1 Favor.'};
 }
 function finishLevel(){mode='win';applyOutcome();}
@@ -364,7 +364,7 @@ function shiftTime(){
   unstick(G.wren);unstick(G.ash);
   G.rings.push({x:G.wren.x,y:G.wren.y,t:1,r:220,c:toRuin?'220,130,80':'240,210,130'});
   lureNear(G.wren.x,G.wren.y,8*T);
-  say('Wren',toRuin?'Three years on. The hall remembers what it became.':'The ball again. Mind the masks.');
+  say('Shiloh',toRuin?'Three years on. The hall remembers what it became.':'The ball again. Mind the masks.');
 }
 function los(x1,y1,x2,y2){
   const d=Math.hypot(x2-x1,y2-y1),n=Math.ceil(d/6);
@@ -413,7 +413,7 @@ function loadLevel(i){
     face:Math.atan2(wp[1][1]-wp[0][1],wp[1][0]-wp[0][0]),stun:0,pause:0,lure:null,back:null,ret:false,seeing:false,spd,rm:d.flight?.8:1}));
   if(R.fled>0)g.guards.splice(Math.max(1,g.guards.length-R.fled),Math.min(R.fled,g.guards.length-1));
   for(const x of g.guards)x.spd*=R.chaos;
-  // Ashling starts on the open tile beside Wren that is farthest from any guard
+  // Ashling starts on the open tile beside Shiloh that is farthest from any guard
   if(!g.flight){let bs=-1;
     for(const [ox,oy] of [[T,0],[0,-T],[0,T],[-T,0],[0,0]]){const x=g.wren.x+ox,y=g.wren.y+oy;
       if(g.grid[y/T|0][x/T|0]==='#')continue;
@@ -452,7 +452,7 @@ function loadLevel(i){
   return g;
 }
 function startBrief(i){lvl=i;mode='brief';}
-function startPlay(){G=loadLevel(lvl);gatherLights();mode='play';say(G.flight?'Ashling':'Wren',G.d.opening);}
+function startPlay(){G=loadLevel(lvl);gatherLights();mode='play';say(G.flight?'Ashling':'Shiloh',G.d.opening);}
 
 /* ---------- touch: drag anywhere to walk, no on-screen controls ---------- */
 const TOUCH={capable:('ontouchstart' in window)||navigator.maxTouchPoints>0,used:false,mover:null,fire:false,hold:false,stillT:0,run:false,ptr:new Map()};
@@ -586,7 +586,7 @@ function useBell(){
 }
 function useFlute(){
   if(G.active!=='wren')return;
-  if(G.gad.flute<=0){if(G.d.song)say('Wren','I do not know the Song yet. Find the lectern.');return;}
+  if(G.gad.flute<=0){if(G.d.song)say('Shiloh','I do not know the Song yet. Find the lectern.');return;}
   if(G.d.timeshift){
     for(const p of G.peds)if(Math.hypot(p.x-G.wren.x,p.y-G.wren.y)<46){shiftTime();return;}
   }
@@ -596,7 +596,7 @@ function useFlute(){
     const dd=Math.hypot(d.x*T+16-G.wren.x,d.y*T+16-G.wren.y);
     if(dd<bd){bd=dd;best=d;}
   }
-  if(!best){say('Wren','Nothing close enough to open.');return;}
+  if(!best){say('Shiloh','Nothing close enough to open.');return;}
   G.gad.flute--;best.open=true;
   G.rings.push({x:G.wren.x,y:G.wren.y,t:1,r:140,c:'160,220,255'});
   lureNear(G.wren.x,G.wren.y,8*T);
@@ -650,7 +650,7 @@ function completeTarget(t){
   if(t.kind==='guard'){
     const g=t.ref;g.stun=10;g.found=false;g.seeing=false;g.wasSee=false;
     burst(g.x,g.y,8,'smoke',30,.8);
-    if(!G.koSaid){G.koSaid=true;say('Wren','Sleep tight. Someone will find him, so keep moving.');}
+    if(!G.koSaid){G.koSaid=true;say('Shiloh','Sleep tight. Someone will find him, so keep moving.');}
     return;
   }
   const it=t.ref;it.done=true;
@@ -661,23 +661,23 @@ function completeTarget(t){
     const left=G.items.filter(i=>i.type==='C'&&!i.done).length;
     G.rings.push({x:it.x,y:it.y,t:.5,r:50,c:'200,200,255'});
     burst(it.x,it.y-10,10,'smoke',18,1.6);
-    say('Wren',left?'Snuffed. '+left+' to go.':'The last candle. Now he has nowhere to hide.');
+    say('Shiloh',left?'Snuffed. '+left+' to go.':'The last candle. Now he has nowhere to hide.');
   } else if(it.type==='L'){
     G.song=true;G.gad.flute=999;
     G.rings.push({x:G.wren.x,y:G.wren.y,t:1,r:120,c:'160,220,255'});
-    say('Wren','The Song of Opening. Press F near a sealed door. It is loud.');
-  } else if(it.type==='O'&&G.d.song){say('Wren','The ledger. Every bribe Sable ever took, in one hand.');
+    say('Shiloh','The Song of Opening. Press F near a sealed door. It is loud.');
+  } else if(it.type==='O'&&G.d.song){say('Shiloh','The ledger. Every bribe Sable ever took, in one hand.');
   } else if(it.type==='O'){
     if(lvl===0){
       G.ash.on=true;G.ash.x=G.wren.x+14;G.ash.y=G.wren.y+14;
       G.rings.push({x:G.wren.x,y:G.wren.y,t:1,r:90,c:'255,140,60'});
       burst(it.x,it.y,24,'spark',90,.8);burst(it.x,it.y,8,'smoke',40,1.2);
       say('Ashling','Oh. I hatched. Press TAB to swap, SPACE to burn.');
-    } else if(G.d.timeshift)say('Wren',"Veyra's signet, still warm from a three-year-old fire.");
-    else say('Wren','Seal swapped. Grell will sign his own surrender.');
+    } else if(G.d.timeshift)say('Shiloh',"Veyra's signet, still warm from a three-year-old fire.");
+    else say('Shiloh','Seal swapped. Grell will sign his own surrender.');
   } else if(it.type==='P'){
-    if(G.d.timeshift){G.planted=true;say('Wren','Treaty planted. Dunmoor will find it, and so will its enemies.');}
-    else say(G.flight?'Ashling':'Wren',G.flight?'Letter dropped. Ostrander will find a very convincing forgery.':'One cup. One very bad evening for the guest of honor.');
+    if(G.d.timeshift){G.planted=true;say('Shiloh','Treaty planted. Dunmoor will find it, and so will its enemies.');}
+    else say(G.flight?'Ashling':'Shiloh',G.flight?'Letter dropped. Ostrander will find a very convincing forgery.':'One cup. One very bad evening for the guest of honor.');
   }
 }
 // what E would act on right now: a lock, an objective, or an unaware guard's back
@@ -767,7 +767,7 @@ function update(dt){
     }
   }
   const moving=!!(mx0||my0);
-  // hostage follows Wren
+  // hostage follows Shiloh
   if(G.host&&G.host.on){
     const h=G.host,w=G.wren,hd=Math.hypot(w.x-h.x,w.y-h.y);
     if(hd>6*T){h.x=w.x;h.y=w.y;}
@@ -784,7 +784,7 @@ function update(dt){
     s.x=s.a[0]+(s.b[0]-s.a[0])*q;s.y=s.a[1]+(s.b[1]-s.a[1])*q;
     if(Math.hypot(s.x-ox,s.y-oy)>.01)s.face=Math.atan2(s.y-oy,s.x-ox);
   }
-  // forge vents: Wren burns, Ashling does not
+  // forge vents: Shiloh burns, Ashling does not
   for(const v of G.vents){
     const c=(G.time+v.ph)%4;v.on=c<1.4;v.warn=c>3.3;
     const vx=v.x*T+16,vy=v.y*T+16;
@@ -926,7 +926,7 @@ function update(dt){
         b.found=true;G.alert=Math.min(.95,G.alert+.22*G.gain);
         if(!g.lure&&!g.ret)g.back={x:g.x,y:g.y};
         g.lure={x:b.x,y:b.y,t:2.5};g.ret=false;bark(g,BARKS.body);
-        if(!G.bodySaid){G.bodySaid=true;say('Wren','They found him. Next time, pick a quieter corner.');}
+        if(!G.bodySaid){G.bodySaid=true;say('Shiloh','They found him. Next time, pick a quieter corner.');}
         break;
       }
     }
@@ -961,7 +961,7 @@ function update(dt){
         if(!G.tollSaid){G.tollSaid=true;say('Ashling','The bell! Freeze when it rings!');}}
       if(B.toll>0){B.toll-=dt;
         if(B.toll<=0){G.shake=Math.max(G.shake,.2);
-          if(moving&&Math.hypot(A.x-B.x,A.y-B.y)<7*T){G.alert+=.3;say('Wren','It heard me move.');}}}
+          if(moving&&Math.hypot(A.x-B.x,A.y-B.y)<7*T){G.alert+=.3;say('Shiloh','It heard me move.');}}}
     }
   }
   // timers and particles
@@ -981,7 +981,7 @@ function update(dt){
   // exit
   const req=G.items.filter(i=>'OPBLHC'.includes(i.type));
   G.exitOpen=req.every(i=>i.done)&&(!G.boss||G.boss.dead);
-  if(G.exitOpen&&!G.doneSaid){G.doneSaid=true;say(G.flight?'Ashling':'Wren',G.flight?'Done. Land on the green pad.':'Objectives done. Get Wren to the gate.');}
+  if(G.exitOpen&&!G.doneSaid){G.doneSaid=true;say(G.flight?'Ashling':'Shiloh',G.flight?'Done. Land on the green pad.':'Objectives done. Get Shiloh to the gate.');}
   const ex=G.flight?G.ash:G.wren;
   if(G.exitOpen&&(G.flight||G.active==='wren')&&Math.hypot(ex.x-G.exit.x,ex.y-G.exit.y)<20
      &&(!G.host||Math.hypot(G.host.x-G.exit.x,G.host.y-G.exit.y)<90)){
@@ -1264,7 +1264,7 @@ function wrenHead(w,hx,hy,mood,talk){
   if(mood==='sleep')sleepZ(hx,hy,R);
   ctx.lineCap='butt';
 }
-function drawWren(w){
+function drawShiloh(w){
   const sn=G.sneak,st=w.mv?Math.sin(w.walk*.3):0,curl=G.active!=='wren';
   shadowAt(w.x,w.y,9);
   ctx.save();ctx.translate(w.x,w.y);
@@ -1280,7 +1280,7 @@ function drawWren(w){
   ctx.strokeStyle='rgba('+INKC+',.7)';ctx.lineWidth=.8;ctx.stroke();
   ell(0,0,6.5,6,'#6a55a0');
   ctx.restore();
-  wrenHead(w,Math.cos(w.face)*2.5,(sn?-4.6:-6.2)+Math.sin(w.face)*1.6,wrenMood(w),talking('Wren'));
+  wrenHead(w,Math.cos(w.face)*2.5,(sn?-4.6:-6.2)+Math.sin(w.face)*1.6,wrenMood(w),talking('Shiloh'));
   ctx.restore();
 }
 function ashMood(){
@@ -1545,15 +1545,65 @@ function drawGuest(s){
   ctx.fillStyle='#f0d070';ctx.fillRect(3.5,-4,2.5,8);ctx.fillStyle='#000';ctx.fillRect(4.5,-2.5,1,1.5);ctx.fillRect(4.5,1,1,1.5);
   ctx.restore();
 }
+function perrinMood(h){
+  const al=G.alert;
+  if(al>.8)return'panic';if(al>.45)return'worry';
+  if(G.exitOpen&&Math.hypot(h.x-G.exit.x,h.y-G.exit.y)<100)return'joy';
+  return'hope';
+}
+function perrinHead(h,hx,hy,mood,talk){
+  const R=7,skin='#ecd0ac',INKL='#2a1608',ex=2.8,ey=hy+1.2,by=ey-3.6,my=hy+5.1;
+  const lx=Math.cos(h.face||0)*1.0,ly=Math.sin(h.face||0)*.7;
+  ctx.lineCap='round';ctx.lineJoin='round';
+  ell(hx-R+.4,hy+1,1.9,2.6,skin);ell(hx+R-.4,hy+1,1.9,2.6,skin);
+  ell(hx,hy+.6,R-.2,R*.98,skin);
+  // golden hair swept to one side, with a slim circlet
+  const gr=ctx.createLinearGradient(hx-R,hy-9,hx+R,hy-1);gr.addColorStop(0,'#f6dc84');gr.addColorStop(1,'#c8a43c');
+  ctx.fillStyle=gr;ctx.beginPath();ctx.ellipse(hx,hy-1.8,R+.7,R*.8,0,Math.PI,0);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(hx-R-.5,hy-1.6);ctx.quadraticCurveTo(hx-R-1,hy+2.6,hx-R+1.8,hy+3);ctx.quadraticCurveTo(hx-R+1.4,hy,hx-R+2.6,hy-1.8);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(hx+R+.5,hy-1.6);ctx.quadraticCurveTo(hx+R+1,hy+2.6,hx+R-1.8,hy+3);ctx.quadraticCurveTo(hx+R-1.4,hy,hx+R-2.6,hy-1.8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#f6dc84';ctx.beginPath();ctx.moveTo(hx-5.5,hy-2.4);ctx.quadraticCurveTo(hx-.6,hy-.2,hx+4.2,hy-3);ctx.quadraticCurveTo(hx+.8,hy-2.8,hx-2.2,hy-4.4);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#e8c870';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(hx-R+.8,hy-3.7);ctx.quadraticCurveTo(hx,hy-6,hx+R-.8,hy-3.7);ctx.stroke();
+  ell(hx,hy-5.2,1,1,'#4aa8e0');
+  ell(hx,hy+3.1,1,.9,'#d0a47c');
+  const wide=mood==='worry'||mood==='panic',ew=mood==='panic'?2.6:wide?2.4:2.1,eh=mood==='panic'?3.2:wide?2.9:2.4;
+  if(mood==='joy'){
+    ctx.strokeStyle=INKL;ctx.lineWidth=1.2;ctx.beginPath();
+    for(const sd of[-1,1]){const cx=hx+sd*ex;ctx.moveTo(cx-1.8,ey+.6);ctx.quadraticCurveTo(cx,ey-1.8,cx+1.8,ey+.6);}ctx.stroke();
+  } else for(const sd of[-1,1]){
+    const cx=hx+sd*ex;ell(cx,ey,ew,eh,'#fbf2e0');
+    ell(cx+lx*.9,ey+ly*.7,wide?1.15:1.4,wide?1.35:1.55,'#3a78b8');ell(cx+lx*.9,ey+ly*.7,.6,.7,'#101a28');ell(cx+lx*.9-.45,ey+ly*.7-.5,.4,.4,'#ffffff');
+    if(mood==='captive'){ctx.save();ctx.beginPath();ctx.ellipse(cx,ey,ew,eh,0,0,7);ctx.clip();ctx.fillStyle=skin;ctx.fillRect(cx-4,ey-4,8,2.6);ctx.restore();
+      ctx.strokeStyle=INKL;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cx-ew,ey-1.4);ctx.lineTo(cx+ew,ey-1.4);ctx.stroke();}
+  }
+  ctx.strokeStyle='#8a6a20';ctx.lineWidth=1.3;ctx.beginPath();
+  if(wide||mood==='captive'){ctx.moveTo(hx-ex-2,by+1);ctx.lineTo(hx-ex+2,by-1.2);ctx.moveTo(hx+ex+2,by+1);ctx.lineTo(hx+ex-2,by-1.2);}
+  else if(mood==='joy'){ctx.moveTo(hx-ex-2,by);ctx.quadraticCurveTo(hx-ex,by-2,hx-ex+2,by);ctx.moveTo(hx+ex-2,by);ctx.quadraticCurveTo(hx+ex,by-2,hx+ex+2,by);}
+  else{ctx.moveTo(hx-ex-2,by);ctx.quadraticCurveTo(hx-ex,by-1.6,hx-ex+2,by-.4);ctx.moveTo(hx+ex-2,by-.4);ctx.quadraticCurveTo(hx+ex,by-1.6,hx+ex+2,by);}
+  ctx.stroke();
+  if(mood==='captive'){ctx.fillStyle='rgba(70,40,80,.28)';ctx.beginPath();ctx.ellipse(hx+4.2,hy+3.4,1.8,1.1,0,0,7);ctx.fill();ell(hx-ex-1.2,ey+3.6,.7,1.1,'#9ad4ff');}
+  if(mood==='panic'){ell(hx,my,1.5,2.1,'#3a0c14');ell(hx+R+1.5,hy-3,1.2,1.7,'#9ad4ff');}
+  else if(talk){ell(hx,my,1.9,.8+Math.abs(Math.sin(now*14))*1.5,'#3a0c14');}
+  else if(mood==='joy'){ell(hx,my-.4,2.6,1.9,'#3a0c14');ell(hx,my+.4,1.6,.9,'#e0607a');}
+  else{
+    ctx.strokeStyle=INKL;ctx.lineWidth=1.1;ctx.beginPath();
+    if(mood==='worry'||mood==='captive'){ctx.moveTo(hx-2,my+.7);ctx.quadraticCurveTo(hx,my-.7,hx+2,my+.7);}
+    else{ctx.moveTo(hx-2,my-.3);ctx.quadraticCurveTo(hx,my+.9,hx+2,my-.3);}
+    ctx.stroke();
+  }
+  ctx.lineCap='butt';
+}
 function drawPerrin(h){
   const st=h.mv?Math.sin(h.walk*.3):0;
   shadowAt(h.x,h.y,9);
-  ctx.save();ctx.translate(h.x,h.y);ctx.rotate(h.face||0);
+  ctx.save();ctx.translate(h.x,h.y);
+  ctx.save();ctx.rotate(h.face||0);
   if(h.mv){ell(3+st*4,-4,3,2,'#1a2430');ell(3-st*4,4,3,2,'#1a2430');}
   ell(-1,0,7,8.5,'#2f5f8a');ell(-1,0,4,6,'#7fd0ff');
   ctx.fillStyle='#999';ctx.fillRect(1,-10,3,3);ctx.fillRect(1,7,3,3);
   ell(1,-8.6,2.2,2,'#a8aeb8');ell(1,8.6,2.2,2,'#a8aeb8');
-  ell(1,0,5,5,'#e6c4a0');ell(-1.5,0,4,5,'#e0c060');ell(3.2,-1.7,.8,.8,'#2a1a2a');ell(3.2,1.7,.8,.8,'#2a1a2a');
+  ctx.restore();
+  perrinHead(h,Math.cos(h.face||0)*2.2,-5.8+Math.sin(h.face||0)*1.5,perrinMood(h),talking('Perrin'));
   ctx.restore();
 }
 function drawGem(it){
@@ -1588,7 +1638,8 @@ function drawItem(it){
   } else if(it.type==='H'){
     if(!it.done){
       for(const sd of[-1,1])for(let k=0;k<4;k++)ell(x+sd*(14-k*2.3),y-12+k*2.6,2.1,1.4,k%2?'#8a909c':'#b8bcc6',sd*.8);
-      shadowAt(x,y,8);ell(x,y+2,8,6,'#2f5f8a');ell(x,y+2,5,4,'#7fd0ff');ell(x,y-4,4.5,4.5,'#e6c4a0');ell(x,y-6,4.5,3,'#e0c060');
+      shadowAt(x,y,8);ell(x,y+3,8,6,'#2f5f8a');ell(x,y+3,5,4,'#7fd0ff');
+      const A=G.active==='wren'?G.wren:G.ash;perrinHead({face:Math.atan2(A.y-y,A.x-x)},x,y-4,'captive',talking('Perrin'));
     }
   } else if(it.type==='L'){
     ell(x,y+8,10,3,'rgba(0,0,0,.4)');ctx.fillStyle='#4a3020';ctx.fillRect(x-2,y,4,9);
@@ -1847,7 +1898,7 @@ function drawWorld(){
   for(const g of G.guards)actors.push([g.stun>0?g.y-20:g.y,spr(g,g.spin?1:g.boss?1.15:G.flight?1.25:1.3,()=>drawGuard(g))]);
   if(G.guests&&G.state==='ball')for(const s of G.guests)actors.push([s.y,spr(s,1.2,()=>drawGuest(s))]);
   if(G.host&&G.host.on)actors.push([G.host.y,spr(G.host,1.3,()=>drawPerrin(G.host))]);
-  if(!G.wren.hidden)actors.push([G.wren.y,spr(G.wren,1.35,()=>drawWren(G.wren))]);
+  if(!G.wren.hidden)actors.push([G.wren.y,spr(G.wren,1.35,()=>drawShiloh(G.wren))]);
   if(G.ash.on)actors.push([G.flight?1e9:G.ash.y,spr(G.ash,1.2,()=>drawAsh(G.ash))]);
   actors.sort((a,b)=>a[0]-b[0]).forEach(a=>a[1]());
   INK=false;ctx=main;
@@ -1923,7 +1974,7 @@ function icon(kind,x,y){
 }
 function portrait(who,x,y){
   ell(x,y,12,12,'#2a1a40');ctx.strokeStyle='#e8c870';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,12,0,7);ctx.stroke();
-  if(who==='Wren'){ell(x,y+3,9,7,'#46346b');ell(x,y-1,6.5,7,'#6a55a0');ell(x,y,4,4.6,'#e6c4a0');ell(x-1.5,y,.8,.9,'#2a1a2a');ell(x+1.5,y,.8,.9,'#2a1a2a');}
+  if(who==='Shiloh'){ell(x,y+3,9,7,'#46346b');ell(x,y-1,6.5,7,'#6a55a0');ell(x,y,4,4.6,'#e6c4a0');ell(x-1.5,y,.8,.9,'#2a1a2a');ell(x+1.5,y,.8,.9,'#2a1a2a');}
   else{ctx.fillStyle='#ffe0a8';ctx.beginPath();ctx.moveTo(x-4,y-3);ctx.lineTo(x-7,y-9);ctx.lineTo(x-1,y-5);ctx.fill();ctx.beginPath();ctx.moveTo(x+4,y-3);ctx.lineTo(x+7,y-9);ctx.lineTo(x+1,y-5);ctx.fill();
     ell(x,y,7,6.5,'#ef7434');ell(x,y+3.5,4,3,'#e2642a');ell(x-2.5,y-1,1.2,1.2,'#fff2a0');ell(x+2.5,y-1,1.2,1.2,'#fff2a0');}
 }
@@ -1947,10 +1998,10 @@ function drawHud(){
     const s=l+(its.length>1?' '+n+'/'+its.length:'');ctx.fillText(s,x+14,18);
     x+=ctx.measureText(s).width+28;
   }
-  const who=G.active==='wren'?'Wren':'Ashling',y=471;
+  const who=G.active==='wren'?'Shiloh':'Ashling',y=471;
   INK=true;
   portrait(who,20,466);
-  ctx.font='bold 13px '+F;ctx.fillStyle=who==='Wren'?'#c8b4ff':'#ff9a4a';ctx.fillText(who,38,y);
+  ctx.font='bold 13px '+F;ctx.fillStyle=who==='Shiloh'?'#c8b4ff':'#ff9a4a';ctx.fillText(who,38,y);
   x=38+ctx.measureText(who).width+8;
   if(G.ash.on&&!G.flight){const x0=x;x+=keyCap(x,y,'TAB')+12;HOT.push({x:x0-6,w:x-x0+4,key:'tab'});}else x+=6;
   ctx.font='bold 12px '+F;
@@ -2063,14 +2114,14 @@ function draw(){
       ...(TOUCH.capable?[
       'Drag anywhere to walk: a short drag sneaks, a long drag runs',
       'Hold still next to something to pick, steal, poison, or knock out',
-      'Tap Q R F and TAB in the bar below  -  hold a second finger to breathe fire','']:[
+      'Tap Q R F and TAB in the bar below, hold a second finger to breathe fire','']:[
       'WASD / Arrows  move      Shift  sneak      Space  dragon fire      Tab  swap',
       'E (hold)  pick a lock, steal, poison, or knock out a guard you sneak up behind',
       'Q  smoke powder      R  whisper bell      F  bone flute (opens a door, loud)','']),
       'Stay out of the cones. Torchlight gives you away; shadows hide you.',
       'Running is loud. Guards hunt where they last saw you, and notice the fallen.','',
       (TOUCH.capable?'Difficulty (tap to change):   ':'Difficulty (press 1, 2 or 3):   ')+DIFFS.map((d,i)=>(i===diff?'[ ':'  ')+(i+1)+' '+d.name+(i===diff?' ]':'  ')).join('   '),
-      DIFFS[diff].blurb],'Press Enter to begin  -  Chapter I: The Hollow Crown');
+      DIFFS[diff].blurb],'Press Enter to begin. Chapter I: The Hollow Crown');
   } else if(mode==='brief'){
     const d=LEVELS[lvl];
     const R=rep(),extra=(R.f+R.e+R.r>0)?['','Standing: Favor '+R.f+'   Fear '+R.e+'   Ruin '+R.r,
@@ -2078,13 +2129,13 @@ function draw(){
     let fin=[];
     if(d.finale){const hc=houseCounts();
       fin=['Favor sends +'+Math.min(3,hc.f)+' whisper bells   Fear stands down '+Math.min(3,hc.e)+' guards   Ruin: he starts at '+(100-8*hc.r)+' HP'];}
-    panel(d.name,['Mission '+(lvl+1)+'  -  '+d.house,''].concat(d.intro,extra,fin),'Press Enter to begin');
+    panel(d.name,['Mission '+(lvl+1)+': '+d.house,''].concat(d.intro,extra,fin),'Press Enter to begin');
   } else if(mode==='court'){
     panel('The Whisper Court',[
       'Before Gallowmere you may turn one servant of House Grell.','',
-      '1   Bribe the steward  -  one guard sleeps through the feast',
-      '2   Blackmail the chamberlain  -  suspicion fades much faster',
-      '3   Taint the wine  -  guards are drowsy: shorter sight, slower steps','',
+      '1   Bribe the steward: one guard sleeps through the feast',
+      '2   Blackmail the chamberlain: suspicion fades much faster',
+      '3   Taint the wine: drowsy guards, shorter sight and slower steps','',
       'Every favor has a price. The houses will remember.'],'Press 1, 2 or 3');
   } else if(mode==='play'){
     drawWorld();drawHud();drawTouch();
@@ -2093,17 +2144,17 @@ function draw(){
     const can=stats.gems>=BREAK_GEMS;
     panel('The Throne of Hallow',[
       'The Candlemaker is dead. The throne is yours to decide.','',
-      '1   Crown a puppet  -  peace, held by strings',
-      '2   Burn it all down  -  Ashling finishes what the war began',
-      can?'3   Break the throne  -  no crown, no more wars'
-         :'3   Break the throne  -  locked: needs '+BREAK_GEMS+' ember gems (you have '+stats.gems+')','',
+      '1   Crown a puppet: peace, held by strings',
+      '2   Burn it all down: Ashling finishes what the war began',
+      can?'3   Break the throne: no crown, no more wars'
+         :'3   Break the throne (locked, needs '+BREAK_GEMS+' ember gems, you have '+stats.gems+')','',
       'There is no taking this back.'],can?'Press 1, 2 or 3':'Press 1 or 2','#f0d080',true);
   } else if(mode==='choice'){
     drawWorld();drawHud();
     panel('Perrin Ostrander',[
       'The heir of the Drowned Spire stands at the gate, breathing hard.','',
-      '1   Return him to House Ostrander  -  an ally, if a little humbled',
-      '2   Hold him as leverage  -  a bribe, and a house that fears you','',
+      '1   Return him to House Ostrander: an ally, if a little humbled',
+      '2   Hold him as leverage: a bribe, and a house that fears you','',
       'Whatever you choose, House Kest will not forget who emptied their cell.'],'Press 1 or 2','#7fd0ff',true);
   } else if(mode==='win'){
     drawWorld();drawHud();
@@ -2112,7 +2163,7 @@ function draw(){
       'Total gems: '+stats.gems+'  (more gems, longer dragon fire)',''].concat(G.outLines),'Press Enter to continue','#7be08a',true);
   } else if(mode==='lose'){
     drawWorld();drawHud();
-    panel('CAUGHT',['Wren: ...that went poorly.','Ashling: I said nothing. Loudly.'],'Press Enter to retry the mission','#e05050',true);
+    panel('CAUGHT',['Shiloh: ...that went poorly.','Ashling: I said nothing. Loudly.'],'Press Enter to retry the mission','#e05050',true);
   } else if(mode==='end'){
     const epi={
       bribe:'The steward drinks your coin and your secrets. Grell trusts no one now.',
