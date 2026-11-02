@@ -475,6 +475,7 @@ function moveG(g,tx,ty,dt,spd){
 }
 function stepGuard(g,dt){
   if(g.stun>0){g.stun-=dt;return;}
+  if(g.run){runStep(g,dt);return;}
   if(g.seeing)return;
   if(g.toastT>0){g.toastT-=dt;g.face=Math.atan2(G.d.feast.table[1]*T-g.y,G.d.feast.table[0]*T-g.x);return;}
   if(g.spin){g.face+=g.spin*.7*dt;return;}
@@ -558,6 +559,47 @@ function stepFeast(dt){
     G.toast=2;toast('The feast ends','Sober guards walk faster and see further.','#ff9a6a');
     for(const gd of G.guards)if(!gd.boss&&!gd.spin){gd.spd*=1.12;gd.rm=(gd.rm||1)*1.06;}
   }
+}
+/* Ashfall Keep: the first guard to spot you runs for the beacon. If he lights it the whole keep is on alert. */
+function beaconItem(){return G.items.find(i=>i.type==='B');}
+function startRunner(g){
+  g.run=true;g.rp=null;g.rpT=0;g.lure=null;g.ret=false;G.runner=g;
+  toast('Runner!','A guard is racing for the beacon. Stop him before he lights it.','#ff8a4a');
+  g.say={t:1.7,x:'To the beacon!'};
+}
+function runStep(g,dt){
+  const B=beaconItem();if(!B||B.done){g.run=false;g.ret=false;if(G.runner===g)G.runner=null;return;}
+  g.rpT-=dt;
+  if(!g.rp||g.rpT<=0){g.rp=foePath(g,B.x,B.y);g.rpT=.5;}
+  const near=Math.hypot(B.x-g.x,B.y-g.y)<1.3*T;
+  if(near){raiseAlarm(g);return;}
+  const nx=g.rp&&g.rp[0];
+  if(nx){if(Math.hypot(nx[0]-g.x,nx[1]-g.y)<8)g.rp.shift();else moveG(g,nx[0],nx[1],dt,g.spd*1.55);}
+  else moveG(g,B.x,B.y,dt,g.spd*1.55);
+}
+function raiseAlarm(g){
+  g.run=false;G.runner=null;G.alarmSt='raised';
+  G.rings.push({x:g.x,y:g.y,t:1,r:220,c:'255,120,50'});Aud.S.bell();shake(5);
+  toast('ALARM','The whole keep is on alert: faster guards, longer sight.','#ff5a4a');
+  G.alert=Math.min(.95,G.alert+.12);
+  for(const gd of G.guards)if(!gd.boss&&!gd.spin){gd.spd*=1.15;gd.rm=(gd.rm||1)*1.1;}
+  g.back=g.back||{x:g.x,y:g.y};g.ret=false;
+}
+function stepAlarm(dt){
+  if(!G.d.alarm||G.alarmSt==='raised')return;
+  G.runCd=Math.max(0,(G.runCd||0)-dt);
+  const r=G.runner;
+  if(r&&(r.stun>0||r.dead)){r.run=false;G.runner=null;G.runCd=10;G.cinders+=6;toast('Alarm averted','The runner is down. For now.','#7be08a');}
+  const B=beaconItem();if(r&&B&&B.done){r.run=false;G.runner=null;}
+}
+/* In a boss fight the character you are not controlling stays close behind the one you are, instead of standing in the line of fire */
+function stepPartner(dt){
+  const B=G.boss;if(!B||!B.eng||B.dead||G.flight||!G.ash.on)return;
+  const a=activeChar(),p=partnerChar();if(!p)return;
+  const dx=a.x-p.x,dy=a.y-p.y,d=Math.hypot(dx,dy);
+  if(d>34){const s=Math.min(d-28,150*dt),nx=p.x+dx/d*s,ny=p.y+dy/d*s;
+    if(!blocked(nx,ny,8)){p.x=nx;p.y=ny;}else if(!blocked(nx,p.y,8))p.x=nx;else if(!blocked(p.x,ny,8))p.y=ny;}
+  if(p.vx!==undefined){p.vx=0;p.vy=0;}
 }
 function stepTorches(dt){
   for(const tr of G.torches||[]){
@@ -860,7 +902,8 @@ function update(dt){
         best=Math.max(best,.45+(1-dist/range)*1.1);
       }
     }
-    if(g.seeing&&!g.was){g.bang=1;if(g.kind==='guard'||g.kind==='brute'||g.kind==='archer')bark(g,'alert');G.st.detect++;if(!G.alertSfxT||G.time-G.alertSfxT>1.2){G.alertSfxT=G.time;Aud.S.alert();}}
+    if(g.seeing&&!g.was){g.bang=1;if(g.kind==='guard'||g.kind==='brute'||g.kind==='archer')bark(g,'alert');
+      if(G.d.alarm&&!G.alarmSt&&!G.runner&&!(G.runCd>0)&&g.kind==='guard'&&!g.boss){const B=beaconItem();if(B&&!B.done&&G.grace<=0)startRunner(g);}G.st.detect++;if(!G.alertSfxT||G.time-G.alertSfxT>1.2){G.alertSfxT=G.time;Aud.S.alert();}}
     if(!g.seeing&&g.was&&!g.spin&&!g.boss&&g.seen){
       // lost sight: go and look
       if(!g.lure&&!g.ret)g.back={x:g.x,y:g.y};
@@ -908,7 +951,7 @@ function update(dt){
   }
   stepCombat(dt);
   // timers
-  stepTorches(dt);stepFeast(dt);
+  stepTorches(dt);stepFeast(dt);stepAlarm(dt);stepPartner(dt);
   G.smoke=G.smoke.filter(s=>(s.t-=dt)>0);
   G.rings=G.rings.filter(r=>(r.t-=dt)>0);
   if(G.msgT>0)G.msgT-=dt;

@@ -607,6 +607,7 @@ function drawMarkers(g){
     return;
   }
   if(g.spin||g.eng)return;
+  if(g.run){c.save();c.strokeStyle='rgba(255,120,40,.9)';c.lineWidth=2;circ(c,g.x,g.y,16+Math.sin(G.time*10)*2);c.stroke();c.fillStyle='rgba(255,140,60,.9)';c.font='bold 9px '+BODY;c.textAlign='center';c.fillText('RUNNER',g.x,g.y+26);c.restore();}
   if(g.say){
     const k=Math.min(1,g.say.t/.3,(1.7-g.say.t)/.12+.01);
     c.save();c.globalAlpha=Math.max(0,k);c.font='italic 11px '+BODY;c.textAlign='center';

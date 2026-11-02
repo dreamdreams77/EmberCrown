@@ -63,7 +63,7 @@ const VAULTS=[
 ];
 
 const LEVELS=[
-{name:'Ashfall Keep',house:'House Marrow',sigil:'marrow',
+{name:'Ashfall Keep',house:'House Marrow',sigil:'marrow',alarm:true,
  th:{floor:'stone',wall:'brick',amb:[14,9,22,.40],part:'ash',tapestry:.05,rack:.06,wood:'#6a4a30',stone:'#8a8694',rafters:true,chains:.05,web:.05,grade:'rgba(90,70,140,.20)',bg:'night',wood:'#6a4a30',stone:'#8a8694',rafters:true,chains:.05,web:.05,grade:'rgba(90,70,140,.20)',bg:'night',torch:.16,banner:.07,bannerCol:'#cfc9bd',bones:.045,guard:'#8d8a98',trim:'#d9d4c4',music:{root:98,mode:'minor',tempo:.9}},
  pal:{f1:'#24202c',f2:'#282431',w:'#4a4458',wt:'#615a73'},
  intro:["Six months ago you carried a letter across a border. A war started.", "Everyone remembers the courier. Nobody remembers who wrote it.", "Mother Quill of the Hollow Crown has offered you a way back in.", "House Marrow took an egg that belongs to her. Bring it home.", "", "Take the egg from the north-east tower, burn the beacon, leave by the gate."],

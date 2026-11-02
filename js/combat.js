@@ -660,8 +660,8 @@ function candleAI(B,A,dt){
       if(B.t<=0){
         const r=Math.random();
         if(B.sumCd<=0&&foesAlive()<(p2?2:1)&&((shielded&&G.candlesLit<=3)||p2)){B.st='summon';B.t=1;B.sumCd=20;Aud.S.wind();}
-        else if(r<(shielded?.62:.42)){B.st='volleyWind';B.t=p2?.65:.8;Aud.S.wind();candleLanes(B,ang,p2);}
-        else if(r<(shielded?.9:.78)){
+        else if(shielded||r<.42){B.st='volleyWind';B.t=p2?.65:.8;Aud.S.wind();candleLanes(B,ang,p2);}
+        else if(r<.78){
           for(let n=0;n<30;n++){const a=Math.random()*6.283,rr=(1.7+Math.random()*1.2)*T,x=A.x+Math.cos(a)*rr,y=A.y+Math.sin(a)*rr;
             if(!blocked(x,y,12)){B.blink={x,y,t:1.05};G.rings.push({x,y,t:1.05,r:40,c:'255,120,60'});Aud.S.blink();break;}}
           B.st=B.blink?'blinkWind':'volleyWind';B.t=B.blink?1.05:.7;
@@ -672,7 +672,7 @@ function candleAI(B,A,dt){
     case'volleyWind':
       B.t-=dt;B.face=B.aim;
       if(Math.random()<dt*20)pt(B.x+Math.cos(B.vf)*16,B.y+Math.sin(B.vf)*16,0,0,.3,3,'#ffb040',{add:true});
-      if(B.t<=0){const n=p2?5:3;for(let k=0;k<n;k++)fireOrb(B.x,B.y,B.aim+(k-(n-1)/2)*(p2?.26:.34),(shielded?104:132)+(p2?20:0));Aud.S.orb();B.st='float';B.t=shielded?3.2:(p2?1.5:2.1);}
+      if(B.t<=0){const n=p2?5:3;for(let k=0;k<n;k++)fireOrb(B.x,B.y,B.aim+(k-(n-1)/2)*(p2?.26:.34),(shielded?94:132)+(p2?20:0));Aud.S.orb();B.st='float';B.t=shielded?3.6:(p2?1.5:2.1);}
       break;
     case'blinkWind':
       B.t-=dt;
@@ -699,6 +699,6 @@ function candleAI(B,A,dt){
       B.t-=dt;if(Math.random()<dt*30)pt(B.x+rrand(-30,30),B.y+rrand(-30,30),0,-30,.6,2,'#ffb040',{add:true});
       if(B.t<=0){const a=Math.random()*6.28;spawnFoe('wisp',B.x+Math.cos(a)*50,B.y+Math.sin(a)*50);B.st='float';B.t=1;}
       break;
-    case'stagger':B.t-=dt;if(B.t<=0){B.st='float';B.t=.6;}break;
+    case'stagger':B.t-=dt;if(B.t<=0){B.st='float';B.t=G.candlesLit>0?1.8:.6;}break;
   }
 }
