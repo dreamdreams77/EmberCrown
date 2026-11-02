@@ -76,6 +76,7 @@ const UI=(()=>{
       case'restart':pauseGame(false);startPlay();break;
       case'how':openModal(howHTML());break;
       case'codex':openModal(codexHTML());break;
+      case'case':openModal(caseHTML());break;
       case'close':closeModal();persistRun();if(mode==='brief'||mode==='win')show(mode);break;
       case'forge':openModal(forgeHTML());break;
       case'sfx':settings.sfx=!settings.sfx;Aud.setOpt('sfx',settings.sfx);saveSettings();refresh();break;
@@ -117,6 +118,15 @@ const UI=(()=>{
     const disc=meta.disc.length?meta.disc.map(t=>'<div class="cx lore"><div><b>'+t+'</b></div></div>').join(''):'<div class="cx lore locked"><div><b>???</b><span>Examine the glinting bones and notes you find in each level.</span></div></div>';
     return'<h2>Codex</h2><div class="codex"><h3>Relics</h3>'+rl+'<h3>Lore</h3>'+lore+'<h3>Discoveries ('+meta.disc.length+')</h3>'+disc+'</div>'+btn('Close','close','primary');
   }
+  function caseHTML(){
+    const done=CLUES.map((c,i)=>run.ranks[i]!=null?c:null);
+    const clues=done.map((c,i)=>'<div class="cx lore '+(c?'':'locked')+'"><div><b>'+(i+1)+'. '+(c?LEVELS[i].name:'???')+'</b><span>'+(c||'Not found yet.')+'</span></div></div>').join('');
+    const verdict=done.every(Boolean)?'<p class="lead" style="text-align:center"><i>Quill wrote the war. I carried it.</i></p>':'';
+    const mood=k=>{const h=houses[k];return h.ruin>0?'in ruins':h.fear>0?'afraid of you':h.favor>0?'owes you':'does not know your name';};
+    const hs=Object.keys(HOUSE_NAMES).map(k=>'<div class="cx lore"><div><b>House '+HOUSE_NAMES[k]+'</b><span>'+mood(k)+'</span></div></div>').join('');
+    const st=[];for(let i=1;i<STAIRS.length;i++){const a=stairsAction(i);if(a)st.push('<div class="cx lore"><div><b>'+LEVELS[i].name+'</b><span>You '+a.short+'.</span></div></div>');}
+    return'<h2>Case File</h2><div class="codex"><h3>Clues</h3>'+clues+verdict+'<h3>Where the houses stand</h3>'+hs+(st.length?'<h3>On the back stairs</h3>'+st.join(''):'')+'</div>'+btn('Close','close','primary');
+  }
   function forgeHTML(){
     const col=(br,title)=>'<div class="fcol"><h3>'+title+'</h3>'+TALENTS.filter(t=>t.branch===br).map(t=>{
       const own=hasT(t.id),rq=talentReq(t),locked=!own&&rq&&!hasT(rq),aff=canBuy(t);
@@ -142,7 +152,7 @@ const UI=(()=>{
       title(){
         const next=saved&&saved.run?saved.run.next:0;
         const cont=saved&&saved.run;
-        const label=cont?(saved.run.stage==='court'?'Whisper Court':'Mission '+(next+1)+': '+LEVELS[next].name):'';
+        const label=cont?(saved.run.stage==='court'?'The Back Stairs':'Mission '+(next+1)+': '+LEVELS[next].name):'';
         screen('title','<div class="logo"><div class="crown">'+sigil('hallow')+'</div><h1>EMBERCROWN</h1><p class="tag">A spy. A runt dragon. Seven feuding houses. One engineered war.</p></div>'+
         '<div class="menu">'+(cont?btn('Continue<small>'+label+'</small>','continue','primary big')+btn(confirmNew?'Tap again: erase save':'New Game','new','ghost'):btn('Begin','new','primary big'))+
         '<div class="diffrow"><span>Difficulty</span>'+diffChips()+'</div><p class="blurb">'+DIFFS[diff].blurb+'</p>'+
@@ -155,14 +165,13 @@ const UI=(()=>{
         let fin='';if(d.finale){const hc=houseCounts();fin='<div class="stand"><span>Favor sends +'+Math.min(3,hc.f)+' whisper bells &middot; Fear stands down '+Math.min(3,hc.e)+' guards &middot; Ruin: he starts at '+(100-8*hc.r)+' HP</span></div>';}
         const rel=run.relics.length?'<div class="relrow">'+run.relics.map(k=>'<span title="'+RELICS[k].name+'">'+ricon(RELICS[k].icon)+'</span>').join('')+'</div>':'';
         screen('brief','<div class="bleft">'+sigil(d.sigil)+'<div class="mnum">Mission '+(lvl+1)+' of '+LEVELS.length+'</div><h2>'+d.name+'</h2><div class="house">'+d.house+'</div>'+rel+'</div>'+
-        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+btn('Begin mission','begin','primary big')+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+'<p class="foot">press <kbd>Enter</kbd></p></div>');
+        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+btn('Begin mission','begin','primary big')+'<div class="row">'+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+(lvl>0?btn('Case file','case','ghost small'):'')+'</div><p class="foot">press <kbd>Enter</kbd></p></div>');
       },
       court(){
-        screen('court','<h2>The Whisper Court</h2><p class="lead">Before Gallowmere you may turn one servant of House Grell.</p><div class="cards">'+
-        '<button type="button" tabindex="-1" class="card3" data-a="perk1"><b>1</b><h3>Bribe the steward</h3><p>One guard sleeps through the feast.</p></button>'+
-        '<button type="button" tabindex="-1" class="card3" data-a="perk2"><b>2</b><h3>Blackmail the chamberlain</h3><p>Suspicion fades much faster.</p></button>'+
-        '<button type="button" tabindex="-1" class="card3" data-a="perk3"><b>3</b><h3>Taint the wine</h3><p>Guards are drowsy: shorter sight, slower steps.</p></button></div>'+
-        '<p class="foot">Every favor has a price. The houses will remember.</p>');
+        const st=STAIRS[lvl+1];if(!st){startBrief(lvl+1);return;}
+        screen('court','<h2>The Back Stairs</h2><p class="lead">'+st.intro+'</p><div class="cards">'+st.options.map((o,k)=>
+        '<button type="button" tabindex="-1" class="card3" data-a="perk'+(k+1)+'"><b>'+(k+1)+'</b><h3>'+o.name+'</h3><p>'+o.desc+'</p></button>').join('')+'</div>'+
+        '<p class="foot">'+st.foot+'</p><div class="row">'+btn('Case file','case','ghost small')+'</div>');
       },
       choice(){
         if(G.d.finale){
@@ -197,7 +206,7 @@ const UI=(()=>{
       },
       pause(){
         screen('pause over','<h2>Paused</h2><div class="menu">'+btn('Resume','resume','primary big')+btn('Restart mission','restart','ghost')+
-        '<div class="row">'+btn('How to play','how','ghost small')+btn('Codex','codex','ghost small')+'</div>'+toggles()+
+        '<div class="row">'+btn('How to play','how','ghost small')+btn('Codex','codex','ghost small')+btn('Case file','case','ghost small')+'</div>'+toggles()+
         btn(confirmQuit?'Tap again: quit to title':'Quit to title','title','ghost small')+'</div>');
       },
       end(){

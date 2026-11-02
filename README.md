@@ -31,6 +31,7 @@ The camera follows the action close-up on every screen size and leans toward thr
 - **Furnished, lit worlds.** Auto-dressed rooms with tables, benches, bookcases, anvils, statues and breakable pots; chandeliers, rafters and doorway lintels in the foreground; a parallax scenery backdrop beyond the walls; distinct atmosphere in every area.
 - **Exploration.** Each mission has a hidden **vault**: burn or dash through a cracked wall, light three braziers with Ashling's fire to open the inner gate, take the relic, survive the guardian trial, then open the reward chest. Examine glinting remains for story fragments; the Codex records everything.
 - **Progression.** Cinders (from pots, foes, chests, secrets and rank) buy permanent talents at the **Ember Forge**: 12 upgrades across Wren, Ashling and shared branches, including extra hearts, Twin Dash, Ember Nova and Phoenix Spark. Relics, ember gems and S-C mission ranks still count.
+- **The Back Stairs and case file.** Before each mission after the first you turn one servant of the house you are about to rob (three options each, each changing the mission and the house's opinion of you). The case file collects one clue per mission and shows where every house stands.
 - **Saves.** Progress, talents, cinders, relics and settings persist in `localStorage` (older saves keep working). Cinders and relics are only banked when a mission is completed.
 - **Audio.** Procedural music, ambient beds per area, and combat intensity layers. No asset files.
 

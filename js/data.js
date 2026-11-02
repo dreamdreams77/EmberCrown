@@ -356,3 +356,40 @@ const LORE=[
  [{t:'The Last Hallow',x:'The crown was never lost. It was handed down, quietly, one liar to the next, each sure they would be the last.'},
   {t:'Candle-Wright Notes',x:'Five wicks. One flame, split five ways. Put one out and the rest burn brighter. Put them all out and he is just a man.'}]
 ];
+
+/* ---------- The Back Stairs: before each mission after the first, turn one servant of the house you are about to rob ---------- */
+// Indexed by the mission that follows. fx keys: drop (one fewer guard), decay, sight, speed, spin (searchlight rate), gad ({smoke,bell}), noise, vents, pick.
+const STAIRS=[null,
+ {intro:"Every house runs on its servants. Before Gallowmere, you may turn one of Grell's.",foot:'Servants talk. Every favor you buy will be repeated.',options:[
+  {name:'Bribe the steward',desc:'One guard sleeps through the feast.',short:'bribed the steward',fx:{drop:true},led:['grell','favor','The steward remembers your coin.']},
+  {name:'Blackmail the chamberlain',desc:'Suspicion fades much faster.',short:'blackmailed the chamberlain',fx:{decay:2.5},led:['grell','fear','The chamberlain keeps your secret, for now.']},
+  {name:'Taint the wine',desc:'Drowsy guards: shorter sight, slower steps.',short:'tainted the wine',fx:{sight:.75,speed:44},led:['grell','ruin','Grell wakes to a signature he does not remember.']}]},
+ {intro:'Ostrander runs on a handful of people who talk. Before the Spire, turn one.',foot:'On the sea road, a rumor travels faster than a ship.',options:[
+  {name:'Pay the harbor pilot',desc:'The harbor watch shuts down one searchlight.',short:'paid the harbor pilot',fx:{drop:true},led:['ostrander','favor','The harbor pilot remembers your coin.']},
+  {name:'Frighten the bell-ringer',desc:'The searchlights sweep slower.',short:'frightened the bell-ringer',fx:{spin:.6},led:['ostrander','fear','The bell-ringer has stopped sleeping.']},
+  {name:'Spoil the lamp oil',desc:'The searchlights see less far.',short:'spoiled the lamp oil',fx:{sight:.75},led:['ostrander','ruin','The lamp oil was cut with seawater.']}]},
+ {intro:"Sable's silence is paid for, and what is paid for can be paid for again.",foot:'In an abbey of silence, the cellars are the loudest place.',options:[
+  {name:'Pay the gatekeeper',desc:'Three extra whisper bells.',short:'paid the gatekeeper',fx:{gad:{bell:3}},led:['sable','favor','The gatekeeper has a new coat.']},
+  {name:'Threaten the choirmaster',desc:'The monks hear less.',short:'threatened the choirmaster',fx:{noise:.65},led:['sable','fear','The choirmaster no longer sings alone.']},
+  {name:'Water the refectory wine',desc:'Drowsy, slower monks.',short:'watered the refectory wine',fx:{speed:45},led:['sable','ruin','The monks were drowsy at vespers.']}]},
+ {intro:"Kest's furnaces run on foremen and favors. Before Ironvale, find the soft spot.",foot:'A forge is only as hard as the people who stoke it.',options:[
+  {name:'Bribe the foreman',desc:'The vents burn for less time.',short:'bribed the foreman',fx:{vents:.9},led:['kest','favor','The foreman retired early, with a pension.']},
+  {name:'Blackmail the quartermaster',desc:'Two extra smoke bombs and two bells.',short:'blackmailed the quartermaster',fx:{gad:{smoke:2,bell:2}},led:['kest','fear','The quartermaster counts the stores twice now.']},
+  {name:'Loosen the cell hinges',desc:'Locks pick in half the time.',short:'loosened the cell hinges',fx:{pick:.5},led:['kest','ruin','Three cell doors in Ironvale failed in one week.']}]},
+ {intro:'A ball needs a doorman, musicians and wine. Before Dunmoor, buy one.',foot:'At a masked ball, everyone is someone else, including the staff.',options:[
+  {name:'Slip the doorman a coin',desc:'One guard looks the other way.',short:'tipped the doorman',fx:{drop:true},led:['dunmoor','favor','The doorman lost your invitation, politely.']},
+  {name:'Blackmail the first violin',desc:'The music covers your mistakes: suspicion fades faster.',short:'blackmailed the first violin',fx:{decay:2},led:['dunmoor','fear','The first violin plays what he is told.']},
+  {name:'Spike the punch',desc:'Tipsy guards see less and walk slower.',short:'spiked the punch',fx:{sight:.9,speed:45},led:['dunmoor','ruin','The punch bowl was blamed on the staff.']}]},
+ {intro:'Quill left caches across the city for her couriers. There is time to reach one.',foot:'Quill is thorough. Every cache is exactly where you would have put it.',options:[
+  {name:"The courier's satchel",desc:'Two extra smoke bombs and two bells.',short:"took the courier's satchel",fx:{gad:{smoke:2,bell:2}},led:null},
+  {name:"The apothecary's tonic",desc:'Suspicion fades far faster.',short:"took the apothecary's tonic",fx:{decay:1.6},led:null},
+  {name:"The tailor's gray cloak",desc:'Guards see you less well.',short:"took the tailor's cloak",fx:{sight:.85},led:null}]}
+];
+const CLUES=[
+ 'The egg crate was sealed with a ring of plain wax. Marrow stamps a bone.',
+ "The same blank ring under Grell's treaty seal.",
+ "Ostrander's receipt book: seven letters, one courier. S. Sallow.",
+ 'Counting House gold bought the silence of Sable.',
+ 'Kest took its orders from a courier who ties her satchel as I do.',
+ "A note in Ottoline's signet case, signed Q. The Crown's rings hang in the ruins.",
+ 'The Candlemaker was trained by Quill too. He lights a candle for every crown she empties.'];

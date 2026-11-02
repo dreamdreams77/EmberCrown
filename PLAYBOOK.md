@@ -329,3 +329,16 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 **Economy (estimate).** A single casual run of a mission banks roughly 110 cinders, enough for the cheapest talent (90) after mission 1. Casual play across all seven missions earns about 730 of the 2040 needed for the whole tree. Full vault and trial clears with S rank bring it all within about four missions.
 
 **Performance.** Visible-rect blits, a DPR pixel budget (lower on touch devices), cached HUD overlays and minimap, and adaptive quality tiers. All performance figures were gathered in headless Chromium, not on a real phone.
+
+## 12. Back Stairs and the case file (ported from the parallel rewrite)
+
+**The Back Stairs.** Before every mission after the first, you turn one servant of the house you are about to rob, choosing one of three options. Each option changes that mission and leaves a mark on the house (Favor, Fear or Ruin), except the finale's cache, which changes the mission only. The effects:
+- Gallowmere: bribe the steward (a guard sleeps), blackmail the chamberlain (suspicion fades much faster), taint the wine (shorter sight, slower steps).
+- Drowned Spire: pay the harbor pilot (one searchlight shut down), frighten the bell-ringer (searchlights sweep slower), spoil the lamp oil (shorter sight).
+- Thornwick: pay the gatekeeper (+3 whisper bells), threaten the choirmaster (monks hear less), water the wine (slower monks).
+- Ironvale: bribe the foreman (vents burn for less time), blackmail the quartermaster (+2 smoke, +2 bells), loosen the hinges (locks pick in half the time).
+- Dunmoor: tip the doorman (one guard fewer), blackmail the violin (suspicion fades faster), spike the punch (shorter sight, slower steps).
+- Finale: Quill's cache (+2 smoke and bells, suspicion fades faster, or shorter guard sight).
+Saves record the choices. Older saves with the single Gallowmere choice still load.
+
+**The case file.** Opened from the pause menu, briefings and the Back Stairs: one clue per cleared mission (the verdict line appears once all seven are cleared), how each house feels about you, and what you did on the back stairs.
