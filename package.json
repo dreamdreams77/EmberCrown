@@ -1,0 +1,15 @@
+{
+  "name": "embercrown",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A stealth-action prototype in plain JavaScript and canvas. No build step.",
+  "scripts": {
+    "format": "prettier --write \"js/*.js\" style.css index.html \"test/*.js\"",
+    "format:check": "prettier --check \"js/*.js\" style.css index.html \"test/*.js\"",
+    "test": "node --test --test-concurrency=2 \"test/*.test.js\""
+  },
+  "devDependencies": {
+    "playwright": "^1.50.0",
+    "prettier": "^3.3.0"
+  }
+}

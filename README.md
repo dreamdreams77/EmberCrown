@@ -1,58 +1,81 @@
 # Embercrown
 
-A stealth-action prototype: a spy and her runt dragon infiltrate feuding houses to stop an engineered war. Inspired by the feel of N64 and PS1 classics, with all-new characters.
+A small stealth game in plain JavaScript and canvas. You play Shiloh, a courier turned spy, and Ashling, a runt dragon hatched from an egg she steals. Together they slip into the strongholds of seven feuding houses to stop a war someone is manufacturing.
 
-**Play:** open `index.html` in any modern browser (keyboard required). No build step or dependencies (the storybook typeface loads from Google Fonts when online, and falls back to Georgia offline).
+**Play it:** https://dreamdreams77.github.io/EmberCrown/ or open `index.html` in a browser. There is no build step and no runtime dependency (the typeface loads from Google Fonts when online and falls back to Georgia).
 
-**Design doc:** see [PLAYBOOK.md](PLAYBOOK.md).
+This is an early prototype. Seven short missions are playable start to finish, with three endings.
 
 ## Controls
 
-| Key | Action |
-|---|---|
-| WASD / arrows | Move |
-| Shift | Sneak |
-| E (hold) | Pick lock / steal / poison / knock out a guard (sneak up behind) |
-| Space | Dragon fire |
-| Tab | Swap Shiloh and Ashling |
-| Q / R / F | Smoke / whisper bell / bone flute |
-| M | Sound on, effects only, off |
+| | Keyboard | Touch |
+|---|---|---|
+| Walk | WASD or arrows | Drag anywhere. A short drag sneaks, a long drag runs |
+| Sneak | Shift | Short drag |
+| Pick a lock, steal, poison, snuff a candle, knock out a guard | Hold E next to it | Hold your finger still next to it |
+| Dragon fire | Space (as Ashling) | Hold a second finger down (as Ashling) |
+| Swap Shiloh and Ashling | Tab | Tap Tab in the bottom bar, or tap with a second finger |
+| Smoke, whisper bell, bone flute | Q, R, F | Tap them in the bottom bar |
+| Sound on, effects only, off | M | Tap the speaker, top right |
 
-## Sound
+On a phone, turn it sideways. Nothing is drawn over the playfield except a faint ring under your thumb.
 
-All sound is synthesized in the browser (no audio files): effects for footsteps, locks, gems, fire, guard voices, bells and thunder, plus a different theme for each mission that builds drums and horns as suspicion rises. Press **M** (or tap the speaker in the top-right corner) to cycle **sound on, sound effects only, sound off**. Your choice is remembered. Browsers only start audio after your first key press or tap.
+## How it plays
 
-## Touch controls
+- Guards see in a cone, blocked by walls, doors and smoke. Standing in torchlight makes you easier to see; shadow hides you. Running is loud.
+- A guard who loses you searches where he last saw you. Guards who find a fallen comrade raise the alarm. Suspicion fills when you are seen, and at 100% you are caught and the mission restarts.
+- Shiloh is quiet and clever. Ashling is fast, fireproof and loud, and fire is the only way to burn signal beacons.
+- Your choices raise each house's Favor, Fear or Ruin, which changes later missions and the finale.
 
-Nothing is drawn over the playfield. Turn the phone sideways, then:
+The rules in full are in [DESIGN.md](DESIGN.md).
 
-- **Walk:** drag anywhere. A short drag sneaks, a long drag runs; the anchor follows your thumb.
-- **Interact (lock, steal, poison, knock out):** stand next to it and hold your finger still.
-- **Dragon fire:** while playing Ashling, hold a second finger down.
-- **Swap / gadgets:** tap Tab, Q, R, or F in the bar at the bottom. With Shiloh active, a quick second-finger tap also swaps.
-- **Menus:** tap to continue, or tap a numbered choice.
+## What is not built yet
 
-Keyboard and touch both work at the same time.
+- No saving or pausing. A page reload starts over.
+- Each mission is one screen with no scrolling, and the missions are short.
+- Dialogue is single lines, not conversations. The Whisper Court (choosing which servant to turn) happens once, before Gallowmere.
+- Ashling's growth only extends his flame reach. Gliding, charging and carrying are designed but not built.
+- Planned but missing: the other flute songs, per-house effects on single missions, extra objectives on harder difficulties, split-screen co-op.
+- Balance has had little real play testing. Phone performance and the audio mix are the least tested.
 
-## Stealth rules worth knowing
+## Project layout
 
-- **Light and shadow.** Torches, beacons, candles, and forge vents light you up; guards see you up to 22% farther in full light and 18% less far in shadow. The gem in the bottom bar shows how exposed you are (Shadow, Dim, Lit). Ashling's fire lights her up too.
-- **Noise.** Running, or Ashling walking, makes footsteps that turn nearby guards around. Sneak (Shift) to stay quiet.
-- **Guards search.** A guard who loses sight of you walks to where he last saw you and looks around (`?` over his head).
-- **Bodies.** Sneak up behind an unaware guard and hold E to knock him out for 10 seconds. If another guard sees a stunned comrade, suspicion jumps and he goes to check.
+```
+index.html        page shell and script tags
+style.css         page and canvas styles
+js/
+  config.js       canvas, scale, constants
+  levels.js       the seven missions as data (maps, guards, palettes, text)
+  story.js        game state, house reputation, outcomes, endings, difficulty
+  world.js        collision, line of sight, loading a level
+  audio.js        synthesized sound effects, generative music, mute
+  input.js        touch and keyboard input, gadgets
+  update.js       guard behaviour, interactions, detection, bosses, the frame update
+  gfx.js          canvases, the clay material, baked level backgrounds
+  sprites.js      characters and their faces
+  props.js        items, doors, vents, smoke, particles
+  scene.js        vision cones, lighting, overlays, drawing the world
+  ui.js           HUD, menus, title screen, main loop
+test/             browser tests (Playwright)
+```
 
-## Put it on GitHub Pages
+The files are plain scripts loaded in order and share globals, so the game still runs by double-clicking `index.html`.
 
-1. Create a new repository on GitHub (for example `embercrown`).
-2. Upload `index.html`, `README.md`, and `PLAYBOOK.md`, or push this folder:
-   ```
-   git remote add origin https://github.com/YOUR-USERNAME/embercrown.git
-   git branch -M main
-   git push -u origin main
-   ```
-3. In the repository, open **Settings, Pages**, choose **Deploy from a branch**, select `main` and `/ (root)`, and save.
-4. After a minute the game is live at `https://YOUR-USERNAME.github.io/embercrown/`.
+## Development
 
-## Status
+```
+npm install
+npx playwright install chromium   # once, for the tests
+npm test           # about 30 seconds, headless Chromium
+npm run format     # Prettier
+```
 
-The full story is playable, seven missions ending in three possible endings (crown a puppet, burn it all down, or break the throne). Missions: Ashfall Keep, Gallowmere, the Drowned Spire (a flight level), Thornwick Abbey (a boss dungeon with the Bell-Warden), Ironvale (a hostage escort through forge vents, ending in a choice), Dunmoor Marsh (one hall in two time states: a masked ball and its ruins, switched at pedestals with F), and the Candlemaker's Crown (a boss fight shaped by how your houses ended up). Your choices raise each house's Favor, Fear, or Ruin, which changes later missions. Pick Courier, Spy, or Shadow difficulty on the title screen with keys 1, 2, 3. See the roadmap in the playbook.
+The tests play the whole game with key presses, fuzz every mission with random input, and check the stealth and boss rules, touch controls, the audio engine, every character expression, and that no text contains dashes or the old name of the hero.
+
+## Credits and licence
+
+Inspired by GoldenEye 007 (mission objectives, gadgets), Spyro the Dragon (gems, fire), Zelda 64 (songs that open things, bosses with rules) and the houses and betrayals of Game of Thrones. All characters, houses and places are original.
+
+Built with AI assistance (Claude, by Anthropic); the commit history shows the changes.
+
+Released under the [MIT licence](LICENSE).
