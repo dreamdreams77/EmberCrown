@@ -4,7 +4,7 @@ const TALENTS=[
  {id:'quick',branch:'wren',name:'Quick Fingers',desc:'Picking locks, stealing and snuffing take 30% less time.',cost:90},
  {id:'pockets',branch:'wren',name:'Deep Pockets',desc:'Start every mission with +1 smoke powder and +1 whisper bell.',cost:120},
  {id:'silent',branch:'wren',name:'Silent Blade',desc:'Takedowns make no noise and last far longer. Strikes hit harder.',cost:160},
- {id:'cloak',branch:'wren',name:'Shadow Cloak',desc:'Sneaking makes Wren much harder to spot.',cost:220},
+ {id:'cloak',branch:'wren',name:'Shadow Cloak',desc:'Sneaking makes Shiloh much harder to spot.',cost:220},
  {id:'lung',branch:'ash',name:"Dragon's Lung",desc:'Ashling\'s fire reaches 18 units further.',cost:100},
  {id:'searing',branch:'ash',name:'Searing Flame',desc:'Fire stuns guards 2s longer and burns foes 40% faster.',cost:150},
  {id:'twin',branch:'ash',name:'Twin Dash',desc:'Ember Dash stores two charges.',cost:190},

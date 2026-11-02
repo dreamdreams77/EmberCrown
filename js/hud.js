@@ -167,6 +167,9 @@ function drawHud(){
   const gcol=c.createLinearGradient(mx,0,mx+mw,0);gcol.addColorStop(0,'#5bd078');gcol.addColorStop(.55,'#f0b44c');gcol.addColorStop(1,'#ff4a3a');
   c.save();rr(c,mx,my+mh*.22,mw,mh*.56,4);c.clip();c.fillStyle=gcol;c.fillRect(mx,my+mh*.22,mw*a,mh*.56);
   c.fillStyle='rgba(255,255,255,.2)';c.fillRect(mx,my+mh*.22,mw*a,mh*.18);c.restore();
+  if(!G.flight&&mode==='play'){ // exposure: how well the light shows Shiloh to guards
+    const ex=Math.min(1,G.expo||0);c.fillStyle='rgba(0,0,0,.45)';c.fillRect(mx,my+mh*.84,mw,3);
+    c.fillStyle=ex<.3?'#6aa8ff':ex<.65?'#e8d070':'#ffb040';c.fillRect(mx,my+mh*.84,Math.max(2,mw*ex),3);}
   c.strokeStyle='rgba(255,255,255,.3)';c.lineWidth=1;for(let i=1;i<4;i++){c.beginPath();c.moveTo(mx+mw*i/4,my+mh*.22);c.lineTo(mx+mw*i/4,my+mh*.78);c.stroke();}
   // --- minimap ---
   let rightBottom=my+mh+10;
@@ -247,7 +250,7 @@ function drawHud(){
       if(fn&&avail)HIT.push({x:bx,y:by,w:s*1.85,h:s,fn});
       bx+=s*1.85+gap;
     };
-    chip('Wren','#c8b4ff',wr,true,()=>{if(!wr)swapChar();});
+    chip('Shiloh','#c8b4ff',wr,true,()=>{if(!wr)swapChar();});
     chip('Ashling','#ff9a4a',!wr,G.ash.on&&!G.flight||G.flight,()=>{if(wr&&G.ash.on)swapChar();});
     bx+=gap;
     if(!G.flight){

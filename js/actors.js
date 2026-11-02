@@ -1,5 +1,5 @@
 'use strict';
-/* EMBERCROWN - actors: Wren, Ashling, foes, bosses, and combat effects. */
+/* EMBERCROWN - actors: Shiloh, Ashling, foes, bosses, and combat effects. */
 
 /* Faces: drawn in local head space, facing +x, from above. mood: calm|wary|alarm|hurt|ko|focus|shout|joy|rage */
 function drawFace(c,x,y,sc,mood,ph,eyeCol,skinCol){
@@ -50,7 +50,7 @@ function drawKO(g,col,trim){
   for(let i=0;i<3;i++){const k=((t*.7+i*.33)%1);c.fillStyle='rgba(200,220,255,'+(1-k)*.9+')';c.font='bold '+(8+k*5)+'px '+HEAD;c.fillText('z',g.x+6+k*8,g.y-12-k*16);}
 }
 
-/* ---------- Wren ---------- */
+/* ---------- Shiloh ---------- */
 function ribbon(c,pts,wid0,col,wob,t){
   if(pts.length<3)return;
   c.strokeStyle=col;c.lineCap='round';

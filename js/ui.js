@@ -32,15 +32,15 @@ const TIPS=[
  'When a guard loses you they go to look. Break line of sight and move away quietly.',
  'The idle partner counts as curled up: much harder to spot. Swap before you scout.'
 ];
-const DOWNQ=[['Wren: Ow.','Ashling: That is your plan? Getting hit?'],['Wren: I had it under control.','Ashling: You were on the floor.'],['Ashling: Dodge. The word is dodge.','Wren: I know the word.']];
+const DOWNQ=[['Shiloh: Ow.','Ashling: That is your plan? Getting hit?'],['Shiloh: I had it under control.','Ashling: You were on the floor.'],['Ashling: Dodge. The word is dodge.','Shiloh: I know the word.']];
 const CTIPS=[
- 'Telegraphs glow red before every big attack. Dash (Ashling) or roll (Wren, double-tap Shift or press C) through them: you are invulnerable while rolling.',
+ 'Telegraphs glow red before every big attack. Dash (Ashling) or roll (Shiloh, double-tap Shift or press C) through them: you are invulnerable while rolling.',
  'Enemies stagger after a heavy attack. That is your opening: hit them hard while they are dazed.',
  'Hold fire on a Cinderling and it never gets to lunge. Wisps die to a single dash.',
  'Smoke breaks line of sight, so foes lose track of you. A thrown bell pulls them away.',
  'Hollow Husks block most damage from the front. Slip behind them, or wait for the slam recovery.',
  'Spend cinders at the Ember Forge: extra hearts and Ember Nova make fights far easier.'];
-const QUIPS=[['Wren: ...that went poorly.','Ashling: I said nothing. Loudly.'],['Wren: They saw the dragon.','Ashling: They saw a very small, very menacing dragon.'],['Wren: Again?','Ashling: I had a plan. It involved less running.']];
+const QUIPS=[['Shiloh: ...that went poorly.','Ashling: I said nothing. Loudly.'],['Shiloh: They saw the dragon.','Ashling: They saw a very small, very menacing dragon.'],['Shiloh: Again?','Ashling: I had a plan. It involved less running.']];
 
 const UI=(()=>{
   const root=document.getElementById('ui');
@@ -99,15 +99,15 @@ const UI=(()=>{
   function howHTML(){
     return'<h2>How to play</h2><div class="howgrid">'+
     '<div><h3>Keyboard &amp; mouse</h3><ul>'+
-    '<li><kbd>WASD</kbd> / arrows &mdash; move</li><li><kbd>Space</kbd> &mdash; Wren strikes (hit from behind to take a guard down silently); Ashling breathes fire</li>'+
-    '<li><kbd>Shift</kbd> &mdash; Wren sneaks (tap twice to roll, or <kbd>C</kbd>); Ashling dashes</li>'+
+    '<li><kbd>WASD</kbd> / arrows &mdash; move</li><li><kbd>Space</kbd> &mdash; Shiloh strikes (hit from behind to take a guard down silently); Ashling breathes fire</li>'+
+    '<li><kbd>Shift</kbd> &mdash; Shiloh sneaks (tap twice to roll, or <kbd>C</kbd>); Ashling dashes</li>'+
     '<li><kbd>E</kbd> &mdash; hold to pick, steal, open, examine; Ashling: Ember Nova once learned</li>'+
     '<li>Mouse: left-click strikes / fires toward the cursor; right-click swaps. <kbd>Tab</kbd> swaps too</li>'+
     '<li><kbd>Q</kbd> smoke &nbsp;<kbd>R</kbd> whisper bell &nbsp;<kbd>F</kbd> bone flute &nbsp;<kbd>Z</kbd> hold for a wide view</li>'+
     '<li><kbd>Esc</kbd> pause &nbsp;<kbd>M</kbd> mute &nbsp;<kbd>N</kbd> minimap</li></ul></div>'+
-    '<div><h3>Touch</h3><ul><li>Drag the left side to move. Tap the minimap for a wide scouting view.</li><li><b>STRIKE</b> (Wren) / <b>FIRE</b> (Ashling, hold). <b>ACT</b> holds to interact; for Ashling it becomes <b>NOVA</b>.</li>'+
+    '<div><h3>Touch</h3><ul><li>Drag the left side to move. Tap the minimap for a wide scouting view.</li><li><b>STRIKE</b> (Shiloh) / <b>FIRE</b> (Ashling, hold). <b>ACT</b> holds to interact; for Ashling it becomes <b>NOVA</b>.</li>'+
     '<li><b>SNEAK</b> toggles; double-tap it to roll. For Ashling it becomes <b>DASH</b>.</li><li><b>SWAP</b> changes character. Gadget buttons show remaining uses.</li></ul></div>'+
-    '<div class="wide"><h3>The goal</h3><p>Stay out of the yellow cones. Do not let Suspicion fill. Burn beacons with Ashling, steal with Wren. Learn enemy attack tells (red telegraphs), dodge with roll or dash, and spend cinders at the Ember Forge between missions. Hunt cracked walls, vault trials, relics and lore.</p></div></div>'+
+    '<div class="wide"><h3>The goal</h3><p>Stay out of the yellow cones. Do not let Suspicion fill. Burn beacons with Ashling, steal with Shiloh. Learn enemy attack tells (red telegraphs), dodge with roll or dash, and spend cinders at the Ember Forge between missions. Hunt cracked walls, vault trials, relics and lore.</p></div></div>'+
     btn('Close','close','primary');
   }
   function codexHTML(){
@@ -132,7 +132,7 @@ const UI=(()=>{
       const own=hasT(t.id),rq=talentReq(t),locked=!own&&rq&&!hasT(rq),aff=canBuy(t);
       const st=own?'own':locked?'locked':aff?'buy':'poor';
       return'<button type="button" tabindex="-1" class="tal '+st+'" data-a="buy:'+t.id+'"><b>'+t.name+'</b><span>'+t.desc+'</span><i>'+(own?'Learned':locked?'Needs '+TALENTS.find(x=>x.id===rq).name:t.cost+' cinders')+'</i></button>';}).join('')+'</div>';
-    return'<h2>The Ember Forge</h2><p class="forgec">'+run.cinders+' cinders</p><div class="forge">'+col('wren','Wren')+col('ash','Ashling')+col('both','Shared')+'</div>'+btn('Close','close','primary');
+    return'<h2>The Ember Forge</h2><p class="forgec">'+run.cinders+' cinders</p><div class="forge">'+col('wren','Shiloh')+col('ash','Ashling')+col('both','Shared')+'</div>'+btn('Close','close','primary');
   }
   function forgeBadge(){return anyAffordable()?' <em class="dot"></em>':'';}
   function openModal(html){

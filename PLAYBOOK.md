@@ -6,12 +6,12 @@
 
 ## 1. Pitch
 
-A third-person stealth-action adventure. You play **Wren Sallow**, a disgraced courier turned spy, and **Ashling**, a runt dragon hatched from the egg she stole. Together you infiltrate the strongholds of seven feuding houses to stop a war that someone is engineering.
+A third-person stealth-action adventure. You play **Shiloh Sallow**, a disgraced courier turned spy, and **Ashling**, a runt dragon hatched from the egg she stole. Together you infiltrate the strongholds of seven feuding houses to stop a war that someone is engineering.
 
 **Design pillars**
 
 1. **Mission-based infiltration.** Every castle is a self-contained mission with objectives that change by difficulty.
-2. **Two bodies, one plan.** Wren is quiet and clever. Ashling is loud, fast, and fireproof. Good plans use both.
+2. **Two bodies, one plan.** Shiloh is quiet and clever. Ashling is loud, fast, and fireproof. Good plans use both.
 3. **Everyone is playing someone.** Bribes, blackmail, and poison move the houses. Houses can rise, betray you, or fall.
 4. **Castles are dungeons.** Locked doors, learned songs, bosses, and places that change over time.
 
@@ -35,10 +35,10 @@ All characters, houses, and places are original.
 | Key | Action |
 |---|---|
 | WASD / arrows | Move |
-| Shift | Sneak (Wren only; much harder to spot) |
+| Shift | Sneak (Shiloh only; much harder to spot) |
 | E (hold) | Pick a lock, steal the objective, poison the cup |
 | Space | Dragon fire (Ashling only) |
-| Tab | Swap between Wren and Ashling |
+| Tab | Swap between Shiloh and Ashling |
 | Q | Smoke powder |
 | R | Whisper bell |
 | F | Bone flute: opens the nearest door, but is loud |
@@ -50,8 +50,8 @@ All characters, houses, and places are original.
 **Stealth**
 - Guards see in a cone (about 70 degrees) up to 5.2 tiles. Walls, closed doors, and smoke block sight.
 - Suspicion is a single meter. It rises faster the closer you are and falls slowly when unseen. At 100% you are caught and the mission restarts.
-- Sneaking multiplies Wren's visibility range by 0.6. The character you are *not* controlling counts as curled up, also 0.6.
-- Ashling is 1.45x more visible than Wren. Power comes with a price.
+- Sneaking multiplies Shiloh's visibility range by 0.6. The character you are *not* controlling counts as curled up, also 0.6.
+- Ashling is 1.45x more visible than Shiloh. Power comes with a price.
 
 **Gadgets (per mission)**
 - Smoke powder x3: a cloud for 6 seconds that blocks sight lines.
@@ -59,7 +59,7 @@ All characters, houses, and places are original.
 - Bone flute x1: opens the nearest door within 3 tiles, but lures guards within 8 tiles to you.
 
 **Ashling**
-- Faster than Wren (135 vs 92 px/s).
+- Faster than Shiloh (135 vs 92 px/s).
 - Fire stuns a guard for 5 seconds and adds a little suspicion. Fire reach grows with ember gems (+8 px per gem, capped at 12).
 - Fire is the only way to burn signal beacons (hold the flame on it for 1 second).
 - If the two are more than 7.5 tiles apart, the tether pulls the idle one to the active one.
@@ -71,10 +71,10 @@ Between missions you pick one servant of the next house to turn: bribe the stewa
 
 ## 5. Cast
 
-- **Wren Sallow.** Raised a courier's orphan. She once delivered a letter that started a border war and was blamed for it. The Hollow Crown gave her a second chance. Dry, observant, bad at trusting anyone.
+- **Shiloh Sallow.** Raised a courier's orphan. She once delivered a letter that started a border war and was blamed for it. The Hollow Crown gave her a second chance. Dry, observant, bad at trusting anyone.
 - **Ashling.** Hatched too early, so he is small and insecure and covers it with sarcasm. Starts with sparks, grows into a storm.
 - **Lady Veyra Dunmoor.** Rules the northern marshes. Believes a short, controlled war will prevent a longer one. Gracious, patient, wrong.
-- **The Candlemaker.** A masked assassin and a former Hollow Crown agent trained by the same mentor as Wren. Always one step ahead.
+- **The Candlemaker.** A masked assassin and a former Hollow Crown agent trained by the same mentor as Shiloh. Always one step ahead.
 - **Lord Tobias Grell.** A cowardly warlord who belongs to whoever flattered him last.
 - **Mother Quill.** The Hollow Crown's quartermaster. Hands out gadgets and secrets, and may be hiding her own agenda.
 
@@ -112,21 +112,21 @@ Each mission has three difficulties. Higher ones add objectives and tighten the 
 3. **The Drowned Spire** (flight level, playable)
    - You fly Ashling alone over a sea fortress; walls and water do not block you or sight lines.
    - Five rotating searchlight towers and one patrol boat (slightly shorter sight than land guards).
-   - Objectives: burn four signal beacons with fire (hold 1 second) and drop Wren's forged letters at two war rooms (hold E).
-   - Wren hides offscreen, so gadgets are unavailable. Land on the green pad to finish.
+   - Objectives: burn four signal beacons with fire (hold 1 second) and drop Shiloh's forged letters at two war rooms (hold E).
+   - Shiloh hides offscreen, so gadgets are unavailable. Land on the green pad to finish.
 
 4. **Thornwick Abbey** (dungeon with a boss, playable)
-   - *Silence is law:* moving without sneaking makes noise (Wren 4 tiles, Ashling 5) that draws monks who have a clear line to you.
+   - *Silence is law:* moving without sneaking makes noise (Shiloh 4 tiles, Ashling 5) that draws monks who have a clear line to you.
    - Find the lectern and hold E to learn the **Song of Opening**. Until then the flute is silent. After, F opens any door within 3 tiles, including **sealed doors** (purple rune) that lockpicking cannot open, and it never runs out (still loud).
    - The sealed door leads to the bell hall, where the **Bell-Warden** patrols with the abbot's ledger behind him.
-   - *Boss rules:* he is deaf to footsteps but not to the whisper bell, so Wren lures him and Ashling burns him from behind. Fire only hurts from behind (about 4.5 seconds of flame to win, health does not regrow). Fire into his front only raises suspicion.
+   - *Boss rules:* he is deaf to footsteps but not to the whisper bell, so Shiloh lures him and Ashling burns him from behind. Fire only hurts from behind (about 4.5 seconds of flame to win, health does not regrow). Fire into his front only raises suspicion.
    - *Toll:* every 6 seconds his bell tolls (a gold ring telegraphs it for 0.9 seconds). Whoever you control must stand still if within 7 tiles, or suspicion jumps.
    - Objectives: learn the Song, take the ledger, silence the Warden. The exit opens when all three are done.
 
 5. **Ironvale** (escort and choice, playable)
-   - Pick the cell lock (hold E on the door), then hold E on **Perrin Ostrander**, heir of the Drowned Spire, to free him. He follows Wren and guards can see him too.
+   - Pick the cell lock (hold E on the door), then hold E on **Perrin Ostrander**, heir of the Drowned Spire, to free him. He follows Shiloh and guards can see him too.
    - Burn the muster beacon with Ashling, then walk Perrin to the gate. The exit needs him close.
-   - **Forge vents** burst into flame on a cycle (they glow orange just before). Standing on a live vent makes Wren suspicious fast. Ashling is immune.
+   - **Forge vents** burst into flame on a cycle (they glow orange just before). Standing on a live vent makes Shiloh suspicious fast. Ashling is immune.
    - **The choice:** return Perrin to House Ostrander (Favor) or hold him as leverage (Fear). Kest gains Fear either way.
 
 **Difficulty (implemented as tuning; extra objectives still planned)**
@@ -145,8 +145,8 @@ Each mission has three difficulties. Higher ones add objectives and tighten the 
    - Results: Dunmoor gets +Ruin and +Fear.
 
 7. **The Candlemaker's Crown** (finale, playable)
-   - A ruined hall of extinct House Hallow, lit by five candles. The Candlemaker, a former Hollow Crown agent trained by Wren's own mentor, patrols it.
-   - **Candles:** snuff all five (hold E, Wren only). While any candle burns he is shielded and Ashling's fire does nothing. The hall gets darker with each one snuffed.
+   - A ruined hall of extinct House Hallow, lit by five candles. The Candlemaker, a former Hollow Crown agent trained by Shiloh's own mentor, patrols it.
+   - **Candles:** snuff all five (hold E, Shiloh only). While any candle burns he is shielded and Ashling's fire does nothing. The hall gets darker with each one snuffed.
    - **The boss:** like the Bell-Warden, fire only hurts him from behind (22 health per second), and the whisper bell lures him. His signature is the **blink**: every 8 seconds he marks a spot 1.6 to 3 tiles from whoever you control (a pulsing orange ring), then appears there 1.3 seconds later facing you. If you are still within about 2 tiles, suspicion jumps. Move off the ring.
    - **Your houses shape the fight** (the briefing screen shows the numbers):
      - Each house with Favor sends help: +1 whisper bell (up to +3).
@@ -173,7 +173,7 @@ The ending screen shows the ending title, a short epilogue, ember gems, times ca
 | 0 | Hatchling | Sparks, short flame |
 | 6 | Fledgling | Glide over pits and low walls |
 | 14 | Wyrmling | Charge attack: smashes brittle doors |
-| 24 | Drake | Wide flame; can carry Wren across gaps |
+| 24 | Drake | Wide flame; can carry Shiloh across gaps |
 | 36 | Dragon | Full flame; unlocks the finale ending choice |
 
 The prototype implements flame reach only, plus the finale gate: the **Break the throne** ending needs 20 of the 33 gems in the game (60%). The thresholds above are the full-game design and will be rescaled to the final gem count.
@@ -231,7 +231,7 @@ The bone flute's Song of Time switches state at special pedestals. Objects you m
 | Song | Effect |
 |---|---|
 | Opening | Opens sealed doors (implemented: learn it in Thornwick Abbey, F near a door) |
-| Calling | Summons Ashling to Wren's position (planned) |
+| Calling | Summons Ashling to Shiloh's position (planned) |
 | Hush | Muffles footsteps for 10 seconds (planned) |
 | Time | Switches feast and ruin states (implemented: F at a pedestal in Dunmoor Marsh) |
 | Ember | Ignites braziers and beacons from a distance (planned) |
@@ -240,7 +240,7 @@ The bone flute's Song of Time switches state at special pedestals. Objects you m
 
 ## 12. Split-screen co-op (planned)
 
-Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives require both, such as Ashling distracting guards while Wren steals. Suspicion is shared.
+Player 1 is Shiloh. Player 2 is Ashling. Each has their own camera. Objectives require both, such as Ashling distracting guards while Shiloh steals. Suspicion is shared.
 
 ---
 
@@ -282,7 +282,7 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 
 **Combat and encounters**
 - *Ember Dash* (Shift as Ashling): a short charge, 2.6 s cooldown. Stuns ordinary guards, is blocked by brutes and the Candlemaker's candle shield, chips the Bell-Warden for 8, shatters cracked walls.
-- *Oil barrels* (`o`): ignite with fire. Blast radius 2.7 tiles stuns guards (brutes 2 s, others 4.5 s), hurts Wren if she is within 1.5 tiles, lures every guard within 9 tiles, and chains to neighbouring barrels.
+- *Oil barrels* (`o`): ignite with fire. Blast radius 2.7 tiles stuns guards (brutes 2 s, others 4.5 s), hurts Shiloh if she is within 1.5 tiles, lures every guard within 9 tiles, and chains to neighbouring barrels.
 - *Guard types* (assigned per mission): **hound** (fast, short wide cone, smells within 2.5 tiles through any facing), **archer** (1.45x range, narrow 40 degree cone, slower), **brute** (shield: fire only stuns from behind, 4 s).
 - Guards who lose sight of you walk to your last seen position for about 1.6 s before returning to their patrol.
 
@@ -294,9 +294,9 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 
 ## 10. Combat, bosses, vaults and the Forge
 
-**Hearts and damage.** The team shares 4 hearts (up to 6 with talents). A hit costs 1 heart (slams and the Warden's phase-2 slam cost 2 in damage terms), grants 1.15 s of invulnerability, and knocks the active character back. Rolling (Wren) and dashing (Ashling) are fully invulnerable. Hearts reach zero: *Overwhelmed*, retry the mission. Reaching 100% suspicion still means *Caught*, as before.
+**Hearts and damage.** The team shares 4 hearts (up to 6 with talents). A hit costs 1 heart (slams and the Warden's phase-2 slam cost 2 in damage terms), grants 1.15 s of invulnerability, and knocks the active character back. Rolling (Shiloh) and dashing (Ashling) are fully invulnerable. Hearts reach zero: *Overwhelmed*, retry the mission. Reaching 100% suspicion still means *Caught*, as before.
 
-**Wren.** Strike: 3-hit combo (third hit is heavier). Hitting an unaware guard from behind is a silent *takedown* (9 s KO, 16 s with Silent Blade). Facing or alerted guards are only staggered and the noise draws others. Shielded brutes block frontal strikes. Roll: 0.3 s, i-frames, 0.85 s cooldown.
+**Shiloh.** Strike: 3-hit combo (third hit is heavier). Hitting an unaware guard from behind is a silent *takedown* (9 s KO, 16 s with Silent Blade). Facing or alerted guards are only staggered and the noise draws others. Shielded brutes block frontal strikes. Roll: 0.3 s, i-frames, 0.85 s cooldown.
 
 **Ashling.** Fire (damages foes, burns beacons, lights braziers, destroys fire orbs), Ember Dash (2.6 s, charges with Twin Dash), Ember Nova (84 unit radius, 6 s cooldown, unlocked at the Forge).
 
@@ -314,7 +314,7 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 
 ## 11. Audit and refinement pass
 
-**Fair start.** Guards that spawn within six tiles of Wren are reseated at their farthest waypoint, and every mission opens with 2.2 s of grace followed by a 1.6 s detection ramp, so standing still at the start can no longer lose the mission.
+**Fair start.** Guards that spawn within six tiles of Shiloh are reseated at their farthest waypoint, and every mission opens with 2.2 s of grace followed by a 1.6 s detection ramp, so standing still at the start can no longer lose the mission.
 
 **Foe behaviour.** Foes path around walls (BFS) instead of freezing without line of sight, spawn only on open floor, and take turns: one Cinderling lunges at a time while others circle, and Ashwisp volleys never overlap. The Husk is slower to recover from its slam, and the slam hits once.
 
@@ -324,7 +324,7 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 
 **Look.** Soft flashlight cones, per-room floor patterns/tints and auto-placed rugs, prop variants and new furniture per area, 13 story-point illustrations, and a distinct style per vault (floor tint, rune, flame colour, dressing).
 
-**Visible upgrades.** Ashling visibly grows with ember gems, Searing Flame turns the fire white-blue, Shadow Cloak adds a shimmer aura around Wren.
+**Visible upgrades.** Ashling visibly grows with ember gems, Searing Flame turns the fire white-blue, Shadow Cloak adds a shimmer aura around Shiloh.
 
 **Economy (estimate).** A single casual run of a mission banks roughly 110 cinders, enough for the cheapest talent (90) after mission 1. Casual play across all seven missions earns about 730 of the 2040 needed for the whole tree. Full vault and trial clears with S rank bring it all within about four missions.
 
@@ -345,8 +345,16 @@ Saves record the choices. Older saves with the single Gallowmere choice still lo
 
 ## 13. Story pass and faces (ported from the parallel rewrite)
 
-**Story.** The thread is now explicit: Mother Quill of the Hollow Crown engineered the war and used Wren as the courier. Every mission intro is rewritten around its house's voice (Marrow clipped, Grell loud, Ostrander nautical, Sable silent, Kest blunt, Dunmoor ironic, Hallow candle-lit). Each mission now plants a clue that the case file records (the blank wax ring on the egg crate and Grell's seal, the receipt book signed "S. Sallow", the Counting House ledger, Perrin's remark about the satchel, the signet note signed Q.). The Candlemaker has dying words and Quill appears in the epilogues of the Puppet and Burn endings. Dialogue lines can now be queued, so a discovery can be followed by a reply.
+**Story.** The thread is now explicit: Mother Quill of the Hollow Crown engineered the war and used Shiloh as the courier. Every mission intro is rewritten around its house's voice (Marrow clipped, Grell loud, Ostrander nautical, Sable silent, Kest blunt, Dunmoor ironic, Hallow candle-lit). Each mission now plants a clue that the case file records (the blank wax ring on the egg crate and Grell's seal, the receipt book signed "S. Sallow", the Counting House ledger, Perrin's remark about the satchel, the signet note signed Q.). The Candlemaker has dying words and Quill appears in the epilogues of the Puppet and Burn endings. Dialogue lines can now be queued, so a discovery can be followed by a reply.
 
 **Barks.** Guards shout short house-flavoured lines above their heads when alerted, when they lose you and when a noise draws them (Sable's monks mime with `*points*`). One bark every 1.6 s at most so the screen never fills with text.
 
-**Faces.** Wren, Ashling, every guard and both bosses have faces with expressions driven by what is happening: guards are calm, wary (investigating), alarmed (seeing you), hurt or knocked out; Wren narrows her eyes when sneaking, shouts when striking, winces when hit and looks alarmed as suspicion peaks; Ashling frowns when breathing fire and looks worried when hurt; the Candlemaker smiles until he attacks, and the Warden scowls harder in phase 2. Faces are drawn in a single helper (`drawFace` in `js/actors.js`).
+**Faces.** Shiloh, Ashling, every guard and both bosses have faces with expressions driven by what is happening: guards are calm, wary (investigating), alarmed (seeing you), hurt or knocked out; Shiloh narrows her eyes when sneaking, shouts when striking, winces when hit and looks alarmed as suspicion peaks; Ashling frowns when breathing fire and looks worried when hurt; the Candlemaker smiles until he attacks, and the Warden scowls harder in phase 2. Faces are drawn in a single helper (`drawFace` in `js/actors.js`).
+
+## 14. Light, shadow and the toast
+
+**Light and shadow.** Detection now depends on how well lit Shiloh is. Torches, lit braziers, forge vents, burning beacons, unsnuffed candles and Ashling's fire all cast light. Guard sight range against Shiloh scales from x0.78 in shadow to x1.33 right under a flame (Ashling already glows and is unaffected). A thin gauge under the suspicion bar shows exposure: blue (hidden), gold, orange (lit).
+
+**Snuffing.** Hold E at a wall torch to snuff it (the flight mission has none). A smoke bomb smothers every flame in its cloud. A cold torch is not free: guards within five tiles with a line of sight come to look at it, and any guard who walks within about 1.7 tiles of it for a second relights it. Cutting a dark route therefore costs attention. Time-shift ruins keep their burnt-out torches.
+
+**Gallowmere's toast.** At 70 seconds Lord Grell calls the toast: for 9 seconds every guard who has not spotted you stops and turns to the head table, then the feast ends and they are 12% faster with 6% more sight. It is a window to cross the hall, but only through ground they are not facing.

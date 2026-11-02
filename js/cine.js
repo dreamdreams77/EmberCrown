@@ -56,7 +56,7 @@ function introCine(short){
       const k=Math.min(n-1,Math.floor((t-HOLD)/(MOVE+HOLD2))+1),st=HOLD+(k-1)*(MOVE+HOLD2);
       return seq[k].cap&&t-st>MOVE*.55?{text:seq[k].cap,a:Math.min(1,(t-st-MOVE*.55)/.25)*Math.min(1,(st+MOVE+HOLD2-t)/.2+.2)}:null;
     },
-    onEnd:()=>{G.grace=2.2;say(G.flight?'Ashling':'Wren',G.d.opening);}
+    onEnd:()=>{G.grace=2.2;say(G.flight?'Ashling':'Shiloh',G.d.opening);}
   });
 }
 

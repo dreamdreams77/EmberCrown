@@ -42,7 +42,7 @@ function mkVault(orient,crack,inspect,waves){
 const VW=[['cinder','cinder'],['cinder','cinder','cinder']];
 
 const RELICS={
-  boots:{name:"Cat's-Paw Boots",icon:'boots',desc:'Wren creeps 25% faster while sneaking.'},
+  boots:{name:"Cat's-Paw Boots",icon:'boots',desc:'Shiloh creeps 25% faster while sneaking.'},
   purse:{name:"Grell's Gilded Purse",icon:'purse',desc:'Every mission starts with one extra whisper bell.'},
   stormglass:{name:'Stormglass Lens',icon:'lens',desc:'Ashling\'s fire reaches 14 units further.'},
   cowl:{name:'Hush Cowl',icon:'cowl',desc:'Suspicion builds 10% slower.'},
@@ -108,7 +108,7 @@ const LEVELS=[
  barks:{"lure": ["Is that the toast?", "Was that gold?"], "lost": ["Gone! Search the pantry.", "Where did they go?"], "alert": ["Thief at the feast!", "Hic. Intruder!"]},
  labels:{O:'Swap the seal',P:'Poison the wine cup',B:'Burn the signal beacon'},
  gadgets:{smoke:3,bell:3,flute:1},
- bribeIdx:4,
+ bribeIdx:4,feast:{at:70,len:9,table:[11.5,3.5]},
  map:buildMap([
  "#########################",
  "#S...#.....P.....#.....O#",
@@ -142,7 +142,7 @@ const LEVELS=[
 {name:'The Drowned Spire',house:'House Ostrander',sigil:'ostrander',flight:true,
  th:{floor:'sea',wall:'roof',amb:[6,22,34,.30],part:'sea',grade:'rgba(60,160,200,.14)',bg:'sea',grade:'rgba(60,160,200,.14)',bg:'sea',torch:0,banner:0,bones:0,guard:'#3f8fa0',trim:'#e8f4ff',music:{root:87,mode:'lydian',tempo:.8}},
  pal:{f1:'#10303a',f2:'#123540',w:'#3f6f6a',wt:'#6fa89a'},
- intro:["Ostrander rings a bell for the tide, for supper, and for the dead.", "Wren waits on the rocks with the forged letters. Ashling carries them.", "Burn four beacons. Drop the letters in two war rooms (hold E). Land on the green pad.", "Walls and water do not stop you. Searchlights do."],
+ intro:["Ostrander rings a bell for the tide, for supper, and for the dead.", "Shiloh waits on the rocks with the forged letters. Ashling carries them.", "Burn four beacons. Drop the letters in two war rooms (hold E). Land on the green pad.", "Walls and water do not stop you. Searchlights do."],
  opening:"She hides on the rocks. I fly. Please note that.",
  barks:{"lure": ["Off the port side.", "Hail that."], "lost": ["Lost her.", "Fog took her."], "alert": ["Who is aloft?", "Raise the bell!"]},
  labels:{P:'Plant the forged letters',B:'Burn the four beacons'},
@@ -211,7 +211,7 @@ const LEVELS=[
 {name:'Ironvale',house:'House Kest',sigil:'kest',choice:true,
  th:{floor:'forge',wall:'iron',amb:[26,8,4,.40],part:'sparks',grate:.1,wood:'#4a3a38',stone:'#6a5048',chains:.1,grade:'rgba(255,90,30,.22)',bg:'forge',wood:'#4a3a38',stone:'#6a5048',chains:.1,grade:'rgba(255,90,30,.22)',bg:'forge',torch:.14,banner:.05,bannerCol:'#a64a2a',bones:0,pipes:.12,guard:'#8a5a40',trim:'#ff9a4a',music:{root:73,mode:'minor',tempo:1.15}},
  pal:{f1:'#2a1c1a',f2:'#2e1f1c',w:'#5a3a34',wt:'#7a4e44'},
- intro:["House Kest hammers iron and grudges. It holds Perrin Ostrander in a cell.", "Pick the cell lock, free him, burn the muster beacon, and walk him out.", "The vents belch fire on a beat. Ashling does not mind. Wren will.", "", "At the gate you decide what he is worth."],
+ intro:["House Kest hammers iron and grudges. It holds Perrin Ostrander in a cell.", "Pick the cell lock, free him, burn the muster beacon, and walk him out.", "The vents belch fire on a beat. Ashling does not mind. Shiloh will.", "", "At the gate you decide what he is worth."],
  opening:"The floor is breathing. Watch the vents.",
  barks:{"lure": ["Hey.", "Who is that?"], "lost": ["Slipped us.", "Hammer take it."], "alert": ["Hold there!", "Iron's up!"]},
  labels:{H:'Free Perrin Ostrander',B:'Burn the muster beacon'},

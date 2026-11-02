@@ -339,7 +339,7 @@ function bakeStatic(){
         lastTorch=x;
         c.fillStyle='#2a2018';c.fillRect(px+14,py+13,4,10);c.fillStyle='#4a3a28';c.fillRect(px+12,py+21,8,3);
         c.fillStyle='#1a1410';c.fillRect(px+15,py+9,2,6);
-        G.torches.push({x:px+16,y:py+12,ph:rnd()*6,col:tc,out:ruin&&rnd()<.4});
+        {const ro=ruin&&rnd()<.4;G.torches.push({x:px+16,y:py+12,ph:rnd()*6,col:tc,out:ro,ruinOut:ro});}
       } else if(r<(th.torch||0)+(th.banner||0)&&!nearDoor){
         const bc=th.bannerCol||'#8a4a4a';
         c.fillStyle='#2a2018';c.fillRect(px+7,py+10,18,2);

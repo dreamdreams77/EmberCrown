@@ -47,7 +47,7 @@ function stairsFx(i){const a=stairsAction(i);return a?a.fx:{};}
 function houseCounts(){let f=0,e=0,r=0;for(const k in houses){if(houses[k].favor>0)f++;if(houses[k].fear>0)e++;if(houses[k].ruin>0)r++;}return{f,e,r};}
 function finaleEnding(choice){
   const R=rep(),keys=Object.keys(houses);
-  const stub=hasRelic('stub')?'The Hallow candle-stub sits cold in Wren\'s pocket. She does not throw it away.':null;
+  const stub=hasRelic('stub')?'The Hallow candle-stub sits cold in Shiloh\'s pocket. She does not throw it away.':null;
   if(choice==='puppet'){
     let best=keys[0],bs=-1;
     for(const k of keys){const s=houses[k].fear*2+houses[k].favor;if(s>bs){bs=s;best=k;}}
@@ -55,7 +55,7 @@ function finaleEnding(choice){
     return{title:'Ending: The Puppet Crown',col:'#c8b4ff',
       lines:['House '+HOUSE_NAMES[best]+' wears the crown, and every string runs back to the Hollow Crown.',
         R.e>=4?'The houses obey because they are afraid, not because they agree.':'The houses go along with it. Peace holds, for now.',
-        R.f>=2?'A few of them even thank you. Wren does not sleep well anyway.':'Wren holds the strings and does not sleep well.',"Quill's note is waiting at the palace. It says: Well done. It is exactly what she planned."].concat(stub?[stub]:[]),
+        R.f>=2?'A few of them even thank you. Shiloh does not sleep well anyway.':'Shiloh holds the strings and does not sleep well.',"Quill's note is waiting at the palace. It says: Well done. It is exactly what she planned."].concat(stub?[stub]:[]),
       sum:'House '+HOUSE_NAMES[best]+': crowned, +1 Fear.'};
   }
   if(choice==='burn'){
@@ -70,7 +70,7 @@ function finaleEnding(choice){
   return{title:'Ending: The Broken Throne',col:'#7be08a',
     lines:['Ashling, full grown, shatters the throne. No crown is left to fight over.',
       R.f>=3?'The houses you helped meet in the rubble and draft a charter. It holds.':'The houses scramble for order. It is a hard winter, but nobody has a crown to steal.',
-      'Wren sends one last letter. This time she knows what it says.'].concat(stub?[stub]:[]),
+      'Shiloh sends one last letter. This time she knows what it says.'].concat(stub?[stub]:[]),
     sum:'Every house: +1 Favor.'};
 }
 const DIFFS=[
@@ -214,7 +214,7 @@ function shiftTime(){
   Aud.S.shift();shake(5);
   burst(G.wren.x,G.wren.y,26,toRuin?'#ffb070':'#cfe0ff',120,1.1,2.4,{add:true,dr:1.5});
   lureNear(G.wren.x,G.wren.y,8*T);
-  say('Wren',toRuin?'Three years on. The hall remembers what it became.':'The ball again. Mind the masks.');
+  say('Shiloh',toRuin?'Three years on. The hall remembers what it became.':'The ball again. Mind the masks.');
   Aud.setTheme(Object.assign({},G.d.th.music,{root:G.d.th.music.root*(toRuin?.84:1)}));
 }
 
@@ -322,7 +322,7 @@ function startPlay(){
   setMode('play');
   Aud.S.confirm();
   Aud.setTheme(G.d.th.music);Aud.ambient(G.d.th.bg);
-  say(G.flight?'Ashling':'Wren',G.d.opening);
+  say(G.flight?'Ashling':'Shiloh',G.d.opening);
   if(typeof onLevelStart==='function')onLevelStart();
 }
 
@@ -423,7 +423,7 @@ function useBell(){
 }
 function useFlute(){
   if(G.active!=='wren')return;
-  if(G.gad.flute<=0){if(G.d.song)say('Wren','I do not know the Song yet. Find the lectern.');return;}
+  if(G.gad.flute<=0){if(G.d.song)say('Shiloh','I do not know the Song yet. Find the lectern.');return;}
   if(G.d.timeshift){
     for(const p of G.peds)if(Math.hypot(p.x-G.wren.x,p.y-G.wren.y)<46){shiftTime();return;}
   }
@@ -433,7 +433,7 @@ function useFlute(){
     const dd=Math.hypot(d.x*T+16-G.wren.x,d.y*T+16-G.wren.y);
     if(dd<bd){bd=dd;best=d;}
   }
-  if(!best){say('Wren','Nothing close enough to open.');return;}
+  if(!best){say('Shiloh','Nothing close enough to open.');return;}
   G.gad.flute--;best.open=true;
   G.rings.push({x:G.wren.x,y:G.wren.y,t:1,r:140,c:'160,220,255'});
   Aud.S.flute();Aud.S.open();
@@ -476,6 +476,7 @@ function moveG(g,tx,ty,dt,spd){
 function stepGuard(g,dt){
   if(g.stun>0){g.stun-=dt;return;}
   if(g.seeing)return;
+  if(g.toastT>0){g.toastT-=dt;g.face=Math.atan2(G.d.feast.table[1]*T-g.y,G.d.feast.table[0]*T-g.x);return;}
   if(g.spin){g.face+=g.spin*.7*dt;return;}
   if(g.lure){
     if(moveG(g,g.lure.x,g.lure.y,dt,g.spd*1.3)){g.lure.t-=dt;if(g.lure.t<=0){g.lure=null;g.ret=true;}}
@@ -488,6 +489,7 @@ function stepGuard(g,dt){
 }
 function completeTarget(t){
   if(t.kind==='insp'){readInspect(t.ref);return;}
+  if(t.kind==='torch'){snuffTorch(t.ref);return;}
   if(t.kind==='chest'){openChest(t.ref);return;}
   if(t.kind==='door'){t.ref.open=true;Aud.S.open();
     burst(t.ref.x*T+16,t.ref.y*T+16,10,'#c9a06a',50,.6,2.5,{k:'smoke',gr:4});return;}
@@ -501,26 +503,72 @@ function completeTarget(t){
     G.rings.push({x:it.x,y:it.y,t:.5,r:50,c:'200,200,255'});Aud.S.snuff();
     burst(it.x,it.y-8,12,'#8a8a96',30,1.2,5,{k:'smoke',g:-30,gr:6});
     G.candlesLit=left;candleSnuffed(G.boss);
-    if(left===4&&G.boss&&!G.boss.dead)say('Candlemaker','I light one for every crown she empties. Leave them.');else say('Wren',left?'Snuffed. '+left+' to go.':'The last candle. Now he has nowhere to hide.');
+    if(left===4&&G.boss&&!G.boss.dead)say('Candlemaker','I light one for every crown she empties. Leave them.');else say('Shiloh',left?'Snuffed. '+left+' to go.':'The last candle. Now he has nowhere to hide.');
   } else if(it.type==='L'){
     G.song=true;G.gad.flute=999;
     G.rings.push({x:G.wren.x,y:G.wren.y,t:1,r:120,c:'160,220,255'});Aud.S.flute();
     toast('Song of Opening learned','Press F near a sealed door. It is loud.','#9fd8ff');
-    say('Wren','The Song of Opening. Press F near a sealed door. It is loud.');
-  } else if(it.type==='O'&&G.d.song){say('Wren','Counting House gold, paid for silence about seven letters. One courier. Me.');
+    say('Shiloh','The Song of Opening. Press F near a sealed door. It is loud.');
+  } else if(it.type==='O'&&G.d.song){say('Shiloh','Counting House gold, paid for silence about seven letters. One courier. Me.');
   } else if(it.type==='O'){
     if(lvl===0){
       G.ash.on=true;G.ash.x=G.wren.x+14;G.ash.y=G.wren.y+14;
       G.rings.push({x:G.wren.x,y:G.wren.y,t:1,r:90,c:'255,140,60'});
       burst(G.wren.x,G.wren.y,30,'#ff9a4a',120,1,3,{add:true});shake(5);
       toast('Ashling hatches!','TAB swaps characters. SPACE breathes fire. SHIFT dashes.','#ff9a4a');
-      say('Wren','No bone on the crate. Only a ring of plain wax, with nothing pressed in it.');say('Ashling','Oh. I hatched. Nobody asked me first. (TAB swaps, SPACE burns.)',3.6);
-    } else if(G.d.timeshift){say('Wren','Her signet. A note inside the case: "Do nothing until the treaty is found. Q."');say('Wren','I planted that treaty.',3.6);}
-    else say('Wren','Seal swapped. Under the old one, a ring of plain wax. The same as the crate.');
+      say('Shiloh','No bone on the crate. Only a ring of plain wax, with nothing pressed in it.');say('Ashling','Oh. I hatched. Nobody asked me first. (TAB swaps, SPACE burns.)',3.6);
+    } else if(G.d.timeshift){say('Shiloh','Her signet. A note inside the case: "Do nothing until the treaty is found. Q."');say('Shiloh','I planted that treaty.',3.6);}
+    else say('Shiloh','Seal swapped. Under the old one, a ring of plain wax. The same as the crate.');
   } else if(it.type==='P'){
-    if(G.d.timeshift){G.planted=true;say('Wren','Treaty planted. By morning every house will have a copy.');}
-    else {if(G.flight){G.letters=(G.letters||0)+1;say('Ashling',G.letters===1?'Dropped. A receipt book lies open beside it: "S. Sallow, courier." That is her name.':'Seven receipts in one hand, all hers. Seven houses, one day. She will not like this.');}else say('Wren','One cup. He will not finish the toast.');}
+    if(G.d.timeshift){G.planted=true;say('Shiloh','Treaty planted. By morning every house will have a copy.');}
+    else {if(G.flight){G.letters=(G.letters||0)+1;say('Ashling',G.letters===1?'Dropped. A receipt book lies open beside it: "S. Sallow, courier." That is her name.':'Seven receipts in one hand, all hers. Seven houses, one day. She will not like this.');}else say('Shiloh','One cup. He will not finish the toast.');}
   }
+}
+/* ---------- light and shadow ---------- */
+// How brightly fixed light falls on a point: 0 (deep shadow) to 1 (right under a flame). Shiloh is easier to spot in light.
+function lightAt(x,y){
+  let m=0;
+  const f=(sx,sy,r,a)=>{const d=Math.hypot(sx-x,sy-y);if(d>=r)return;const v=Math.min(1,(1-d/r)*a*1.3);
+    if(v<=m)return;const k=14/(d||1);if(d<14||los(sx+(x-sx)*k,sy+(y-sy)*k,x,y))m=v;};
+  for(const tr of G.torches||[]){if(tr.out)continue;f(tr.x,tr.y+(tr.small?6:14),tr.pipe?80:(tr.small?85*(tr.s||1):118),tr.small?.8:.95);}
+  for(const b of G.braz||[])if(b.lit)f(b.x,b.y,105,.9);
+  for(const v of G.vents)if(v.on)f(v.x*T+16,v.y*T+16,86,.9);
+  for(const it of G.items){if(it.type==='C'&&!it.done)f(it.x,it.y,100,.9);else if(it.type==='B'&&!it.done)f(it.x,it.y,70+it.p*70,.8);}
+  if(G.fireOn)f(G.ash.x+Math.cos(G.ash.face)*40,G.ash.y+Math.sin(G.ash.face)*40,150,1);
+  return m;
+}
+function snuffTorch(tr){
+  tr.out=true;tr.relight=0;G.st.snuffed=(G.st.snuffed||0)+1;
+  burst(tr.x,tr.y-4,12,'#8a8a96',30,1.2,5,{k:'smoke',g:-30,gr:6});Aud.S.snuff();
+  if(!G.torchSaid){G.torchSaid=true;say('Shiloh','Dark enough. Guards do notice a cold torch, though.');}
+  // a cold torch is worth a look
+  for(const gd of G.guards){
+    if(gd.stun>0||gd.boss||gd.spin||gd.eng||gd.kind==='hound')continue;
+    if(Math.hypot(gd.x-tr.x,gd.y-tr.y)<5*T&&los(gd.x,gd.y,tr.x,tr.y+10)){if(!gd.lure&&!gd.ret)gd.back={x:gd.x,y:gd.y};gd.lure={x:tr.x,y:tr.y+10,t:3.2,torch:tr};gd.ret=false;gd.quest=1.4;}
+  }
+}
+/* Gallowmere: at the toast every guard turns to the head table for a few seconds, then the feast ends and they sober up */
+function stepFeast(dt){
+  const F=G.d.feast;if(!F||G.cine)return;
+  if(!G.toast&&G.time>=F.at){
+    G.toast=1;toast('The toast','Every guard turns to the head table. Move.','#f0b44c');Aud.S.bell&&Aud.S.bell();
+    for(const gd of G.guards)if(!gd.boss&&!gd.spin&&gd.stun<=0&&!gd.seeing){gd.toastT=F.len;gd.lure=null;gd.ret=false;gd.bang=0;}
+    say('Ashling','Is that a toast? Everyone is looking at the cheese.',1.2);
+  } else if(G.toast===1&&G.time>=F.at+F.len){
+    G.toast=2;toast('The feast ends','Sober guards walk faster and see further.','#ff9a6a');
+    for(const gd of G.guards)if(!gd.boss&&!gd.spin){gd.spd*=1.12;gd.rm=(gd.rm||1)*1.06;}
+  }
+}
+function stepTorches(dt){
+  for(const tr of G.torches||[]){
+    if(!tr.out||tr.pipe||tr.ruinOut)continue;
+    let near=false;
+    for(const gd of G.guards){if(gd.stun>0||gd.boss||gd.spin||gd.kind==='hound')continue;if(Math.hypot(gd.x-tr.x,gd.y-tr.y)<1.7*T){near=true;break;}}
+    tr.relight=near?(tr.relight||0)+dt:0;
+    if(tr.relight>.9){tr.out=false;tr.relight=0;burst(tr.x,tr.y-4,10,'#ffd27a',50,.6,2,{add:true});}
+  }
+  // smoke bombs smother nearby flames
+  for(const s of G.smoke)for(const tr of G.torches||[])if(!tr.out&&!tr.pipe&&Math.hypot(tr.x-s.x,tr.y-s.y)<s.r+8){snuffTorch(tr);}
 }
 function findTarget(A){
   let tgt=null,bd=1e9;
@@ -538,6 +586,7 @@ function findTarget(A){
         tgt={kind:'item',ref:it,need:(it.type==='H'?1.6:it.type==='C'?.8:1.2)*(hasT('quick')?.7:1)*(G.bsx.pick||1),x:it.x,y:it.y,label:lab};}
     }
   }
+  if(A===G.wren&&!G.flight)for(const tr of G.torches||[]){if(tr.out||tr.pipe)continue;const dd=Math.hypot(tr.x-A.x,tr.y+6-A.y)+12;if(dd<46&&dd<bd){bd=dd;tgt={kind:'torch',ref:tr,need:.45*(hasT('quick')?.7:1),x:tr.x,y:tr.y,label:'Snuff torch'};}}
   for(const n of G.insp||[]){if(n.done)continue;const dd=Math.hypot(n.x-A.x,n.y-A.y);if(dd<36&&dd<bd){bd=dd;tgt={kind:'insp',ref:n,need:.55,x:n.x,y:n.y,label:'Examine'};}}
   for(const ch of G.chests||[]){if(ch.open)continue;const dd=Math.hypot(ch.x-A.x,ch.y-A.y);if(dd<38&&dd<bd){bd=dd;tgt={kind:'chest',ref:ch,need:1,x:ch.x,y:ch.y,label:'Open chest'};}}
   return tgt;
@@ -565,7 +614,7 @@ function explode(it){
   igniteNear(x,y,R);
   for(const o of G.items)if(o.type==='o'&&!o.done&&Math.hypot(o.x-x,o.y-y)<2.6*T)o.fuse=.28;
   for(const k in G.cracks){const c=G.cracks[k];if(Math.hypot(c.x*T+16-x,c.y*T+16-y)<2.4*T){openCrack(c);}}
-  if(!G.flight&&Math.hypot(G.wren.x-x,G.wren.y-y)<1.5*T){G.alert=Math.min(.95,G.alert+.3);say('Wren','Too close. That stung.');}
+  if(!G.flight&&Math.hypot(G.wren.x-x,G.wren.y-y)<1.5*T){G.alert=Math.min(.95,G.alert+.3);say('Shiloh','Too close. That stung.');}
   else if(hit)say('Ashling','Boom. You are welcome.');
   lureNear(x,y,9*T,true);
 }
@@ -685,7 +734,7 @@ function update(dt){
   if(moving)G.lastMoveT=G.time;
   trackMotion(G.wren,dt);trackMotion(G.ash,dt);easeFace(G.wren,dt,16);easeFace(G.ash,dt,16);
   for(const gg of G.guards)easeFace(gg,dt,12);
-  // hostage follows Wren
+  // hostage follows Shiloh
   if(G.host&&G.host.on){
     const h=G.host,w=G.wren,hd=Math.hypot(w.x-h.x,w.y-h.y);
     if(hd>6*T){h.x=w.x;h.y=w.y;}
@@ -701,7 +750,7 @@ function update(dt){
     const q=(1+Math.sin(G.time*.45+s.ph))/2;
     s.x=s.a[0]+(s.b[0]-s.a[0])*q;s.y=s.a[1]+(s.b[1]-s.a[1])*q;
   }
-  // forge vents: Wren burns, Ashling does not
+  // forge vents: Shiloh burns, Ashling does not
   for(const v of G.vents){
     const c=(G.time+v.ph)%4,was=v.on;v.on=c<(G.bsx&&G.bsx.vents||1.4);v.warn=c>3.3;
     if(v.on&&!was){Aud.S.ember();}
@@ -716,7 +765,7 @@ function update(dt){
     G.noiseT-=dt;
     if(G.noiseT<=0){G.noiseT=.7;lureNear(A.x,A.y,(G.active==='wren'?4:5)*T*(G.bsx&&G.bsx.noise||1),true);G.rings.push({x:A.x,y:A.y,t:.35,r:30,c:'150,100,200'});}
   }
-  // hold-to-interact (Wren only)
+  // hold-to-interact (Shiloh only)
   const holding=actHeld&&(G.active==='wren'||G.flight);
   const tgtNow=(G.active==='wren'||G.flight)?findTarget(A):null;
   G.prompt=tgtNow;
@@ -801,6 +850,7 @@ function update(dt){
     for(const t of targets){
       const isActive=t.host?true:(t===G.wren)===(G.active==='wren');
       let mul=(t===G.ash?1.45:1)*(isActive?1:.6)*G.rangeMul;
+      if(t!==G.ash){if(t._LT!==G.time){t._LT=G.time;t._L=lightAt(t.x,t.y);}mul*=.78+.55*t._L;if(t===G.wren)G.expo=t._L;}
       if(t===G.wren&&G.sneak)mul*=hasT('cloak')?.45:.6;
       const range=5.2*T*mul*(g.rm||1)*(g.kr||1),dx=t.x-g.x,dy=t.y-g.y,dist=Math.hypot(dx,dy);
       let see=dist<range&&(dist<T*.9||angDiff(Math.atan2(dy,dx),g.face)<(g.half||.62))&&los(g.x,g.y,t.x,t.y);
@@ -853,11 +903,12 @@ function update(dt){
       if(B.tollT<=0&&B.toll<=0){B.tollT=6;B.toll=.9;G.rings.push({x:B.x,y:B.y,t:.9,r:7*T,c:'255,200,80'});Aud.S.toll();shake(5);
         if(!G.tollSaid){G.tollSaid=true;say('Ashling','The bell! Freeze when it rings!');}}
       if(B.toll>0){B.toll-=dt;
-        if(B.toll<=0&&moving&&Math.hypot(A.x-B.x,A.y-B.y)<7*T){G.alert+=.3;say('Wren','It heard me move.');}}
+        if(B.toll<=0&&moving&&Math.hypot(A.x-B.x,A.y-B.y)<7*T){G.alert+=.3;say('Shiloh','It heard me move.');}}
     }
   }
   stepCombat(dt);
   // timers
+  stepTorches(dt);stepFeast(dt);
   G.smoke=G.smoke.filter(s=>(s.t-=dt)>0);
   G.rings=G.rings.filter(r=>(r.t-=dt)>0);
   if(G.msgT>0)G.msgT-=dt;
@@ -869,7 +920,7 @@ function update(dt){
   // exit
   const req=G.items.filter(i=>'OPBLHC'.includes(i.type));
   G.exitOpen=req.every(i=>i.done)&&(!G.boss||G.boss.dead);
-  if(G.exitOpen&&!G.doneSaid){G.doneSaid=true;Aud.S.win();toast('Objectives complete',G.flight?'Land on the green pad.':'Get Wren to the gate.','#7be08a');say(G.flight?'Ashling':'Wren',G.flight?'Done. Land on the green pad.':'Objectives done. Get Wren to the gate.');}
+  if(G.exitOpen&&!G.doneSaid){G.doneSaid=true;Aud.S.win();toast('Objectives complete',G.flight?'Land on the green pad.':'Get Shiloh to the gate.','#7be08a');say(G.flight?'Ashling':'Shiloh',G.flight?'Done. Land on the green pad.':'Objectives done. Get Shiloh to the gate.');}
   const ex=G.flight?G.ash:G.wren;
   if(G.exitOpen&&(G.flight||G.active==='wren')&&Math.hypot(ex.x-G.exit.x,ex.y-G.exit.y)<20
      &&(!G.host||Math.hypot(G.host.x-G.exit.x,G.host.y-G.exit.y)<90)){
