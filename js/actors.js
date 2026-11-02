@@ -1,6 +1,41 @@
 'use strict';
 /* EMBERCROWN - actors: Wren, Ashling, foes, bosses, and combat effects. */
 
+/* Faces: drawn in local head space, facing +x, from above. mood: calm|wary|alarm|hurt|ko|focus|shout|joy|rage */
+function drawFace(c,x,y,sc,mood,ph,eyeCol,skinCol){
+  const bl=(G.time*.7+ph)%3.7<.11,ink='#2a1a1a';
+  c.save();c.translate(x,y);c.scale(sc,sc);c.lineCap='round';c.lineJoin='round';
+  for(const sd of[-1,1]){
+    const ey=sd*1.45;
+    c.strokeStyle=ink;c.fillStyle=eyeCol||ink;c.lineWidth=.42;
+    if(mood==='ko'){c.beginPath();c.moveTo(-.5,ey-.5);c.lineTo(.5,ey+.5);c.moveTo(-.5,ey+.5);c.lineTo(.5,ey-.5);c.stroke();}
+    else if(bl||mood==='hurt'){c.beginPath();if(mood==='hurt'){c.moveTo(-.5,ey-sd*.5);c.lineTo(.5,ey);c.lineTo(-.5,ey+sd*.5);}else{c.moveTo(-.4,ey);c.lineTo(.5,ey);}c.stroke();}
+    else if(mood==='alarm'){c.fillStyle='#fff';ell(c,0,ey,.95,.95);c.fill();c.fillStyle=eyeCol||ink;circ(c,.28,ey,.48);c.fill();}
+    else if(mood==='joy'){c.beginPath();c.arc(0,ey,.6,3.5,6.0);c.stroke();}
+    else{const ry=(mood==='wary'||mood==='focus'||mood==='rage')?.36:.6;ell(c,0,ey,.62,ry);c.fill();}
+    // brows sit behind the eyes (toward the crown of the head)
+    let xi=-1,xo=-1;
+    if(mood==='wary'||mood==='focus'){xi=-.55;xo=-1.45;}
+    else if(mood==='rage'){xi=-.2;xo=-1.7;}
+    else if(mood==='alarm'){xi=-1.6;xo=-.8;}
+    else if(mood==='hurt'){xi=-1.5;xo=-.9;}
+    if(mood!=='ko'&&mood!=='joy'){c.lineWidth=.5;c.beginPath();c.moveTo(xi,sd*.7);c.lineTo(xo,sd*2.1);c.stroke();}
+  }
+  c.lineWidth=.45;c.strokeStyle=ink;
+  if(mood==='alarm'||mood==='shout'||mood==='ko'){c.fillStyle='#4a1010';ell(c,2.2,0,mood==='ko'?.45:.6,mood==='shout'?1.0:.8);c.fill();}
+  else if(mood==='wary'||mood==='rage'){c.beginPath();c.moveTo(1.8,-.8);c.quadraticCurveTo(2.5,0,1.8,.8);c.stroke();}
+  else if(mood==='hurt'){c.beginPath();c.moveTo(2,-.9);c.lineTo(2.3,-.3);c.lineTo(2,.3);c.lineTo(2.3,.9);c.stroke();}
+  else if(mood==='joy'){c.beginPath();c.moveTo(1.7,-1);c.quadraticCurveTo(2.7,0,1.7,1);c.stroke();}
+  else{c.beginPath();c.moveTo(2.1,-.7);c.lineTo(2.1,.7);c.stroke();}
+  c.restore();
+}
+function guardMood(g){
+  if(g.stun>0)return g.ko?'ko':'hurt';
+  if(g.boss&&g.p2)return'rage';
+  if(g.seeing||g.bang>0||g.eng)return g.boss?'rage':'alarm';
+  if(g.quest>0||g.lure)return'wary';
+  return'calm';
+}
 function bodyFlash(o){return o.hitT>0||o.hurt>0;}
 function drawKO(g,col,trim){
   const c=ctx,t=G.time;
@@ -9,7 +44,7 @@ function drawKO(g,col,trim){
   c.fillStyle='#2a2226';ell(c,-9,-3,3.6,2.2);c.fill();ell(c,-10,4,3.6,2.2);c.fill();
   c.fillStyle=sh(col,.72);ell(c,0,0,7.4,9.2);c.fill();c.strokeStyle='rgba(0,0,0,.4)';c.lineWidth=1;c.stroke();
   c.fillStyle=trim;c.fillRect(-1,-8,2,16);
-  c.fillStyle='#8a8f9e';circ(c,6,0,5.4);c.fill();c.fillStyle='#14101a';c.fillRect(8.4,-2.4,1.6,4.8);
+  c.fillStyle='#8a8f9e';circ(c,6,0,5.4);c.fill();c.fillStyle='#d8b898';ell(c,9,0,2.8,3.3);c.fill();drawFace(c,9,0,1,'ko',g.ph);
   c.restore();
   c.strokeStyle='#8a7a60';c.lineWidth=1.6;c.beginPath();c.moveTo(g.x-14,g.y+12);c.lineTo(g.x+14,g.y+8);c.stroke();
   for(let i=0;i<3;i++){const k=((t*.7+i*.33)%1);c.fillStyle='rgba(200,220,255,'+(1-k)*.9+')';c.font='bold '+(8+k*5)+'px '+HEAD;c.fillText('z',g.x+6+k*8,g.y-12-k*16);}
@@ -92,7 +127,8 @@ function drawWren(w,active){
   const look=mv?0:Math.sin(t*.8+1)*.35;
   c.save();c.translate(2,0);c.rotate(look);
   c.fillStyle='#2f2352';circ(c,0,0,5.8);c.fill();c.fillStyle='#e8c8a8';circ(c,3.2,0,3.2);c.fill();
-  c.fillStyle='#3a2a1a';c.fillRect(4.3,-2,1.2,1.3);c.fillRect(4.3,.8,1.2,1.3);
+  const wm=bodyFlash(w)?'hurt':(atk&&atk.a!==undefined)?'shout':G.alert>.7?'alarm':sneak?'focus':'calm';
+  drawFace(c,4.3,0,.9,wm,w.ph>0?1.3:0,'#3a2a1a');
   c.restore();
   c.fillStyle='#d9534f';c.beginPath();c.moveTo(-1,-5.5);c.quadraticCurveTo(1,-7,3,-5);c.lineTo(3,5);c.quadraticCurveTo(1,7,-1,5.5);c.closePath();c.fill();
   if(bodyFlash(w)){c.fillStyle='rgba(255,255,255,.55)';ell(c,0,0,8,9.5);c.fill();}
@@ -154,8 +190,14 @@ function drawAsh(a,active){
   c.fillStyle='#6a2a10';circ(c,6.4,-1,.7);c.fill();circ(c,6.4,1,.7);c.fill();
   c.fillStyle='#ffe0a0';c.beginPath();c.moveTo(-3,-3);c.lineTo(-7.5,-6.5);c.lineTo(-1,-4.2);c.fill();c.beginPath();c.moveTo(-3,3);c.lineTo(-7.5,6.5);c.lineTo(-1,4.2);c.fill();
   const sq=firing||dashing?.5:1;
+  const am=bodyFlash(a)?1:0;
   c.fillStyle='#fff4a0';ell(c,1.4,-2.5,1.5,1.5*sq);c.fill();ell(c,1.4,2.5,1.5,1.5*sq);c.fill();
   c.fillStyle='#2a1008';circ(c,1.7,-2.5,.75*sq);c.fill();circ(c,1.7,2.5,.75*sq);c.fill();
+  // brows: fierce when breathing fire, worried when hurt or when the alarm is rising
+  c.strokeStyle='#8a3010';c.lineWidth=.9;c.lineCap='round';c.beginPath();
+  const bw=am||G.alert>.7,bf=firing||dashing;
+  c.moveTo(.4,-1.3);c.lineTo(bf?-0.4:bw?-1.2:.1,-4.1);c.moveTo(.4,1.3);c.lineTo(bf?-0.4:bw?-1.2:.1,4.1);c.stroke();c.lineCap='butt';
+  if(am){c.strokeStyle='#2a1008';c.lineWidth=.8;c.beginPath();c.moveTo(1,-2.5);c.lineTo(2.4,-2.5);c.moveTo(1,2.5);c.lineTo(2.4,2.5);c.stroke();}
   if(firing){c.fillStyle='rgba(255,220,120,.9)';circ(c,7,0,3);c.fill();}
   c.restore();
   if(bodyFlash(a)){c.fillStyle='rgba(255,255,255,.5)';ell(c,1,0,10,8);c.fill();}
@@ -298,7 +340,9 @@ function drawBoss(g){
     const arm=st==='slashWind'?(1-g.t/.42)*1.4-.7:(st==='volleyWind'?-.5:0);
     c.fillStyle='#2e2040';ell(c,6,-14,6,3,-.3+arm);c.fill();ell(c,6,14,6,3,.3-arm);c.fill();
     c.fillStyle='#ece4d0';circ(c,3,0,7.4);c.fill();
-    c.fillStyle='#14101a';c.fillRect(6,-4,2.2,2.4);c.fillRect(6,1.6,2.2,2.4);c.fillRect(8.5,-.6,1.6,1.4);
+    const cm=dead?'ko':flash?'hurt':stag?'alarm':roar>0?'shout':(st==='slashWind'||st==='volleyWind'||st==='ringWind'||g.p2)?'rage':'joy';
+    drawFace(c,5.2,0,1.6,cm,g.ph||0,'#14101a');
+    if(cm==='rage'||cm==='shout'){c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,160,60,.55)';circ(c,5.2,-2.3,1.1);c.fill();circ(c,5.2,2.3,1.1);c.fill();c.globalCompositeOperation='source-over';}
     if(!dead)for(let i=0;i<6;i++){
       const a=i/6*6.283+t*.6,cx=3+Math.cos(a)*10,cy=Math.sin(a)*10;
       c.fillStyle='#e8e0c0';c.fillRect(cx-1,cy-1,2,3);
@@ -345,7 +389,10 @@ function drawBoss(g){
   c.fillStyle='#6a6a78';c.fillRect(20,-5,9,10);c.fillStyle='#8a8a98';c.fillRect(20,-5,9,2);
   c.restore();
   c.fillStyle='#4a4058';circ(c,6,0,8);c.fill();c.strokeStyle='#e0b040';c.lineWidth=1.8;circ(c,6,0,8);c.stroke();
-  c.fillStyle='#e8e0c8';c.fillRect(11,-2.4,3,5);c.fillStyle=roar>0?'#ffb040':'#14101a';c.fillRect(11,-.6,3,1.2);
+  c.fillStyle='#d8b898';ell(c,10.4,0,3.8,4.6);c.fill();
+  const wm=dead?'ko':flash||st==='stagger'?'hurt':roar>0?'shout':(g.p2||st==='windSlam'||st==='windCharge'||st==='windLeap'||st==='charge'||st==='leap'||st==='toll')?'rage':'wary';
+  drawFace(c,10,0,1.35,wm,g.ph||0,'#14101a');
+  c.strokeStyle='#e0b040';c.lineWidth=1.2;c.beginPath();c.moveTo(7.6,-4.4);c.lineTo(13.6,-3.2);c.moveTo(7.6,4.4);c.lineTo(13.6,3.2);c.stroke();
   c.restore();
   if(st==='charge'&&Math.random()<.9)pt(g.x-Math.cos(g.dir)*16,g.y-Math.sin(g.dir)*16,rrand(-20,20),rrand(-20,20),.5,5,'#8a7a6a',{k:'smoke',gr:6});
   if(stag&&!dead)for(let i=0;i<3;i++){const a=t*4+i*2.09;c.fillStyle='#ffe27a';circ(c,g.x+Math.cos(a)*12,g.y-26+Math.sin(a)*3.4,2.2);c.fill();}

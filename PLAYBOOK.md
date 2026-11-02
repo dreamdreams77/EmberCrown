@@ -342,3 +342,11 @@ Player 1 is Wren. Player 2 is Ashling. Each has their own camera. Objectives req
 Saves record the choices. Older saves with the single Gallowmere choice still load.
 
 **The case file.** Opened from the pause menu, briefings and the Back Stairs: one clue per cleared mission (the verdict line appears once all seven are cleared), how each house feels about you, and what you did on the back stairs.
+
+## 13. Story pass and faces (ported from the parallel rewrite)
+
+**Story.** The thread is now explicit: Mother Quill of the Hollow Crown engineered the war and used Wren as the courier. Every mission intro is rewritten around its house's voice (Marrow clipped, Grell loud, Ostrander nautical, Sable silent, Kest blunt, Dunmoor ironic, Hallow candle-lit). Each mission now plants a clue that the case file records (the blank wax ring on the egg crate and Grell's seal, the receipt book signed "S. Sallow", the Counting House ledger, Perrin's remark about the satchel, the signet note signed Q.). The Candlemaker has dying words and Quill appears in the epilogues of the Puppet and Burn endings. Dialogue lines can now be queued, so a discovery can be followed by a reply.
+
+**Barks.** Guards shout short house-flavoured lines above their heads when alerted, when they lose you and when a noise draws them (Sable's monks mime with `*points*`). One bark every 1.6 s at most so the screen never fills with text.
+
+**Faces.** Wren, Ashling, every guard and both bosses have faces with expressions driven by what is happening: guards are calm, wary (investigating), alarmed (seeing you), hurt or knocked out; Wren narrows her eyes when sneaking, shouts when striking, winces when hit and looks alarmed as suspicion peaks; Ashling frowns when breathing fire and looks worried when hurt; the Candlemaker smiles until he attacks, and the Warden scowls harder in phase 2. Faces are drawn in a single helper (`drawFace` in `js/actors.js`).

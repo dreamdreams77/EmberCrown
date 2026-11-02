@@ -553,7 +553,10 @@ function drawGuard(g){
     c.fillStyle=stun?'#8a8a94':'#9aa0b0';circ(c,1,0,5.6);c.fill();
     c.strokeStyle='rgba(0,0,0,.5)';circ(c,1,0,5.6);c.stroke();
     c.fillStyle=trim;c.fillRect(-4,-1,10,2);
-    c.fillStyle='#14101a';c.fillRect(4,-2.6,2,5.2);
+    {const sk=['#e8c8a8','#d8b090','#c89a78','#b88a68'][Math.floor(g.ph*7)%4];
+     c.fillStyle=stun?'#b8b8c0':sk;ell(c,4.1,0,2.8,3.3);c.fill();
+     c.strokeStyle=stun?'#80808a':'#9aa0b0';c.lineWidth=.9;c.beginPath();c.moveTo(2.2,0);c.lineTo(7,0);c.stroke();
+     drawFace(c,4.1,0,1,guardMood(g),g.ph,g.boss&&g.kind==='candle'?'#ffb040':null);}
     if(g.kind==='brute'||g.boss&&g.kind!=='candle'){ // shield / bell guard
       if(g.kind==='brute'){
         c.fillStyle=g.hurt>0?'#fff':'#a8afc0';c.beginPath();c.arc(4,0,15,-1.0,1.0);c.arc(4,0,10,1.0,-1.0,true);c.closePath();c.fill();
@@ -604,6 +607,13 @@ function drawMarkers(g){
     return;
   }
   if(g.spin||g.eng)return;
+  if(g.say){
+    const k=Math.min(1,g.say.t/.3,(1.7-g.say.t)/.12+.01);
+    c.save();c.globalAlpha=Math.max(0,k);c.font='italic 11px '+BODY;c.textAlign='center';
+    const tw=c.measureText(g.say.x).width+12,yy=g.y-(g.bang>0||g.seeing||g.quest>0||g.lure?50:36)-(1-k)*4;
+    c.fillStyle='rgba(20,14,28,.78)';rr(c,g.x-tw/2,yy-10,tw,16,5);c.fill();
+    c.fillStyle='#f3e6c8';c.fillText(g.say.x,g.x,yy+2);c.restore();
+  }
   if(g.bang>0||g.seeing){
     const k=g.bang>0?1-g.bang:1,by=-26-Math.sin(Math.min(1,k*3)*Math.PI)*5;
     c.save();c.translate(g.x,g.y+by);

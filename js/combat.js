@@ -475,6 +475,8 @@ function bossDeath(B){
   dropLoot(B.x,B.y,.5,true);for(let i=0;i<6;i++)spawnPick('cinder',B.x,B.y,12);spawnPick('heart',B.x,B.y,1);
   Aud.S.boom();hitstop(.22);punch(1);
   const info=BOSSINFO[B.kind==='candle'?'candle':'warden'];
+  if(B.kind==='candle'){say('Candlemaker','Burn it and she rebuilds.',1.4);say('Candlemaker','Crown it and she holds the strings.',3.4);say('Candlemaker','Break it, and she has nothing to hold.',5.4);}
+  else say('Ashling','The bell is quiet. So is he. Mostly.',1.6);
   startCine('bossdeath',{dur:3.6,minSkip:1.8,
     banner:{title:'VICTORY',sub:info.name.charAt(0)+info.name.slice(1).toLowerCase()+' falls',t0:1.1,t1:3.3,col:'#ffe27a',dy:V.h*.2},
     cam:(u,t)=>({x:B.x,y:B.y,z:1+.7*easeOut(t/1.6)}),

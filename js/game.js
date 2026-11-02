@@ -55,7 +55,7 @@ function finaleEnding(choice){
     return{title:'Ending: The Puppet Crown',col:'#c8b4ff',
       lines:['House '+HOUSE_NAMES[best]+' wears the crown, and every string runs back to the Hollow Crown.',
         R.e>=4?'The houses obey because they are afraid, not because they agree.':'The houses go along with it. Peace holds, for now.',
-        R.f>=2?'A few of them even thank you. Wren does not sleep well anyway.':'Wren holds the strings and does not sleep well.'].concat(stub?[stub]:[]),
+        R.f>=2?'A few of them even thank you. Wren does not sleep well anyway.':'Wren holds the strings and does not sleep well.',"Quill's note is waiting at the palace. It says: Well done. It is exactly what she planned."].concat(stub?[stub]:[]),
       sum:'House '+HOUSE_NAMES[best]+': crowned, +1 Fear.'};
   }
   if(choice==='burn'){
@@ -63,7 +63,7 @@ function finaleEnding(choice){
     return{title:'Ending: Ash and Ember',col:'#ff9a4a',
       lines:['Ashling burns the throne to slag, and then, with enthusiasm, the hall.',
         R.r>=4?'The houses you ruined along the way have nothing left to rebuild with. The marsh smolders for a generation.':'The houses are bruised, not broken. They rebuild fast, and find a new throne by spring.',
-        'Ashling: In my defense, it was very flammable.'].concat(stub?[stub]:[]),
+        'Ashling: In my defense, it was very flammable.','Quill builds a new throne by spring. It looks very like the old one.'].concat(stub?[stub]:[]),
       sum:'Every house: +1 Ruin.'};
   }
   for(const k of keys)houses[k].favor+=1;
@@ -164,7 +164,10 @@ function reachTile(a,tx,ty,range){
   const k=Math.max(0,d-20)/(d||1);
   return los(a.x,a.y,a.x+(cx-a.x)*k,a.y+(cy-a.y)*k);
 }
-function say(who,text){G.msg={who,text};G.msgT=4;}
+function say(who,text,after){if(after){(G.sayQ=G.sayQ||[]).push({t:after,who,text});return;}G.msg={who,text};G.msgT=4;}
+function bark(g,kind){ // a short house-flavoured shout above a guard, rate limited
+  const b=G.d.barks&&G.d.barks[kind];if(!b||g.boss||g.spin||(G.barkT&&G.time-G.barkT<1.6))return;
+  G.barkT=G.time;g.say={t:1.7,x:b[Math.floor(Math.random()*b.length)]};}
 function toast(title,sub,col){G.toasts.push({title,sub:sub||'',col:col||'#f0b44c',t:3.4,t0:3.4});}
 
 /* ---------- particles ---------- */
@@ -399,7 +402,7 @@ function lureNear(x,y,r,noise){
     if(g.stun>0||(noise&&g.boss)||g.eng)continue;
     if(Math.hypot(g.x-x,g.y-y)<r&&los(g.x,g.y,x,y)){
       if(!g.lure&&!g.ret)g.back={x:g.x,y:g.y};
-      g.lure={x,y,t:3};g.ret=false;g.quest=1.4;
+      g.lure={x,y,t:3};g.ret=false;g.quest=1.4;bark(g,'lure');
     }
   }
   for(const f of G.foes||[]){if(f.state!=='dead'&&Math.hypot(f.x-x,f.y-y)<r*.8)f.lure={x,y,t:3};}
@@ -492,31 +495,31 @@ function completeTarget(t){
   Aud.S.confirm();burst(it.x,it.y,14,'#ffe0a0',70,.7,2,{add:true});
   if(it.type==='H'){
     G.host.on=true;G.host.x=it.x;G.host.y=it.y;
-    say('Perrin','You are the spy? You are shorter than I was told. And is that a dragon?');
+    say('Perrin','You are the spy? You are shorter than I was told. Is that a lizard?');say('Ashling','Dragon. Ashling. Write it down.',3.4);say('Perrin','The courier who brought Kest its orders tied her satchel like that. Like yours.',7);
   } else if(it.type==='C'){
     const left=G.items.filter(i=>i.type==='C'&&!i.done).length;
     G.rings.push({x:it.x,y:it.y,t:.5,r:50,c:'200,200,255'});Aud.S.snuff();
     burst(it.x,it.y-8,12,'#8a8a96',30,1.2,5,{k:'smoke',g:-30,gr:6});
     G.candlesLit=left;candleSnuffed(G.boss);
-    say('Wren',left?'Snuffed. '+left+' to go.':'The last candle. Now he has nowhere to hide.');
+    if(left===4&&G.boss&&!G.boss.dead)say('Candlemaker','I light one for every crown she empties. Leave them.');else say('Wren',left?'Snuffed. '+left+' to go.':'The last candle. Now he has nowhere to hide.');
   } else if(it.type==='L'){
     G.song=true;G.gad.flute=999;
     G.rings.push({x:G.wren.x,y:G.wren.y,t:1,r:120,c:'160,220,255'});Aud.S.flute();
     toast('Song of Opening learned','Press F near a sealed door. It is loud.','#9fd8ff');
     say('Wren','The Song of Opening. Press F near a sealed door. It is loud.');
-  } else if(it.type==='O'&&G.d.song){say('Wren','The ledger. Every bribe Sable ever took, in one hand.');
+  } else if(it.type==='O'&&G.d.song){say('Wren','Counting House gold, paid for silence about seven letters. One courier. Me.');
   } else if(it.type==='O'){
     if(lvl===0){
       G.ash.on=true;G.ash.x=G.wren.x+14;G.ash.y=G.wren.y+14;
       G.rings.push({x:G.wren.x,y:G.wren.y,t:1,r:90,c:'255,140,60'});
       burst(G.wren.x,G.wren.y,30,'#ff9a4a',120,1,3,{add:true});shake(5);
       toast('Ashling hatches!','TAB swaps characters. SPACE breathes fire. SHIFT dashes.','#ff9a4a');
-      say('Ashling','Oh. I hatched. Press TAB to swap, SPACE to burn.');
-    } else if(G.d.timeshift)say('Wren',"Veyra's signet, still warm from a three-year-old fire.");
-    else say('Wren','Seal swapped. Grell will sign his own surrender.');
+      say('Wren','No bone on the crate. Only a ring of plain wax, with nothing pressed in it.');say('Ashling','Oh. I hatched. Nobody asked me first. (TAB swaps, SPACE burns.)',3.6);
+    } else if(G.d.timeshift){say('Wren','Her signet. A note inside the case: "Do nothing until the treaty is found. Q."');say('Wren','I planted that treaty.',3.6);}
+    else say('Wren','Seal swapped. Under the old one, a ring of plain wax. The same as the crate.');
   } else if(it.type==='P'){
-    if(G.d.timeshift){G.planted=true;say('Wren','Treaty planted. Dunmoor will find it, and so will its enemies.');}
-    else say(G.flight?'Ashling':'Wren',G.flight?'Letter dropped. Ostrander will find a very convincing forgery.':'One cup. One very bad evening for the guest of honor.');
+    if(G.d.timeshift){G.planted=true;say('Wren','Treaty planted. By morning every house will have a copy.');}
+    else {if(G.flight){G.letters=(G.letters||0)+1;say('Ashling',G.letters===1?'Dropped. A receipt book lies open beside it: "S. Sallow, courier." That is her name.':'Seven receipts in one hand, all hers. Seven houses, one day. She will not like this.');}else say('Wren','One cup. He will not finish the toast.');}
   }
 }
 function findTarget(A){
@@ -793,7 +796,7 @@ function update(dt){
   for(const g of G.guards){
     g.seeing=false;
     if(g.eng){g.was=false;continue;}
-    if(g.bang>0)g.bang-=dt;if(g.quest>0)g.quest-=dt;
+    if(g.bang>0)g.bang-=dt;if(g.quest>0)g.quest-=dt;if(g.say){g.say.t-=dt;if(g.say.t<=0)g.say=null;}
     if(g.stun>0){g.was=false;continue;}
     for(const t of targets){
       const isActive=t.host?true:(t===G.wren)===(G.active==='wren');
@@ -807,11 +810,11 @@ function update(dt){
         best=Math.max(best,.45+(1-dist/range)*1.1);
       }
     }
-    if(g.seeing&&!g.was){g.bang=1;G.st.detect++;if(!G.alertSfxT||G.time-G.alertSfxT>1.2){G.alertSfxT=G.time;Aud.S.alert();}}
+    if(g.seeing&&!g.was){g.bang=1;if(g.kind==='guard'||g.kind==='brute'||g.kind==='archer')bark(g,'alert');G.st.detect++;if(!G.alertSfxT||G.time-G.alertSfxT>1.2){G.alertSfxT=G.time;Aud.S.alert();}}
     if(!g.seeing&&g.was&&!g.spin&&!g.boss&&g.seen){
       // lost sight: go and look
       if(!g.lure&&!g.ret)g.back={x:g.x,y:g.y};
-      g.lure={x:g.seen.x,y:g.seen.y,t:1.6};g.ret=false;g.quest=1.4;
+      g.lure={x:g.seen.x,y:g.seen.y,t:1.6};g.ret=false;g.quest=1.4;bark(g,'lost');
     }
     g.was=g.seeing;
   }
@@ -858,6 +861,7 @@ function update(dt){
   G.smoke=G.smoke.filter(s=>(s.t-=dt)>0);
   G.rings=G.rings.filter(r=>(r.t-=dt)>0);
   if(G.msgT>0)G.msgT-=dt;
+  if(G.sayQ&&G.sayQ.length){const q=G.sayQ[0];q.t-=dt;if(q.t<=0){G.sayQ.shift();say(q.who,q.text);}}
   for(const t of G.toasts)t.t-=dt;G.toasts=G.toasts.filter(t=>t.t>0);
   if(G.loreCard){G.loreCard.t-=dt;if(G.loreCard.t<=0)G.loreCard=null;}
   if(G.flash){G.flash.t-=dt;if(G.flash.t<=0)G.flash=null;}
