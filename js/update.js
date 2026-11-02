@@ -2,16 +2,13 @@
 'use strict';
 
 /* ---------- update ---------- */
-const BARKS = {
-  lure: ['What was that?', 'Huh?', 'Who goes there?'],
-  lost: ['Where did it go?', 'I saw something...', 'Show yourself!'],
-  body: ['Man down!', 'Wake up, you oaf!', 'Intruder about!'],
-  hear: ['Hm?', 'Footsteps?', 'Who is there?']
-};
-function bark(g, txt) {
+// What a guard says, by situation: 'lure' (noticed a noise), 'lost' (lost you), 'body'
+// (found a fallen guard), 'hear' (heard footsteps), 'wake' (came round). Each mission has its
+// own set in text.js, in its own house's voice.
+function bark(g, kind) {
   if (g.boss || g.spin) return;
-  if (G.d.quiet) txt = '...!';
-  g.bark = { text: Array.isArray(txt) ? txt[(Math.random() * txt.length) | 0] : txt, t: 1.8 };
+  const set = G.d.barks[kind];
+  g.bark = { text: Array.isArray(set) ? set[(Math.random() * set.length) | 0] : set, kind, t: 1.8 };
 }
 function burst(x, y, n, k, sp, life) {
   for (let i = 0; i < n; i++) {
@@ -53,7 +50,7 @@ function stepGuard(g, dt) {
       g.pause = 1.6;
       g.scan = g.face;
       g.grog = 1.8;
-      bark(g, 'Ugh... my head.');
+      bark(g, 'wake');
     }
     return;
   }
@@ -105,7 +102,7 @@ function completeTarget(t) {
     burst(g.x, g.y, 8, 'smoke', 30, 0.8);
     if (!G.koSaid) {
       G.koSaid = true;
-      say('Shiloh', 'Sleep tight. Someone will find him, so keep moving.');
+      say('Shiloh', TEXT.lines.knockedOut);
     }
     return;
   }
@@ -115,22 +112,22 @@ function completeTarget(t) {
     G.host.on = true;
     G.host.x = it.x;
     G.host.y = it.y;
-    say('Perrin', 'You are the spy? You are shorter than I was told. And is that a dragon?');
+    say('Perrin', TEXT.lines.perrinFreed);
+    sayLater(2.8, 'Ashling', TEXT.lines.perrinReply);
+    sayLater(9, 'Perrin', TEXT.lines.perrinClue);
   } else if (it.type === 'C') {
     const left = G.items.filter((i) => i.type === 'C' && !i.done).length;
     G.rings.push({ x: it.x, y: it.y, t: 0.5, r: 50, c: '200,200,255' });
     burst(it.x, it.y - 10, 10, 'smoke', 18, 1.6);
-    say(
-      'Shiloh',
-      left ? 'Snuffed. ' + left + ' to go.' : 'The last candle. Now he has nowhere to hide.'
-    );
+    if (left === 4) say('Candlemaker', TEXT.lines.candleFirst);
+    else say('Shiloh', left ? fill(TEXT.lines.candleLeft, { n: left }) : TEXT.lines.candleLast);
   } else if (it.type === 'L') {
     G.song = true;
     G.gad.flute = 999;
     G.rings.push({ x: G.shiloh.x, y: G.shiloh.y, t: 1, r: 120, c: '160,220,255' });
-    say('Shiloh', 'The Song of Opening. Press F near a sealed door. It is loud.');
+    say('Shiloh', TEXT.lines.songLearned);
   } else if (it.type === 'O' && G.d.song) {
-    say('Shiloh', 'The ledger. Every bribe Sable ever took, in one hand.');
+    say('Shiloh', TEXT.lines.ledger);
   } else if (it.type === 'O') {
     if (lvl === 0) {
       G.ash.on = true;
@@ -139,21 +136,21 @@ function completeTarget(t) {
       G.rings.push({ x: G.shiloh.x, y: G.shiloh.y, t: 1, r: 90, c: '255,140,60' });
       burst(it.x, it.y, 24, 'spark', 90, 0.8);
       burst(it.x, it.y, 8, 'smoke', 40, 1.2);
-      say('Ashling', 'Oh. I hatched. Press TAB to swap, SPACE to burn.');
-    } else if (G.d.timeshift)
-      say('Shiloh', "Veyra's signet, still warm from a three-year-old fire.");
-    else say('Shiloh', 'Seal swapped. Grell will sign his own surrender.');
+      say('Shiloh', TEXT.lines.eggCrate);
+      sayLater(3.2, 'Ashling', TEXT.lines.hatch);
+      sayLater(6.4, 'Tip', TEXT.lines.hatchTip);
+    } else if (G.d.timeshift) {
+      say('Shiloh', TEXT.lines.signet);
+      sayLater(3.4, 'Shiloh', TEXT.lines.signetAfter);
+    } else say('Shiloh', TEXT.lines.sealSwapped);
   } else if (it.type === 'P') {
     if (G.d.timeshift) {
       G.planted = true;
-      say('Shiloh', 'Treaty planted. Dunmoor will find it, and so will its enemies.');
-    } else
-      say(
-        G.flight ? 'Ashling' : 'Shiloh',
-        G.flight
-          ? 'Letter dropped. Ostrander will find a very convincing forgery.'
-          : 'One cup. One very bad evening for the guest of honor.'
-      );
+      say('Shiloh', TEXT.lines.treatyPlanted);
+    } else if (G.flight) {
+      const dropped = G.items.filter((i) => i.type === 'P' && i.done).length;
+      say('Ashling', dropped === 1 ? TEXT.lines.letterFirst : TEXT.lines.letterSecond);
+    } else say('Shiloh', TEXT.lines.cupPoisoned);
   }
 }
 // what E would act on right now: a lock, an objective, or an unaware guard's back
@@ -368,7 +365,7 @@ function update(dt) {
       G.alert += 1.6 * dt;
       if (!G.ventSaid) {
         G.ventSaid = true;
-        say('Ashling', 'Hot. Very hot. For you, anyway.');
+        say('Ashling', TEXT.lines.vent);
       }
     }
   }
@@ -396,10 +393,10 @@ function update(dt) {
           g.face = ang;
           g.scan = null;
           g.pause = Math.max(g.pause, 0.9);
-          bark(g, BARKS.hear);
+          bark(g, 'hear');
           if (!G.stepSaid && G.active === 'shiloh') {
             G.stepSaid = true;
-            say('Ashling', 'Feet like a drum. Hold Shift to sneak.');
+            say('Ashling', TEXT.lines.sneakHint);
           }
         }
       }
@@ -486,7 +483,7 @@ function update(dt) {
           g.hurt = 0.1;
           if (!G.shieldSaid) {
             G.shieldSaid = true;
-            say('Ashling', 'My fire slides right off. The candles are shielding him!');
+            say('Ashling', TEXT.lines.shield);
           }
         } else if (angDiff(Math.atan2(a.y - g.y, a.x - g.x), g.face) > 1.3) {
           g.hp -= 22 * dt;
@@ -497,9 +494,12 @@ function update(dt) {
             g.stun = 1e9;
             G.shake = 0.4;
             burst(g.x, g.y, 30, 'spark', 120, 1);
-            if (g.kind === 'candle')
-              say('Candlemaker', 'Burn it, crown it, break it. I was always one step ahead.');
-            else say('Ashling', 'The bell is quiet. So is he. Mostly.');
+            if (g.kind === 'candle') {
+              TEXT.lines.dying.forEach((line, k) => {
+                if (k === 0) say('Candlemaker', line);
+                else sayLater(k * 2.6, 'Candlemaker', line);
+              });
+            } else say('Ashling', TEXT.lines.wardenDown);
           }
         } else G.alert = Math.min(0.95, G.alert + 0.5 * dt);
       } else {
@@ -515,13 +515,14 @@ function update(dt) {
         if (it.p >= 1) {
           it.done = true;
           burst(it.x, it.y - 6, 20, 'spark', 90, 0.8);
-          say('Ashling', 'Signal is out. You are welcome.');
+          const burned = G.items.filter((i) => i.type === 'B' && i.done).length;
+          say('Ashling', TEXT.lines.beacon[lvl < 2 ? lvl : 2 + (burned % 2)]);
         }
       }
     }
     if (!G.fireSaid) {
       G.fireSaid = true;
-      say('Ashling', 'Barbecue time.');
+      say('Ashling', TEXT.lines.firstFire);
     }
   } else
     for (const it of G.items) if (it.type === 'B' && !it.done) it.p = Math.max(0, it.p - dt * 0.5);
@@ -662,7 +663,7 @@ function update(dt) {
       if (!g.lure && !g.ret) g.back = { x: g.x, y: g.y };
       g.lure = { x: g.saw.x, y: g.saw.y, t: 2.4 };
       g.ret = false;
-      bark(g, BARKS.lost);
+      bark(g, 'lost');
     }
     g.wasSee = g.seeing;
   }
@@ -684,10 +685,10 @@ function update(dt) {
         if (!g.lure && !g.ret) g.back = { x: g.x, y: g.y };
         g.lure = { x: b.x, y: b.y, t: 2.5 };
         g.ret = false;
-        bark(g, BARKS.body);
+        bark(g, 'body');
         if (!G.bodySaid) {
           G.bodySaid = true;
-          say('Shiloh', 'They found him. Next time, pick a quieter corner.');
+          say('Shiloh', TEXT.lines.bodyFound);
         }
         break;
       }
@@ -718,7 +719,7 @@ function update(dt) {
           G.shake = Math.max(G.shake, 0.15);
           if (Math.hypot(A.x - q.x, A.y - q.y) < 2.2 * T) {
             G.alert += 0.45;
-            say('Candlemaker', 'Still one step behind, little courier?');
+            say('Candlemaker', TEXT.lines.blinkTaunt);
           }
         }
       } else if (B.blinkT <= 0) {
@@ -744,7 +745,7 @@ function update(dt) {
         G.rings.push({ x: B.x, y: B.y, t: 0.9, r: 7 * T, c: '255,200,80' });
         if (!G.tollSaid) {
           G.tollSaid = true;
-          say('Ashling', 'The bell! Freeze when it rings!');
+          say('Ashling', TEXT.lines.tollWarning);
         }
       }
       if (B.toll > 0) {
@@ -753,7 +754,7 @@ function update(dt) {
           G.shake = Math.max(G.shake, 0.2);
           if (moving && Math.hypot(A.x - B.x, A.y - B.y) < 7 * T) {
             G.alert += 0.3;
-            say('Shiloh', 'It heard me move.');
+            say('Shiloh', TEXT.lines.tollHeard);
           }
         }
       }
@@ -784,14 +785,19 @@ function update(dt) {
   if (G.parts.length > 700) G.parts.splice(0, G.parts.length - 700);
   if (G.msgT > 0) G.msgT -= dt;
   if (G.joyT > 0) G.joyT -= dt;
+  for (const q of G.sayQ) q.t -= dt;
+  const due = G.sayQ.filter((q) => q.t <= 0);
+  G.sayQ = G.sayQ.filter((q) => q.t > 0);
+  for (const q of due) say(q.who, q.text);
   // exit
   const req = G.items.filter((i) => 'OPBLHC'.includes(i.type));
   G.exitOpen = req.every((i) => i.done) && (!G.boss || G.boss.dead);
   if (G.exitOpen && !G.doneSaid) {
     G.doneSaid = true;
-    say(
+    sayLater(
+      3.6,
       G.flight ? 'Ashling' : 'Shiloh',
-      G.flight ? 'Done. Land on the green pad.' : 'Objectives done. Get Shiloh to the gate.'
+      G.flight ? TEXT.lines.flightDone : TEXT.lines.groundDone
     );
   }
   const ex = G.flight ? G.ash : G.shiloh;
@@ -812,6 +818,7 @@ function update(dt) {
   SND.watch(dt);
   if (G.alert >= 1) {
     mode = 'lose';
+    G.caughtPick = (Math.random() * TEXT.caught.length) | 0;
     stats.caught++;
     G.shake = 0.5;
   }

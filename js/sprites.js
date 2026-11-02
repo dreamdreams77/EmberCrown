@@ -491,7 +491,7 @@ function drawAsh(a) {
 function guardMood(g) {
   if (g.stun > 0) return 'ko';
   if (g.seeing) return 'alert';
-  if (g.bark && /Man down|Intruder|Wake up/.test(g.bark.text)) return 'startled';
+  if (g.bark && g.bark.kind === 'body') return 'startled';
   if (g.grog > 0) return 'groggy';
   if (g.lure || g.ret || g.bark) return 'suspicious';
   return 'calm';

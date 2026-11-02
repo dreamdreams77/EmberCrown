@@ -72,12 +72,7 @@ function shiftTime() {
     c: toRuin ? '220,130,80' : '240,210,130'
   });
   lureNear(G.shiloh.x, G.shiloh.y, 8 * T);
-  say(
-    'Shiloh',
-    toRuin
-      ? 'Three years on. The hall remembers what it became.'
-      : 'The ball again. Mind the masks.'
-  );
+  say('Shiloh', toRuin ? TEXT.lines.toRuins : TEXT.lines.toBall);
 }
 function los(x1, y1, x2, y2) {
   const d = Math.hypot(x2 - x1, y2 - y1),
@@ -90,9 +85,14 @@ function los(x1, y1, x2, y2) {
   return true;
 }
 function say(who, text) {
+  text = lineText(text);
   G.msg = { who, text };
   G.msgT = 4;
   sfx('talk', who, text);
+}
+// A line that follows after a pause, so a short exchange can play out.
+function sayLater(delay, who, text) {
+  G.sayQ.push({ t: delay, who, text });
 }
 
 /* ---------- level loading ---------- */
@@ -115,6 +115,7 @@ function loadLevel(i) {
     gems: 0,
     msg: null,
     msgT: 0,
+    sayQ: [],
     fireSaid: false,
     doneSaid: false,
     sneak: false,

@@ -281,7 +281,7 @@ function lureNear(x, y, r, noise) {
     if (Math.hypot(g.x - x, g.y - y) < r && los(g.x, g.y, x, y)) {
       if (!g.lure && !g.ret) {
         g.back = { x: g.x, y: g.y };
-        bark(g, BARKS.lure);
+        bark(g, 'lure');
       }
       g.lure = { x, y, t: 3 };
       g.ret = false;
@@ -309,7 +309,7 @@ function useBell() {
 function useFlute() {
   if (G.active !== 'shiloh') return;
   if (G.gad.flute <= 0) {
-    if (G.d.song) say('Shiloh', 'I do not know the Song yet. Find the lectern.');
+    if (G.d.song) say('Shiloh', TEXT.lines.noSong);
     return;
   }
   if (G.d.timeshift) {
@@ -331,12 +331,12 @@ function useFlute() {
     }
   }
   if (!best) {
-    say('Shiloh', 'Nothing close enough to open.');
+    say('Shiloh', TEXT.lines.nothingToOpen);
     return;
   }
   G.gad.flute--;
   best.open = true;
   G.rings.push({ x: G.shiloh.x, y: G.shiloh.y, t: 1, r: 140, c: '160,220,255' });
   lureNear(G.shiloh.x, G.shiloh.y, 8 * T);
-  say('Ashling', 'Subtle. Real subtle.');
+  say('Ashling', TEXT.lines.fluteLoud);
 }

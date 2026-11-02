@@ -1,6 +1,6 @@
-# Embercrown
+# Plain Wax
 
-A small stealth game in plain JavaScript and canvas. You play Shiloh, a courier turned spy, and Ashling, a runt dragon hatched from an egg she steals. Together they slip into the strongholds of seven feuding houses to stop a war someone is manufacturing.
+A small stealth game in plain JavaScript and canvas. (The repository is still called EmberCrown, the working title.) You play Shiloh, a courier turned spy, and Ashling, a runt dragon hatched from an egg she steals. Together they slip into the strongholds of seven feuding houses to stop a war someone is manufacturing.
 
 **Play it:** https://dreamdreams77.github.io/EmberCrown/ or open `index.html` in a browser. There is no build step and no runtime dependency (the typeface loads from Google Fonts when online and falls back to Georgia).
 
@@ -33,7 +33,7 @@ The rules in full are in [DESIGN.md](DESIGN.md).
 
 - No saving or pausing. A page reload starts over.
 - Each mission is one screen with no scrolling, and the missions are short.
-- Dialogue is single lines, not conversations. The Whisper Court (choosing which servant to turn) happens once, before Gallowmere.
+- Dialogue is single lines, not conversations. The Back Stairs (choosing which servant to turn) happens once, before Gallowmere.
 - Ashling's growth only extends his flame reach. Gliding, charging and carrying are designed but not built.
 - Planned but missing: the other flute songs, per-house effects on single missions, extra objectives on harder difficulties, split-screen co-op.
 - Balance has had little real play testing. Phone performance and the audio mix are the least tested.
@@ -45,7 +45,8 @@ index.html        page shell and script tags
 style.css         page and canvas styles
 js/
   config.js       canvas, scale, constants
-  levels.js       the seven missions as data (maps, guards, palettes, text)
+  levels.js       the seven missions as data (maps, guards, palettes)
+  text.js         every word of the story: briefings, lines, barks, endings, menus
   story.js        game state, house reputation, outcomes, endings, difficulty
   world.js        collision, line of sight, loading a level
   audio.js        synthesized sound effects, generative music, mute
@@ -70,7 +71,7 @@ npm test           # about 30 seconds, headless Chromium
 npm run format     # Prettier
 ```
 
-The tests play the whole game with key presses, fuzz every mission with random input, and check the stealth and boss rules, touch controls, the audio engine, every character expression, and that no text contains dashes or the old name of the hero.
+The tests play the whole game with key presses, fuzz every mission with random input, and check the stealth and boss rules, touch controls, the audio engine, every character expression, that every line of the story exists and fits the screen, and that no text contains dashes.
 
 ## Credits and licence
 

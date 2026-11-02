@@ -15,16 +15,6 @@ const LEVELS = [
       tab: '#d8d0c0',
       weather: 'ash'
     },
-    intro: [
-      'House Marrow keeps a stolen dragon egg in its north-east tower.',
-      'Steal it, then burn the signal beacon so no alarm travels.',
-      'Then slip out through the gate. Torchlight gives you away; keep to the shadows.',
-      'Run and they hear you. Sneak up behind a guard and hold E to put him to sleep.',
-      '',
-      'Something in that egg is going to be very annoyed.'
-    ],
-    opening: 'Egg is in the north-east tower. Quiet feet.',
-    labels: { O: 'Steal the dragon egg', B: 'Burn the signal beacon' },
     gadgets: { smoke: 3, bell: 3, flute: 1 },
     map: [
       '#########################',
@@ -88,15 +78,6 @@ const LEVELS = [
       floor: 'wood',
       weather: 'dust'
     },
-    intro: [
-      'Feast night at Gallowmere. Lord Grell is drunk on flattery.',
-      'Swap the seal on the treaty, poison the wine cup,',
-      'and burn the signal beacon. Then leave before the toast.',
-      '',
-      'Ashling is awake now. Press TAB to swap between you.'
-    ],
-    opening: 'Feast night. Seal, wine, beacon. Any order.',
-    labels: { O: 'Swap the seal', P: 'Poison the wine cup', B: 'Burn the signal beacon' },
     gadgets: { smoke: 3, bell: 3, flute: 1 },
     bribeIdx: 4,
     map: [
@@ -160,16 +141,6 @@ const LEVELS = [
       tab: '#2f6f8a',
       weather: 'rain'
     },
-    intro: [
-      'A sea fortress of bells and searchlights. Shiloh hides on the rocks.',
-      'This one is a flight. You are Ashling, carrying her forged letters.',
-      'Burn all four signal beacons. Drop the letters in two war rooms (hold E).',
-      'Fly over walls and water. Searchlights sweep; boats patrol.',
-      '',
-      'Land on the green pad when done.'
-    ],
-    opening: 'Shiloh is hiding. I do the flying. Try not to look smug.',
-    labels: { P: 'Plant the forged letters', B: 'Burn the four beacons' },
     gadgets: { smoke: 0, bell: 0, flute: 0 },
     map: [
       '.........................',
@@ -217,16 +188,6 @@ const LEVELS = [
       tab: '#2c2238',
       weather: 'dust'
     },
-    intro: [
-      'Black-robed monks. A vow of silence. Footsteps carry here.',
-      'Find the lectern and learn the Song of Opening on the bone flute.',
-      "Then open the sealed door (F) and take the abbot's ledger.",
-      'The Bell-Warden guards it. His bell tolls: freeze when it does.',
-      '',
-      'Fire only hurts him from behind. Lure him with the bell (R).'
-    ],
-    opening: 'Silence is law here. Sneak (Shift), or the monks will come looking.',
-    labels: { L: 'Learn the Song of Opening', O: 'Take the ledger', W: 'Silence the Bell-Warden' },
     gadgets: { smoke: 3, bell: 5, flute: 0 },
     bellAt: [18.5, 5],
     map: [
@@ -308,16 +269,6 @@ const LEVELS = [
       floor: 'iron',
       weather: 'embers'
     },
-    intro: [
-      'House Kest holds Perrin Ostrander, heir to the Drowned Spire, in its foundry cells.',
-      'Pick the cell lock (hold E on his door, then on him), burn the muster beacon,',
-      'and walk him to the gate. Forge vents belch fire on a cycle:',
-      'Ashling is fireproof. Shiloh is not.',
-      '',
-      'At the gate you decide what to do with him. The houses are watching.'
-    ],
-    opening: 'Foundry heat. Watch the vents, and keep Perrin close.',
-    labels: { H: 'Free Perrin Ostrander', B: 'Burn the muster beacon' },
     gadgets: { smoke: 3, bell: 3, flute: 1 },
     map: [
       '#########################',
@@ -397,16 +348,6 @@ const LEVELS = [
       tab: '#5a4a3a',
       weather: 'ash'
     },
-    intro: [
-      'A masked ball in the marsh hall of House Dunmoor. Lanterns, fog, a crowd.',
-      'Plant the forged treaty at the head table while the ball lasts (hold E).',
-      'Then find a pedestal and play the Song of Time (F) to see the hall after the war.',
-      "Take Lady Veyra's signet from the ruined throne room, and burn the muster beacon.",
-      '',
-      'Planting the treaty changes what survives: the throne room wall falls open.'
-    ],
-    opening: 'Masks on. The crowd is cover. Find a pedestal when you are ready to see the end.',
-    labels: { P: 'Plant the treaty (ball)', O: 'Take the signet (ruins)', B: 'Burn the beacon' },
     gadgets: { smoke: 3, bell: 3, flute: 99 },
     map: [
       '#########################',
@@ -539,14 +480,6 @@ const LEVELS = [
       tab: '#6a5a3a',
       weather: 'embers'
     },
-    intro: [
-      'A ruined hall lit by five candles that never gutter. He knows every trick you know.',
-      'Snuff all five candles (hold E). While one burns, he cannot be hurt.',
-      'Then burn him from behind with Ashling. He blinks: the orange mark is where he lands.',
-      'Reach the throne to decide how the war ends.'
-    ],
-    opening: 'Five candles. Snuff them all, and he has nowhere to hide.',
-    labels: { C: 'Snuff the candles', W: 'Defeat the Candlemaker' },
     gadgets: { smoke: 3, bell: 3, flute: 0 },
     map: [
       '#########################',

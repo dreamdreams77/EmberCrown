@@ -397,7 +397,9 @@ function drawHud() {
           ? '#7fd0ff'
           : G.msg.who === 'Candlemaker'
             ? '#f0d080'
-            : '#c8b4ff';
+            : G.msg.who === 'Tip'
+              ? '#e8c870'
+              : '#c8b4ff';
     ctx.font = 'bold 13px ' + F;
     const nw = ctx.measureText(G.msg.who + ':').width;
     ctx.font = '13px ' + F;
@@ -502,40 +504,39 @@ function drawTitleDragon() {
   ctx.restore();
   CLAY = was;
 }
-function drawCrown(x, y, s) {
+// The Hollow Crown's seal: a ring of plain wax with nothing pressed into it.
+function drawSeal(x, y, s) {
   ctx.save();
-  ctx.translate(x, y + Math.sin(now * 1.6) * 2.5);
-  ctx.rotate(Math.sin(now * 1.1) * 0.07);
+  ctx.translate(x, y + Math.sin(now * 1.6) * 2);
+  ctx.rotate(Math.sin(now * 1.1) * 0.05);
   ctx.scale(s, s);
-  addGlow(0, 0, 46 + Math.sin(now * 2.2) * 5, '255,150,60', 0.55);
-  const gr = ctx.createLinearGradient(0, -16, 0, 10);
-  gr.addColorStop(0, '#ffe9a0');
-  gr.addColorStop(1, '#c0541c');
-  ctx.fillStyle = gr;
-  ctx.beginPath();
-  ctx.moveTo(-22, 10);
-  ctx.lineTo(-24, -10);
-  ctx.lineTo(-12, 0);
-  ctx.lineTo(0, -16);
-  ctx.lineTo(12, 0);
-  ctx.lineTo(24, -10);
-  ctx.lineTo(22, 10);
-  ctx.closePath();
-  ctx.fill();
-  ctx.lineJoin = 'round';
-  ctx.strokeStyle = 'rgba(30,10,40,.9)';
-  ctx.lineWidth = 1.8;
+  addGlow(0, 0, 40 + Math.sin(now * 2.2) * 4, '255,120,60', 0.35);
+  const blob = (r, k) => {
+    ctx.beginPath();
+    for (let a = 0; a <= 12; a++) {
+      const t = (a / 12) * Math.PI * 2,
+        rr = r * (1 + 0.07 * Math.sin(t * 3 + k) + 0.04 * Math.sin(t * 5 + k * 2));
+      ctx[a ? 'lineTo' : 'moveTo'](Math.cos(t) * rr, Math.sin(t) * rr * 0.92);
+    }
+    ctx.closePath();
+  };
+  blob(22, 1);
+  ctx.moveTo(11, 0);
+  ctx.ellipse(0, 0, 11, 10, 0, 0, Math.PI * 2);
+  const g = ctx.createRadialGradient(-7, -9, 2, 0, 0, 28);
+  g.addColorStop(0, '#e0604a');
+  g.addColorStop(0.5, '#a3321f');
+  g.addColorStop(1, '#4a0e0c');
+  ctx.fillStyle = g;
+  ctx.fill('evenodd');
+  ctx.strokeStyle = 'rgba(20,6,20,.85)';
+  ctx.lineWidth = 1.6;
   ctx.stroke();
-  ctx.fillStyle = 'rgba(255,250,220,.5)';
+  ctx.strokeStyle = 'rgba(255,225,205,.45)';
+  ctx.lineWidth = 1.2;
   ctx.beginPath();
-  ctx.ellipse(-11, -3, 5, 1.6, -0.6, 0, 7);
-  ctx.fill();
-  const was = CLAY;
-  CLAY = true;
-  ell(0, 3, 3, 3, '#d02a2a');
-  ell(-12, 5, 2, 2, '#5fd0a0');
-  ell(12, 5, 2, 2, '#5fd0a0');
-  CLAY = was;
+  ctx.arc(0, 0, 18, -2.7, -1.3);
+  ctx.stroke();
   ctx.restore();
 }
 function panel(title, lines, foot, col, overlay) {
@@ -552,8 +553,8 @@ function panel(title, lines, foot, col, overlay) {
   } else drawBackdrop();
   drawPlaque(34, 16, 732, 448, 5 + (title.length % 5), 0, 22);
   ctx.textAlign = 'center';
-  const big = title === 'EMBERCROWN';
-  if (big) drawCrown(400, 50, 0.95);
+  const big = title === TEXT.title;
+  if (big) drawSeal(400, 52, 0.95);
   ctx.font = 'bold ' + (big ? 50 : 38) + 'px ' + F;
   ctx.lineJoin = 'round';
   ctx.strokeStyle = 'rgba(18,6,34,.95)';
@@ -591,7 +592,26 @@ function panel(title, lines, foot, col, overlay) {
   ctx.stroke();
   ctx.font = '16px ' + F;
   ctx.fillStyle = '#f3e6cc';
-  lines.forEach((l, i) => ctx.fillText(l, 400, 154 + i * 25.5));
+  // a line too wide for the plaque breaks at the space nearest its middle
+  const shown = [];
+  for (const l of lines) {
+    if (ctx.measureText(l).width <= 640) shown.push(l);
+    else {
+      let cut = -1;
+      for (let k = 0; k < l.length; k++) {
+        if (
+          l[k] === ' ' &&
+          (cut < 0 || Math.abs(k - l.length / 2) < Math.abs(cut - l.length / 2))
+        ) {
+          cut = k;
+        }
+      }
+      shown.push(l.slice(0, cut), l.slice(cut + 1));
+    }
+  }
+  const step = Math.min(25.5, Math.max(17.5, 262 / (shown.length - 1)));
+  if (step < 22) ctx.font = '15px ' + F;
+  shown.forEach((l, i) => ctx.fillText(l, 400, 154 + i * step));
   ctx.globalAlpha = 0.65 + 0.35 * Math.sin(now * 3);
   ctx.fillStyle = '#d8c4f0';
   ctx.font = 'italic 15px ' + F;
@@ -606,9 +626,9 @@ function fmt(s) {
 function draw() {
   if (mode === 'title') {
     panel(
-      'EMBERCROWN',
+      TEXT.title,
       [
-        'A spy. A runt dragon. Seven feuding houses. One engineered war.',
+        TEXT.tagline,
         '',
         ...(TOUCH.capable
           ? [
@@ -642,49 +662,33 @@ function draw() {
         R.f + R.e + R.r > 0
           ? [
               '',
-              'Standing: Favor ' + R.f + '   Fear ' + R.e + '   Ruin ' + R.r,
-              'Suspicion fades ' +
-                Math.round((R.decay - 1) * 100) +
-                '% faster   Guard sight -' +
-                Math.round((1 - R.sight) * 100) +
-                '%   Alert gain +' +
-                Math.round((R.gain - 1) * 100) +
-                '%   Guards fled ' +
-                R.fled
+              fill(TEXT.menus.standing, { f: R.f, e: R.e, r: R.r }),
+              fill(TEXT.menus.effects, {
+                decay: Math.round((R.decay - 1) * 100),
+                sight: Math.round((1 - R.sight) * 100),
+                gain: Math.round((R.gain - 1) * 100),
+                fled: R.fled
+              })
             ]
           : [];
     let fin = [];
     if (d.finale) {
       const hc = houseCounts();
       fin = [
-        'Favor sends +' +
-          Math.min(3, hc.f) +
-          ' whisper bells   Fear stands down ' +
-          Math.min(3, hc.e) +
-          ' guards   Ruin: he starts at ' +
-          (100 - 8 * hc.r) +
-          ' HP'
+        fill(TEXT.menus.finale, {
+          bells: Math.min(3, hc.f),
+          guards: Math.min(3, hc.e),
+          hp: 100 - 8 * hc.r
+        })
       ];
     }
     panel(
       d.name,
-      ['Mission ' + (lvl + 1) + ': ' + d.house, ''].concat(d.intro, extra, fin),
+      ['Mission ' + (lvl + 1) + ': ' + d.house, ''].concat(d.intro.map(lineText), extra, fin),
       'Press Enter to begin'
     );
   } else if (mode === 'court') {
-    panel(
-      'The Whisper Court',
-      [
-        'Before Gallowmere you may turn one servant of House Grell.',
-        '',
-        '1   Bribe the steward: one guard sleeps through the feast',
-        '2   Blackmail the chamberlain: suspicion fades much faster',
-        '3   Taint the wine: drowsy guards, shorter sight and slower steps',
-        '',
-        'Every favor has a price. The houses will remember.'
-      ],
-      'Press 1, 2 or 3'
-    );
+    panel(TEXT.menus.court.title, TEXT.menus.court.lines, 'Press 1, 2 or 3');
   } else if (mode === 'play') {
     drawWorld();
     drawHud();
@@ -693,23 +697,11 @@ function draw() {
     drawWorld();
     drawHud();
     const can = stats.gems >= BREAK_GEMS;
+    const lines = TEXT.menus.throne.lines.slice();
+    if (!can) lines[4] = fill(TEXT.menus.throne.locked, { gems: BREAK_GEMS, have: stats.gems });
     panel(
-      'The Throne of Hallow',
-      [
-        'The Candlemaker is dead. The throne is yours to decide.',
-        '',
-        '1   Crown a puppet: peace, held by strings',
-        '2   Burn it all down: Ashling finishes what the war began',
-        can
-          ? '3   Break the throne: no crown, no more wars'
-          : '3   Break the throne (locked, needs ' +
-            BREAK_GEMS +
-            ' ember gems, you have ' +
-            stats.gems +
-            ')',
-        '',
-        'There is no taking this back.'
-      ],
+      TEXT.menus.throne.title,
+      lines,
       can ? 'Press 1, 2 or 3' : 'Press 1 or 2',
       '#f0d080',
       true
@@ -717,20 +709,7 @@ function draw() {
   } else if (mode === 'choice') {
     drawWorld();
     drawHud();
-    panel(
-      'Perrin Ostrander',
-      [
-        'The heir of the Drowned Spire stands at the gate, breathing hard.',
-        '',
-        '1   Return him to House Ostrander: an ally, if a little humbled',
-        '2   Hold him as leverage: a bribe, and a house that fears you',
-        '',
-        'Whatever you choose, House Kest will not forget who emptied their cell.'
-      ],
-      'Press 1 or 2',
-      '#7fd0ff',
-      true
-    );
+    panel(TEXT.menus.perrin.title, TEXT.menus.perrin.lines, 'Press 1 or 2', '#7fd0ff', true);
   } else if (mode === 'win') {
     drawWorld();
     drawHud();
@@ -751,9 +730,10 @@ function draw() {
   } else if (mode === 'lose') {
     drawWorld();
     drawHud();
+    const pair = TEXT.caught[G.caughtPick || 0];
     panel(
       'CAUGHT',
-      ['Shiloh: ...that went poorly.', 'Ashling: I said nothing. Loudly.'],
+      ['Shiloh: ' + pair[0], 'Ashling: ' + pair[1]],
       'Press Enter to retry the mission',
       '#e05050',
       true

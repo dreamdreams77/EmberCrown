@@ -193,6 +193,7 @@ function buildBg(g) {
     R0 = mulberry(S * 977 + 3);
   x.clearRect(0, 0, 800, 480);
   g.torches = [];
+  const banners = [];
   const floorPath = new Path2D(),
     wallPath = new Path2D();
   for (let ty = 0; ty < GH; ty++)
@@ -406,9 +407,29 @@ function buildBg(g) {
         if (every && tx - lastT >= every && tx > 0 && tx < GW - 1 && hash(tx, ty, S + 5) < 0.6) {
           lastT = tx;
           g.torches.push({ x: px + 16, y: fy + 4, ph: hash(tx, ty, S + 4) * 10 });
+        } else if (ruin && g.d.timeshift && hash(tx, ty, S + 11) < 0.4) {
+          banners.push([px, fy]);
         }
       }
     }
+  }
+  // three years on, the Crown's blank ring hangs where the house banners were
+  for (const [bx, by] of banners) {
+    const cloth = x.createLinearGradient(bx, by, bx + 14, by + 16);
+    cloth.addColorStop(0, '#7a2a2a');
+    cloth.addColorStop(1, '#3e1418');
+    x.fillStyle = cloth;
+    x.beginPath();
+    x.moveTo(bx + 9, by);
+    x.lineTo(bx + 23, by);
+    x.lineTo(bx + 23, by + 15);
+    x.lineTo(bx + 19, by + 12);
+    x.lineTo(bx + 16, by + 16);
+    x.lineTo(bx + 13, by + 12);
+    x.lineTo(bx + 9, by + 15);
+    x.closePath();
+    x.fill();
+    waxRing(x, bx + 16, by + 6, 3.6);
   }
   // shadows fall down and to the right in cool violet
   for (let ty = 0; ty < GH; ty++)
@@ -439,6 +460,7 @@ function buildBg(g) {
     x.fillStyle = 'rgba(255,240,210,.35)';
     x.fillRect(t.x - 4, t.y - 2, 6, 1);
   }
+  g.bannerCount = banners.length;
   g.bgs = [c, c, c];
 }
 function ell0(x, cx, cy, rx, ry, col) {

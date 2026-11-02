@@ -48,25 +48,27 @@ function applyOutcome() {
       'House ' + HOUSE_NAMES[h] + ': +' + n + ' ' + t[0].toUpperCase() + t.slice(1) + '. ' + msg
     );
   };
-  if (lvl === 0) add('marrow', 'fear', 1, 'The thief who walked through their keep.');
-  else if (lvl === 1) {
-    if (perk === 'bribe') add('grell', 'favor', 1, 'The steward remembers your coin.');
-    else if (perk === 'blackmail')
-      add('grell', 'fear', 1, 'The chamberlain keeps your secret, for now.');
-    else add('grell', 'ruin', 1, 'Grell wakes to a signature he does not remember.');
-  } else if (lvl === 2) {
-    add('ostrander', 'fear', 1, 'The beacons went dark in one night.');
-    add('ostrander', 'ruin', 1, 'Forged letters turn their house on itself.');
+  const entry = (key) => {
+    const [h, t, msg] = TEXT.ledger[key];
+    add(h, t, 1, msg);
+  };
+  if (lvl === 0) entry('marrow');
+  else if (lvl === 1)
+    entry(
+      perk === 'bribe' ? 'grellBribe' : perk === 'blackmail' ? 'grellBlackmail' : 'grellPoison'
+    );
+  else if (lvl === 2) {
+    entry('ostranderFear');
+    entry('ostranderRuin');
   } else if (lvl === 3) {
-    add('sable', 'fear', 1, 'The ledger names every bribe they took.');
-    add('sable', 'ruin', 1, 'Their Bell-Warden is silenced.');
+    entry('sableFear');
+    entry('sableRuin');
   } else if (lvl === 4) {
-    add('kest', 'fear', 1, 'Their prize hostage walked out of Ironvale.');
-    if (G.choice === 'return') add('ostrander', 'favor', 1, 'Their heir comes home, unharmed.');
-    else add('ostrander', 'fear', 1, 'You hold their heir over their heads.');
+    entry('kest');
+    entry(G.choice === 'return' ? 'ostranderHome' : 'ostranderKept');
   } else if (lvl === 5) {
-    add('dunmoor', 'ruin', 1, 'The forged treaty is now the first page of their war.');
-    add('dunmoor', 'fear', 1, "Veyra's signet is in your pocket.");
+    entry('dunmoorRuin');
+    entry('dunmoorFear');
   } else if (lvl === 6) {
     G.ending = finaleEnding(G.choice);
     L.push(G.ending.sum);
@@ -88,6 +90,7 @@ function finaleEnding(choice) {
   const R = rep(),
     keys = Object.keys(houses);
   if (choice === 'puppet') {
+    const T0 = TEXT.endings.puppet;
     let best = keys[0],
       bs = -1;
     for (const k of keys) {
@@ -98,50 +101,36 @@ function finaleEnding(choice) {
       }
     }
     houses[best].fear += 1;
+    const v = { house: HOUSE_NAMES[best] };
     return {
-      title: 'Ending: The Puppet Crown',
+      title: T0.title,
       col: '#c8b4ff',
       lines: [
-        'House ' +
-          HOUSE_NAMES[best] +
-          ' wears the crown, and every string runs back to the Hollow Crown.',
-        R.e >= 4
-          ? 'The houses obey because they are afraid, not because they agree.'
-          : 'The houses go along with it. Peace holds, for now.',
-        R.f >= 2
-          ? 'A few of them even thank you. Shiloh does not sleep well anyway.'
-          : 'Shiloh holds the strings and does not sleep well.'
+        fill(T0.first, v),
+        R.e >= 4 ? T0.afraid : T0.calm,
+        R.f >= 2 ? T0.thanked : T0.alone,
+        T0.quill
       ],
-      sum: 'House ' + HOUSE_NAMES[best] + ': crowned, +1 Fear.'
+      sum: fill(T0.summary, v)
     };
   }
   if (choice === 'burn') {
+    const T0 = TEXT.endings.burn;
     for (const k of keys) houses[k].ruin += 1;
     return {
-      title: 'Ending: Ash and Ember',
+      title: T0.title,
       col: '#ff9a4a',
-      lines: [
-        'Ashling burns the throne to slag, and then, with enthusiasm, the hall.',
-        R.r >= 4
-          ? 'The houses you ruined along the way have nothing left to rebuild with. The marsh smolders for a generation.'
-          : 'The houses are bruised, not broken. They rebuild fast, and find a new throne by spring.',
-        'Ashling: In my defense, it was very flammable.'
-      ],
-      sum: 'Every house: +1 Ruin.'
+      lines: [T0.first, ...(R.r >= 4 ? T0.ruined : [T0.bruised]), T0.joke, T0.quill],
+      sum: T0.summary
     };
   }
+  const T0 = TEXT.endings.break;
   for (const k of keys) houses[k].favor += 1;
   return {
-    title: 'Ending: The Broken Throne',
+    title: T0.title,
     col: '#7be08a',
-    lines: [
-      'Ashling, full grown, shatters the throne. No crown is left to fight over.',
-      R.f >= 3
-        ? 'The houses you helped meet in the rubble and draft a charter. It holds.'
-        : 'The houses scramble for order. It is a hard winter, but nobody has a crown to steal.',
-      'Shiloh sends one last letter. This time she knows what it says.'
-    ],
-    sum: 'Every house: +1 Favor.'
+    lines: [T0.first, ...(R.f >= 3 ? T0.helped : T0.scramble), T0.last],
+    sum: T0.summary
   };
 }
 function finishLevel() {

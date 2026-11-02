@@ -30,8 +30,8 @@ test('every character expression renders', async (t) => {
         calm: () => {},
         suspicious: (g) => (g.lure = { x: 0, y: 0, t: 9 }),
         alert: (g) => (g.seeing = true),
-        startled: (g) => (g.bark = { text: 'Man down!', t: 9 }),
-        talking: (g) => (g.bark = { text: 'Hm?', t: 9 }),
+        startled: (g) => (g.bark = { text: 'One down!', kind: 'body', t: 9 }),
+        talking: (g) => (g.bark = { text: 'Hm.', kind: 'hear', t: 9 }),
         groggy: (g) => (g.grog = 9),
         knockedOut: (g) => (g.stun = 9)
       };

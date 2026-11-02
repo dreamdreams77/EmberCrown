@@ -41,7 +41,7 @@ test('audio', async (t) => {
         hold: ['item', 0.5],
         doorOpen: [100, 100],
         alert: [100, 100],
-        voice: [g, 'Man down!'],
+        voice: [g, 'body'],
         stun: [100, 100],
         takedown: [100, 100],
         groan: [100, 100],

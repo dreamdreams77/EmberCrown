@@ -342,17 +342,15 @@ const SFX = {
       lp: 2500
     });
   },
-  voice(g, txt) {
-    const s = at(g.x, g.y),
-      sk = g.sk != null ? g.sk : 0.5,
-      kind = /Man down|Intruder|Wake up/.test(txt)
-        ? 'body'
-        : /Hm|Footsteps|Who is there/.test(txt)
-          ? 'hear'
-          : /Where|saw|Show/.test(txt)
-            ? 'lost'
-            : 'lure';
-    const base = 95 + sk * 85,
+  voice(g, kind) {
+    const s = at(g.x, g.y);
+    if (G.d.quiet) {
+      // the monks keep their vow: a breath, a hiss, a rap of knuckles
+      noise(0.18, 0.08 * s.vol, 'bandpass', kind === 'body' ? 3200 : 2200, { pan: s.pan, q: 2 });
+      return;
+    }
+    const sk = g.sk != null ? g.sk : 0.5,
+      base = 95 + sk * 85,
       n = kind === 'body' ? 3 : kind === 'hear' ? 1 : 2,
       t0 = SND.ctx.currentTime;
     for (let i = 0; i < n; i++) {
@@ -468,6 +466,7 @@ const SFX = {
     });
   },
   talk(who, txt) {
+    if (who === 'Tip') return SFX.tick();
     const f0 = { Shiloh: 300, Ashling: 200, Perrin: 340, Candlemaker: 118 }[who] || 240,
       n = Math.max(2, Math.min(5, ((txt || '').length / 12) | 0)),
       t0 = SND.ctx.currentTime;
@@ -911,7 +910,7 @@ SND.watch = function (dt) {
       sfx(G.holdT && G.holdT.ref === g ? 'takedown' : 'stun', g.x, g.y);
     else if (!st && g._stun && !g.dead && !g.boss) sfx('groan', g.x, g.y);
     g._stun = st;
-    if (g.bark && g.bark !== g._bk && !g.boss) sfx('voice', g, g.bark.text);
+    if (g.bark && g.bark !== g._bk && !g.boss) sfx('voice', g, g.bark.kind);
     g._bk = g.bark;
     if (g.boss) {
       if (g.toll > 0 && !g._tl) sfx('toll', g.x, g.y);

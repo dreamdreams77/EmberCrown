@@ -23,6 +23,33 @@ function drawGem(it) {
   ctx.lineTo(x - 3, y - 2);
   ctx.fill();
 }
+// A ring of plain wax with nothing pressed into it: the Hollow Crown's seal.
+function waxRing(c, x, y, r) {
+  c.save();
+  c.translate(x, y);
+  c.fillStyle = 'rgba(20,6,20,.35)';
+  c.beginPath();
+  c.ellipse(0.6, 0.9, r + 0.8, r * 0.86, 0, 0, 7);
+  c.fill();
+  c.beginPath();
+  c.ellipse(0, 0, r, r * 0.88, 0, 0, 6.283);
+  c.closePath();
+  c.moveTo(r * 0.5, 0);
+  c.ellipse(0, 0, r * 0.5, r * 0.44, 0, 0, 6.283);
+  c.closePath();
+  const g = c.createRadialGradient(-r * 0.3, -r * 0.4, 0, 0, 0, r * 1.2);
+  g.addColorStop(0, '#d8523a');
+  g.addColorStop(0.5, '#a3321f');
+  g.addColorStop(1, '#5a1410');
+  c.fillStyle = g;
+  c.fill('evenodd');
+  c.strokeStyle = 'rgba(255,220,200,.4)';
+  c.lineWidth = 0.8;
+  c.beginPath();
+  c.arc(0, 0, r * 0.88, -2.7, -1.4);
+  c.stroke();
+  c.restore();
+}
 function drawItem(it) {
   const x = it.x,
     y = it.y;
@@ -40,6 +67,7 @@ function drawItem(it) {
       for (let k = 0; k < 4; k++) ctx.fillRect(x - 4, y - 6 + k * 3, 11, 1);
     } else if (lvl === 0) {
       ell(x, y + 4, 14, 7, '#3a2a1a');
+      waxRing(ctx, x + 15, y + 8, 5.5);
       ctx.strokeStyle = '#6a4a2a';
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -82,8 +110,7 @@ function drawItem(it) {
       ctx.fillRect(x + 8, y - 7, 3, 15);
       ctx.fillStyle = 'rgba(0,0,0,.3)';
       for (let k = 0; k < 3; k++) ctx.fillRect(x - 8, y - 3 + k * 3, 12, 1);
-      ell(x + 4, y + 4, 4, 4, '#a82020');
-      ell(x + 3, y + 3, 1.5, 1.5, '#e05050');
+      waxRing(ctx, x + 4, y + 4, 5);
     }
   } else if (it.type === 'C') {
     ell(x, y + 10, 6, 2.5, 'rgba(0,0,0,.4)');

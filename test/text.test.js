@@ -45,6 +45,12 @@ test('text: no dash punctuation, and the hero is called Shiloh everywhere', asyn
       }
       mode = 'play';
     }
+    // everything in the story file, whether or not play reaches it
+    const walk = (v) => {
+      if (typeof v === 'string') seen.add(v);
+      else if (v && typeof v === 'object') Object.values(v).forEach(walk);
+    };
+    walk(TEXT);
     for (const choice of ['puppet', 'burn', 'break']) {
       const e = finaleEnding(choice);
       e.lines.forEach((l) => seen.add(l));
@@ -58,11 +64,11 @@ test('text: no dash punctuation, and the hero is called Shiloh everywhere', asyn
     return { strings: [...seen] };
   });
 
-  assert.ok(strings.length > 200, 'collected ' + strings.length + ' strings');
+  assert.ok(strings.length > 300, 'collected ' + strings.length + ' strings');
   const dashes = strings.filter((s) => /[\u2010-\u2015\u2212]| - |--/.test(s));
   assert.deepEqual(dashes, []);
   assert.deepEqual(
-    strings.filter((s) => /Wren/.test(s)),
+    strings.filter((s) => /Wren|Veyra|Whisper Court|Embercrown/.test(s)),
     []
   );
   assert.ok(strings.some((s) => /Shiloh/.test(s)));

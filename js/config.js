@@ -1,7 +1,7 @@
 // Canvas, scale and global constants.
 'use strict';
 
-/* EMBERCROWN, prototype, Chapter I. Keyboard only. */
+/* Plain Wax: a stealth prototype. Keyboard or touch. */
 const T = 32,
   GW = 25,
   GH = 15;
