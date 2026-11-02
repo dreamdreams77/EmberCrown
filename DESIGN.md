@@ -80,7 +80,24 @@ The totals across all houses shape every later mission (the briefing screen show
 
 ### The Back Stairs
 
-Before Gallowmere you turn one servant of House Grell: bribe the steward (one guard fewer), blackmail the chamberlain (suspicion fades 2.5x faster) or taint the wine (guards see 25% less far and walk slower). The epilogue remembers it.
+Before each mission after the first you turn one servant of the house you are about to rob. Every option changes that mission and leaves a mark on the house afterwards (the finale's three options are Hollow Crown caches instead and mark no house).
+
+| Mission | Favor | Fear | Ruin |
+|---|---|---|---|
+| Gallowmere | Bribe the steward: one guard fewer | Blackmail the chamberlain: suspicion fades 2.5x faster | Taint the wine: guards see 25% less far and walk slower |
+| The Drowned Spire | Pay the harbor pilot: the patrol boat is called off | Frighten the bell-ringer: searchlights sweep 40% slower | Spoil the lamp oil: searchlights see 25% less far |
+| Thornwick Abbey | Pay the gatekeeper: three extra whisper bells | Threaten the choirmaster: monks hear 35% less far | Water the refectory wine: monks walk slower |
+| Ironvale | Bribe the foreman: vents burn 40% less time | Blackmail the quartermaster: two extra smoke and two bells | Loosen the hinges: locks pick in half the time |
+| Dunmoor Marsh | Tip the doorman: one guard fewer | Blackmail the first violin: the Song of Time is half as loud | Spike the punch: guards see 10% less far and walk slower |
+| The Candlemaker's Crown | The courier's satchel: two extra smoke and bells | The apothecary's tonic: suspicion fades 1.6x faster | The tailor's cloak: guards see 15% less far |
+
+For the finale the three columns simply hold its three options in order. Your choices are recorded in the case file.
+
+### Saving, pausing and the case file
+
+- **Saving.** The game writes a save to the browser's local storage at the start of each mission and after each mission is cleared. The title screen offers to continue it (or to start over). The save is cleared when you finish the game. It holds the house standings, Back Stairs choices, difficulty, gems, times caught and which missions are cleared, but not your position inside a mission.
+- **Pausing.** P or Esc, or the pause button on touch. Hiding the tab pauses automatically. The pause menu resumes, opens the case file, restarts the mission, or returns to the title.
+- **Case file.** Page one lists one clue per cleared mission; the closing line appears once all seven are cleared. Page two shows how each house feels about you (in ruins, afraid of you, owes you, watching you, or does not know your name) and what you did on the back stairs.
 
 ## Difficulty
 
@@ -122,10 +139,9 @@ The ending screen shows the epilogue, gems, times caught, a rank (Ghost, Courier
 
 ## Not built yet
 
-- Saving and pausing.
 - Scrolling maps and larger levels. Every mission is a single 25 by 15 tile screen.
-- Dialogue beyond one-line barks and the Back Stairs menu.
-- The Back Stairs before every mission, with a wider pool of actions (flatter, expose, forge).
+- Dialogue scenes with choices, beyond one-line barks and the Back Stairs menu.
+- A wider pool of Back Stairs actions per mission (flatter, expose, forge), and options that depend on how a house already feels about you.
 - Dragon growth beyond flame reach: gliding over pits, a charge that smashes doors, carrying Shiloh across gaps.
 - Flute songs besides Opening and Time: Calling (summon Ashling), Hush (muffle footsteps), Ember (light braziers from afar).
 - Per-house effects on a single mission, and extra objectives on Spy and Shadow difficulty.

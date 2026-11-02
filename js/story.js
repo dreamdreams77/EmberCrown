@@ -3,7 +3,6 @@
 
 let mode = 'title',
   lvl = 0,
-  perk = null,
   G = null,
   diff = 1;
 const HOUSE_NAMES = {
@@ -20,6 +19,16 @@ function resetHouses() {
   for (const k in HOUSE_NAMES) houses[k] = { favor: 0, fear: 0, ruin: 0 };
 }
 resetHouses();
+// Which Back Stairs action was taken before each mission (an index into TEXT.stairs[i].options).
+let perks = {};
+function stairsAction(i) {
+  const st = TEXT.stairs[i];
+  return st && perks[i] != null ? st.options[perks[i]] : null;
+}
+function stairsFx(i) {
+  const a = stairsAction(i);
+  return a ? a.fx : {};
+}
 function rep() {
   let f = 0,
     e = 0,
@@ -53,10 +62,6 @@ function applyOutcome() {
     add(h, t, 1, msg);
   };
   if (lvl === 0) entry('marrow');
-  else if (lvl === 1)
-    entry(
-      perk === 'bribe' ? 'grellBribe' : perk === 'blackmail' ? 'grellBlackmail' : 'grellPoison'
-    );
   else if (lvl === 2) {
     entry('ostranderFear');
     entry('ostranderRuin');
@@ -73,6 +78,8 @@ function applyOutcome() {
     G.ending = finaleEnding(G.choice);
     L.push(G.ending.sum);
   }
+  const act = stairsAction(lvl);
+  if (act && act.ledger) add(act.ledger[0], act.ledger[1], 1, act.ledger[2]);
   G.outLines = L;
 }
 function houseCounts() {
@@ -136,6 +143,64 @@ function finaleEnding(choice) {
 function finishLevel() {
   mode = 'win';
   applyOutcome();
+  if (!stats.cleared.includes(lvl)) stats.cleared.push(lvl);
+  if (lvl + 1 < LEVELS.length) saveGame('court');
+  else clearSave();
+}
+
+/* ---------- saving: progress is kept at the start of each mission ---------- */
+const SAVE_KEY = 'plainwax_save';
+let SAVED = null;
+function saveGame(stage) {
+  try {
+    localStorage.setItem(
+      SAVE_KEY,
+      JSON.stringify({ v: 1, stage, lvl, diff, perks, houses, stats })
+    );
+  } catch (_) {
+    // private browsing or a full disk: the game still plays, it just cannot continue later
+  }
+  SAVED = readSave();
+}
+function readSave() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (!s || s.v !== 1 || !(s.lvl >= 0 && s.lvl < LEVELS.length)) return null;
+    if (s.stage !== 'brief' && s.stage !== 'court') return null;
+    for (const k in HOUSE_NAMES) if (!s.houses || !s.houses[k]) return null;
+    return s;
+  } catch (_) {
+    return null;
+  }
+}
+function clearSave() {
+  try {
+    localStorage.removeItem(SAVE_KEY);
+  } catch (_) {
+    // nothing to clear
+  }
+  SAVED = null;
+}
+SAVED = readSave();
+function newGame() {
+  stats.gems = 0;
+  stats.caught = 0;
+  stats.time = 0;
+  stats.byLvl = [];
+  stats.cleared = [];
+  perks = {};
+  resetHouses();
+  startBrief(0);
+}
+function continueGame(s) {
+  lvl = s.lvl;
+  diff = s.diff;
+  perks = s.perks || {};
+  houses = s.houses;
+  Object.assign(stats, s.stats);
+  stats.cleared = s.stats.cleared || [];
+  if (s.stage === 'court') mode = 'court';
+  else startBrief(lvl);
 }
 const DIFFS = [
   {
@@ -166,7 +231,7 @@ const DIFFS = [
     blurb: 'Sharper eyes, slow recovery, no flute'
   }
 ];
-const stats = { gems: 0, caught: 0, time: 0, byLvl: [] };
+const stats = { gems: 0, caught: 0, time: 0, byLvl: [], cleared: [] };
 const TOTAL_GEMS = LEVELS.reduce((s, l) => s + l.map.join('').split('g').length - 1, 0);
 const BREAK_GEMS = Math.round(TOTAL_GEMS * 0.6);
 const keys = {};

@@ -25,13 +25,22 @@ function gpos(e) {
 }
 // menu taps: the same lines the keyboard numbers pick
 function menuTap(g) {
+  // the small case-file link in the lower left of the briefing and the Back Stairs
+  if ((mode === 'brief' || mode === 'court') && g.x < 190 && g.y > 428) {
+    sfx('ui');
+    openCase();
+    return;
+  }
   if (mode === 'title') {
-    if (g.y > 366 && g.y < 396) {
+    if (UI.newGameBand && g.y > UI.newGameBand[0] && g.y < UI.newGameBand[1]) {
+      sfx('ui');
+      newGame();
+    } else if (g.y > UI.diffBand[0] && g.y < UI.diffBand[1]) {
       diff = (diff + 1) % 3;
       sfx('ui');
     } else press('enter');
-  } else if (mode === 'court' || mode === 'choice') {
-    for (let n = 1; n <= 3; n++) {
+  } else if (mode === 'court' || mode === 'choice' || mode === 'pause') {
+    for (let n = 1; n <= (mode === 'pause' ? 4 : 3); n++) {
       const ly = 154 + (n + 1) * 25.5;
       if (Math.abs(g.y - ly) < 17) {
         press(String(n));
@@ -46,8 +55,12 @@ cv.addEventListener(
     e.preventDefault();
     const g = gpos(e);
     SND.unlock();
-    if (g.x > 750 && g.y < 34) {
+    if (g.y < 34 && g.x > 766) {
       SND.cycle();
+      return;
+    }
+    if (g.y < 34 && g.x > 734 && mode === 'play') {
+      pauseGame();
       return;
     }
     if (e.pointerType === 'mouse' && mode === 'play') return;
@@ -220,16 +233,13 @@ addEventListener('blur', () => {
 });
 
 function press(k) {
-  if (mode !== 'play' && (k === 'enter' || k === '1' || k === '2' || k === '3')) sfx('ui');
+  if (mode !== 'play' && (k === 'enter' || k === '1' || k === '2' || k === '3' || k === '4'))
+    sfx('ui');
   if (mode === 'title' && ['1', '2', '3'].includes(k)) diff = +k - 1;
+  else if (mode === 'title' && k === 'n') newGame();
   else if (mode === 'title' && k === 'enter') {
-    stats.gems = 0;
-    stats.caught = 0;
-    stats.time = 0;
-    stats.byLvl = [];
-    perk = null;
-    resetHouses();
-    startBrief(0);
+    if (SAVED) continueGame(SAVED);
+    else newGame();
   } else if (mode === 'choice' && G.d.finale && ['1', '2', '3'].includes(k)) {
     if (k === '3' && stats.gems < BREAK_GEMS) return;
     G.choice = ['puppet', 'burn', 'break'][+k - 1];
@@ -238,19 +248,45 @@ function press(k) {
     G.choice = k === '1' ? 'return' : 'leverage';
     finishLevel();
   } else if (mode === 'brief' && k === 'enter') startPlay();
+  else if (mode === 'brief' && k === 'c') openCase();
   else if (mode === 'lose' && k === 'enter') startPlay();
   else if (mode === 'win' && k === 'enter') {
-    if (lvl === 0) mode = 'court';
-    else if (lvl + 1 < LEVELS.length) startBrief(lvl + 1);
+    if (lvl + 1 < LEVELS.length) mode = 'court';
     else mode = 'end';
   } else if (mode === 'court' && ['1', '2', '3'].includes(k)) {
-    perk = ['bribe', 'blackmail', 'poison'][+k - 1];
+    perks[lvl + 1] = +k - 1;
     startBrief(lvl + 1);
+  } else if (mode === 'court' && k === 'c') openCase();
+  else if (mode === 'pause') {
+    if (k === '1' || k === 'enter' || k === 'escape' || k === 'p') mode = 'play';
+    else if (k === '2' || k === 'c') openCase();
+    else if (k === '3') startPlay();
+    else if (k === '4') mode = 'title';
+  } else if (mode === 'casefile') {
+    if (k === 'enter' || k === 'arrowright' || k === ' ') {
+      casePage++;
+      if (casePage >= CASE_PAGES) closeCase();
+    } else if (k === 'escape' || k === 'c') closeCase();
+    else if (k === 'arrowleft' && casePage > 0) casePage--;
   } else if (mode === 'end' && k === 'enter') mode = 'title';
   else if (mode === 'play') playPress(k);
 }
+// Pausing drops anything held, so a finger lifted during the pause cannot leave you walking.
+function pauseGame() {
+  if (mode !== 'play') return;
+  TOUCH.ptr.clear();
+  TOUCH.mover = null;
+  TOUCH.fire = false;
+  TOUCH.hold = false;
+  mode = 'pause';
+  sfx('ui');
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) pauseGame();
+});
 function playPress(k) {
-  if (k === 'tab' && G.ash.on && !G.flight) {
+  if (k === 'p' || k === 'escape') pauseGame();
+  else if (k === 'tab' && G.ash.on && !G.flight) {
     G.active = G.active === 'shiloh' ? 'ash' : 'shiloh';
     const a = G.active === 'shiloh' ? G.shiloh : G.ash;
     G.rings.push({ x: a.x, y: a.y, t: 0.4, r: 40, c: '255,255,255' });

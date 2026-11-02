@@ -71,7 +71,7 @@ function shiftTime() {
     r: 220,
     c: toRuin ? '220,130,80' : '240,210,130'
   });
-  lureNear(G.shiloh.x, G.shiloh.y, 8 * T);
+  lureNear(G.shiloh.x, G.shiloh.y, 8 * T * (G.fx.timeNoise || 1));
   say('Shiloh', toRuin ? TEXT.lines.toRuins : TEXT.lines.toBall);
 }
 function los(x1, y1, x2, y2) {
@@ -116,6 +116,7 @@ function loadLevel(i) {
     msg: null,
     msgT: 0,
     sayQ: [],
+    fx: stairsFx(i),
     fireSaid: false,
     doneSaid: false,
     sneak: false,
@@ -131,8 +132,12 @@ function loadLevel(i) {
     host: d.choice ? { x: 0, y: 0, on: false, host: true, face: 0 } : null
   };
   const D = DIFFS[diff];
-  if (!d.flight)
-    for (const k of ['smoke', 'bell', 'flute']) g.gad[k] = Math.max(0, g.gad[k] + D[k]);
+  const fx = g.fx;
+  if (!d.flight) {
+    for (const k of ['smoke', 'bell', 'flute']) {
+      g.gad[k] = Math.max(0, g.gad[k] + D[k] + ((fx.gad && fx.gad[k]) || 0));
+    }
+  }
   let start, ex;
   d.map.forEach((row, y) => {
     g.grid[y] = [];
@@ -173,12 +178,12 @@ function loadLevel(i) {
     g.active = 'ash';
   }
   const R = rep();
-  g.rangeMul = (perk === 'poison' && i === 1 ? 0.75 : 1) * D.range * R.sight;
-  g.decay = (perk === 'blackmail' && i === 1 ? 2.5 : 1) * D.decay * R.decay;
+  g.rangeMul = (fx.sight || 1) * D.range * R.sight;
+  g.decay = (fx.decay || 1) * D.decay * R.decay;
   g.gain = R.gain;
-  const spd = perk === 'poison' && i === 1 ? 44 : 56;
+  const spd = fx.speed || 56;
   g.guards = d.guards
-    .filter((_, k) => !(perk === 'bribe' && i === 1 && k === d.bribeIdx))
+    .filter((_, k) => !(fx.drop && k === d.bribeIdx))
     .map((wp) => ({
       x: wp[0][0] * T + 16,
       y: wp[0][1] * T + 16,
@@ -263,7 +268,7 @@ function loadLevel(i) {
       wp: [[t[0] * T + 16, t[1] * T + 16]],
       i: 0,
       face: t[2],
-      spin: t[3],
+      spin: t[3] * (fx.spin || 1),
       stun: 0,
       pause: 0,
       lure: null,
@@ -347,6 +352,7 @@ function loadLevel(i) {
 function startBrief(i) {
   lvl = i;
   mode = 'brief';
+  saveGame('brief');
 }
 function startPlay() {
   G = loadLevel(lvl);

@@ -229,9 +229,6 @@ const TEXT = {
   // What each house remembers after a mission: [house, kind, line]
   ledger: {
     marrow: ['marrow', 'fear', 'Marrow found an empty crate and no sign of how you got in.'],
-    grellBribe: ['grell', 'favor', 'The steward remembers your coin.'],
-    grellBlackmail: ['grell', 'fear', 'The chamberlain keeps your secret, for now.'],
-    grellPoison: ['grell', 'ruin', 'Grell wakes to a signature he does not remember.'],
     ostranderFear: ['ostrander', 'fear', 'Every beacon on the sea road went dark in one night.'],
     ostranderRuin: [
       'ostrander',
@@ -292,18 +289,6 @@ const TEXT = {
 
   // Menu screens that carry story.
   menus: {
-    court: {
-      title: 'The Back Stairs',
-      lines: [
-        "Every house runs on its servants. Before Gallowmere, you may turn one of Grell's.",
-        '',
-        '1   Bribe the steward: one guard sleeps through the feast',
-        '2   Blackmail the chamberlain: suspicion fades much faster',
-        '3   Taint the wine: drowsy guards, shorter sight and slower steps',
-        '',
-        'Servants talk. Every favor you buy will be repeated.'
-      ]
-    },
     perrin: {
       title: 'Perrin Ostrander',
       lines: [
@@ -328,10 +313,206 @@ const TEXT = {
       ],
       locked: '3   Break the throne (locked, needs {gems} ember gems, you have {have})'
     },
+    stairsTitle: 'The Back Stairs',
+    pause: {
+      title: 'Paused',
+      lines: [
+        'The war can wait.',
+        '',
+        '1   Resume',
+        '2   Case file',
+        '3   Restart this mission',
+        '4   Quit to title',
+        '',
+        'Your save is kept from the start of this mission.'
+      ]
+    },
+    saved: {
+      keys: 'Saved game: mission {n}, {name}. Press N to start over.',
+      touch: 'Saved game: mission {n}, {name}. Tap here to start over.'
+    },
+    caseLink: { keys: 'C: case file', touch: 'Case file' },
     standing: 'Standing: Favor {f}   Fear {e}   Ruin {r}',
     effects:
       'Suspicion fades {decay}% faster, guard sight -{sight}%, alert +{gain}%, guards fled {fled}',
     finale: 'Favor adds bells: {bells}. Fear removes guards: {guards}. Ruin: he starts at {hp} HP.'
+  },
+
+  // The Back Stairs: before each mission after the first, you turn one servant of the house
+  // you are about to rob. `fx` changes the mission, `ledger` is what the house remembers
+  // afterwards ([house, kind, line]), `short` is how the case file records the choice.
+  stairs: [
+    null,
+    {
+      intro: "Every house runs on its servants. Before Gallowmere, you may turn one of Grell's.",
+      options: [
+        {
+          label: 'Bribe the steward: one guard sleeps through the feast',
+          short: 'bribed the steward',
+          fx: { drop: true },
+          ledger: ['grell', 'favor', 'The steward remembers your coin.']
+        },
+        {
+          label: 'Blackmail the chamberlain: suspicion fades much faster',
+          short: 'blackmailed the chamberlain',
+          fx: { decay: 2.5 },
+          ledger: ['grell', 'fear', 'The chamberlain keeps your secret, for now.']
+        },
+        {
+          label: 'Taint the wine: drowsy guards, shorter sight and slower steps',
+          short: 'tainted the wine',
+          fx: { sight: 0.75, speed: 44 },
+          ledger: ['grell', 'ruin', 'Grell wakes to a signature he does not remember.']
+        }
+      ],
+      foot: 'Servants talk. Every favor you buy will be repeated.'
+    },
+    {
+      intro: 'Ostrander runs on a handful of people who talk. Before the Spire, turn one.',
+      options: [
+        {
+          label: 'Pay the harbor pilot: the patrol boat is called off',
+          short: 'paid the harbor pilot',
+          fx: { drop: true },
+          ledger: ['ostrander', 'favor', 'The harbor pilot remembers your coin.']
+        },
+        {
+          label: 'Frighten the bell-ringer: the searchlights sweep slower',
+          short: 'frightened the bell-ringer',
+          fx: { spin: 0.6 },
+          ledger: ['ostrander', 'fear', 'The bell-ringer has stopped sleeping.']
+        },
+        {
+          label: 'Spoil the lamp oil: the searchlights see less far',
+          short: 'spoiled the lamp oil',
+          fx: { sight: 0.75 },
+          ledger: ['ostrander', 'ruin', 'The lamp oil was cut with seawater.']
+        }
+      ],
+      foot: 'On the sea road, a rumor travels faster than a ship.'
+    },
+    {
+      intro: "Sable's silence is paid for, and what is paid for can be paid for again.",
+      options: [
+        {
+          label: 'Pay the gatekeeper: three extra whisper bells',
+          short: 'paid the gatekeeper',
+          fx: { gad: { bell: 3 } },
+          ledger: ['sable', 'favor', 'The gatekeeper has a new coat.']
+        },
+        {
+          label: 'Threaten the choirmaster: the monks hear less',
+          short: 'threatened the choirmaster',
+          fx: { noise: 0.65 },
+          ledger: ['sable', 'fear', 'The choirmaster no longer sings alone.']
+        },
+        {
+          label: 'Water the refectory wine: drowsy, slower monks',
+          short: 'watered the refectory wine',
+          fx: { speed: 45 },
+          ledger: ['sable', 'ruin', 'The monks were drowsy at vespers.']
+        }
+      ],
+      foot: 'In an abbey of silence, the cellars are the loudest place.'
+    },
+    {
+      intro: "Kest's furnaces run on foremen and favors. Before Ironvale, find the soft spot.",
+      options: [
+        {
+          label: 'Bribe the foreman: the vents burn for less time',
+          short: 'bribed the foreman',
+          fx: { vents: 0.85 },
+          ledger: ['kest', 'favor', 'The foreman retired early, with a pension.']
+        },
+        {
+          label: 'Blackmail the quartermaster: two extra smoke and two bells',
+          short: 'blackmailed the quartermaster',
+          fx: { gad: { smoke: 2, bell: 2 } },
+          ledger: ['kest', 'fear', 'The quartermaster counts the stores twice now.']
+        },
+        {
+          label: 'Loosen the cell hinges: locks pick in half the time',
+          short: 'loosened the cell hinges',
+          fx: { pick: 0.5 },
+          ledger: ['kest', 'ruin', 'Three cell doors in Ironvale failed in one week.']
+        }
+      ],
+      foot: 'A forge is only as hard as the people who stoke it.'
+    },
+    {
+      intro: 'A ball needs a doorman, musicians and wine. Before Dunmoor, buy one.',
+      options: [
+        {
+          label: 'Slip the doorman a coin: one guard looks the other way',
+          short: 'tipped the doorman',
+          fx: { drop: true },
+          ledger: ['dunmoor', 'favor', 'The doorman lost your invitation, politely.']
+        },
+        {
+          label: 'Blackmail the first violin: the music drowns the Song of Time',
+          short: 'blackmailed the first violin',
+          fx: { timeNoise: 0.5 },
+          ledger: ['dunmoor', 'fear', 'The first violin plays what he is told.']
+        },
+        {
+          label: 'Spike the punch: tipsy guards see less and walk slower',
+          short: 'spiked the punch',
+          fx: { sight: 0.9, speed: 45 },
+          ledger: ['dunmoor', 'ruin', 'The punch bowl was blamed on the staff.']
+        }
+      ],
+      foot: 'At a masked ball, everyone is someone else, including the staff.'
+    },
+    {
+      intro: 'Quill left caches across the city for her couriers. There is time to reach one.',
+      options: [
+        {
+          label: "The courier's satchel: two extra smoke and two bells",
+          short: "took the courier's satchel",
+          fx: { gad: { smoke: 2, bell: 2 } },
+          ledger: null
+        },
+        {
+          label: "The apothecary's tonic: suspicion fades far faster",
+          short: "took the apothecary's tonic",
+          fx: { decay: 1.6 },
+          ledger: null
+        },
+        {
+          label: "The tailor's gray cloak: guards see you less well",
+          short: "took the tailor's cloak",
+          fx: { sight: 0.85 },
+          ledger: null
+        }
+      ],
+      foot: 'Quill is thorough. Every cache is exactly where you would have put it.'
+    }
+  ],
+
+  // The case file: one clue per cleared mission, then where each house stands.
+  caseFile: {
+    title: 'Case File',
+    unknown: 'Not found yet.',
+    clues: [
+      'The egg crate was sealed with a ring of plain wax. Marrow stamps a bone.',
+      "The same blank ring under Grell's treaty seal.",
+      "Ostrander's receipt book: seven letters, one courier. S. Sallow.",
+      'Counting House gold bought the silence of Sable.',
+      'Kest took its orders from a courier who ties her satchel as I do.',
+      "A note in Ottoline's signet case, signed Q. The Crown's rings hang in the ruins.",
+      'The Candlemaker was trained by Quill too. He lights a candle for every crown she empties.'
+    ],
+    verdict: 'Quill wrote the war. I carried it.',
+    housesTitle: 'Where the houses stand',
+    stairsTitle: 'On the back stairs',
+    mood: {
+      ruined: 'in ruins',
+      afraid: 'afraid of you',
+      owes: 'owes you',
+      watching: 'watching you',
+      unaware: 'does not know your name'
+    },
+    foot: 'Enter: next page. Esc: close.'
   },
 
   // Shown when you are caught: [Shiloh, Ashling], one pair chosen at random.

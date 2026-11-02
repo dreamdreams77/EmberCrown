@@ -132,6 +132,7 @@ const LEVELS = [
     name: 'The Drowned Spire',
     house: 'House Ostrander',
     flight: true,
+    bribeIdx: 0,
     pal: {
       f1: '#10303a',
       f2: '#123540',
@@ -400,6 +401,7 @@ const LEVELS = [
         [23, 11]
       ]
     ],
+    bribeIdx: 7,
     timeshift: {
       guests: [
         [

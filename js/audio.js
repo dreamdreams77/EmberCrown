@@ -780,9 +780,10 @@ SND.sync = function () {
   }
   let name = null;
   if (mode === 'title' || mode === 'brief' || mode === 'court' || mode === 'end') name = 'title';
-  else if ((mode === 'play' || mode === 'choice') && G)
+  else if ((mode === 'play' || mode === 'choice' || mode === 'pause') && G)
     name = G.d.timeshift && G.state === 'ruin' ? 'l5r' : 'l' + lvl;
   SND.setTrack(name);
+  if (mode !== 'play') SND.fireG.gain.setTargetAtTime(0, SND.ctx.currentTime, 0.05);
   let target = 0;
   if (mode === 'play' && G) {
     target = Math.max(0, Math.min(1, (G.alert - 0.08) * 1.25));

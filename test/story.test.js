@@ -17,8 +17,7 @@ test('story text is complete and fits the screen', async (t) => {
       for (const m of read(f).matchAll(/TEXT\.(lines|ledger)\.(\w+)/g))
         wanted.add(m[1] + '.' + m[2]);
     }
-    for (const m of read('story.js').matchAll(/entry\(\s*(?:perk[^)]*\?\s*)?'(\w+)'/g))
-      wanted.add('ledger.' + m[1]);
+    for (const m of read('story.js').matchAll(/entry\('(\w+)'/g)) wanted.add('ledger.' + m[1]);
     const missing = await page.evaluate(
       (list) =>
         list.filter((k) => {
@@ -95,8 +94,26 @@ test('story text is complete and fits the screen', async (t) => {
         startBrief(L);
         draw();
       }
-      mode = 'court';
+      for (let L = 0; L < 6; L++) {
+        lvl = L;
+        mode = 'court';
+        draw();
+        mode = 'brief';
+        draw();
+      }
+      mode = 'pause';
       draw();
+      for (casePage = 0; casePage < CASE_PAGES; casePage++) {
+        mode = 'casefile';
+        draw();
+      }
+      houses.grell.favor = 1;
+      stats.cleared = [0, 1, 2, 3, 4, 5, 6];
+      perks = { 1: 0, 2: 1, 3: 2, 4: 0, 5: 1, 6: 2 };
+      for (casePage = 0; casePage < CASE_PAGES; casePage++) {
+        mode = 'casefile';
+        draw();
+      }
       lvl = 6;
       startPlay();
       for (const ending of ['puppet', 'burn', 'break']) {
@@ -230,9 +247,9 @@ test('story text is complete and fits the screen', async (t) => {
       const y = 154 + 3 * 25.5; // the second option
       P('down', 1, 400, y);
       P('up', 1, 400, y);
-      return { perk, mode };
+      return { second: perks[1], mode };
     });
-    assert.equal(r.perk, 'blackmail');
+    assert.equal(r.second, 1);
     assert.equal(r.mode, 'brief');
   });
 

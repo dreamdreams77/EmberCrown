@@ -6,6 +6,17 @@ A small stealth game in plain JavaScript and canvas. (The repository is still ca
 
 This is an early prototype. Seven short missions are playable start to finish, with three endings.
 
+![The title screen](docs/screenshots/title.png)
+
+| | |
+|---|---|
+| ![Ashfall Keep](docs/screenshots/ashfall-keep.png) | ![The Drowned Spire](docs/screenshots/drowned-spire.png) |
+| Ashfall Keep: shadows, torchlight, patrols. | The Drowned Spire: a flight mission as Ashling. |
+| ![The Back Stairs](docs/screenshots/back-stairs.png) | ![The Candlemaker's Crown](docs/screenshots/candlemaker.png) |
+| The Back Stairs: before each mission you turn one servant. | The finale: snuff the candles, then burn him from behind. |
+
+![The case file](docs/screenshots/case-file.png)
+
 ## Controls
 
 | | Keyboard | Touch |
@@ -16,7 +27,10 @@ This is an early prototype. Seven short missions are playable start to finish, w
 | Dragon fire | Space (as Ashling) | Hold a second finger down (as Ashling) |
 | Swap Shiloh and Ashling | Tab | Tap Tab in the bottom bar, or tap with a second finger |
 | Smoke, whisper bell, bone flute | Q, R, F | Tap them in the bottom bar |
+| Pause | P or Esc | Tap the pause button, top right |
+| Case file | C (from a briefing, the Back Stairs or the pause menu) | Tap "Case file", lower left of those screens |
 | Sound on, effects only, off | M | Tap the speaker, top right |
+| New game (when a save exists) | N on the title screen | Tap the saved-game line on the title screen |
 
 On a phone, turn it sideways. Nothing is drawn over the playfield except a faint ring under your thumb.
 
@@ -25,15 +39,18 @@ On a phone, turn it sideways. Nothing is drawn over the playfield except a faint
 - Guards see in a cone, blocked by walls, doors and smoke. Standing in torchlight makes you easier to see; shadow hides you. Running is loud.
 - A guard who loses you searches where he last saw you. Guards who find a fallen comrade raise the alarm. Suspicion fills when you are seen, and at 100% you are caught and the mission restarts.
 - Shiloh is quiet and clever. Ashling is fast, fireproof and loud, and fire is the only way to burn signal beacons.
+- Before each mission after the first you take the Back Stairs: turn one servant of the house you are about to rob (bribe, blackmail or sabotage). Each choice changes that mission and leaves a mark on the house.
 - Your choices raise each house's Favor, Fear or Ruin, which changes later missions and the finale.
+- The case file keeps the clues you have found and how each house feels about you.
+- The game saves at the start of every mission. Close the page and press Enter on the title screen to continue.
 
 The rules in full are in [DESIGN.md](DESIGN.md).
 
 ## What is not built yet
 
-- No saving or pausing. A page reload starts over.
+- Saving is per mission, not mid-mission: if you quit during a mission you start it again.
 - Each mission is one screen with no scrolling, and the missions are short.
-- Dialogue is single lines, not conversations. The Back Stairs (choosing which servant to turn) happens once, before Gallowmere.
+- Dialogue is single lines, not conversations.
 - Ashling's growth only extends his flame reach. Gliding, charging and carrying are designed but not built.
 - Planned but missing: the other flute songs, per-house effects on single missions, extra objectives on harder difficulties, split-screen co-op.
 - Balance has had little real play testing. Phone performance and the audio mix are the least tested.
@@ -56,6 +73,7 @@ js/
   sprites.js      characters and their faces
   props.js        items, doors, vents, smoke, particles
   scene.js        vision cones, lighting, overlays, drawing the world
+  casefile.js     the case file screen
   ui.js           HUD, menus, title screen, main loop
 test/             browser tests (Playwright)
 ```

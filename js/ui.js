@@ -539,13 +539,40 @@ function drawSeal(x, y, s) {
   ctx.stroke();
   ctx.restore();
 }
+const UI = { diffBand: [366, 396], newGameBand: null };
+// vertical spacing for a screen of n lines: roomy when short, tighter when long
+function panelStep(n) {
+  return Math.min(25.5, Math.max(17.5, 262 / (n - 1)));
+}
+function drawCaseLink() {
+  ctx.font = 'italic 14px "IM Fell English",Georgia';
+  ctx.fillStyle = '#e8c870';
+  ctx.textAlign = 'left';
+  ctx.fillText(lineText(TEXT.menus.caseLink), 62, 446);
+}
+function drawPauseIcon() {
+  const x = 750,
+    y = 15;
+  ctx.save();
+  ctx.fillStyle = 'rgba(20,10,40,.8)';
+  ctx.beginPath();
+  ctx.arc(x, y, 12, 0, 7);
+  ctx.fill();
+  ctx.strokeStyle = '#e8c870';
+  ctx.lineWidth = 1.4;
+  ctx.stroke();
+  ctx.fillStyle = '#f3e6cc';
+  ctx.fillRect(x - 4.5, y - 5, 3, 10);
+  ctx.fillRect(x + 1.5, y - 5, 3, 10);
+  ctx.restore();
+}
 function panel(title, lines, foot, col, overlay) {
   col = col || '#f0b44c';
   const F = '"IM Fell English",Georgia';
   if (TOUCH.capable)
     foot = foot
       .replace('Press Enter to', 'Tap to')
-      .replace(/Press 1, 2 or 3|Press 1 or 2/, 'Tap your choice');
+      .replace(/Press 1, 2 or 3|Press 1 or 2|Press a number/, 'Tap your choice');
   if (overlay) {
     ctx.fillStyle = 'rgba(8,5,16,.7)';
     ctx.fillRect(0, 0, 800, 480);
@@ -609,7 +636,7 @@ function panel(title, lines, foot, col, overlay) {
       shown.push(l.slice(0, cut), l.slice(cut + 1));
     }
   }
-  const step = Math.min(25.5, Math.max(17.5, 262 / (shown.length - 1)));
+  const step = panelStep(shown.length);
   if (step < 22) ctx.font = '15px ' + F;
   shown.forEach((l, i) => ctx.fillText(l, 400, 154 + i * step));
   ctx.globalAlpha = 0.65 + 0.35 * Math.sin(now * 3);
@@ -625,35 +652,44 @@ function fmt(s) {
 }
 function draw() {
   if (mode === 'title') {
+    const lines = [
+      TEXT.tagline,
+      '',
+      ...(TOUCH.capable
+        ? [
+            'Drag anywhere to walk: a short drag sneaks, a long drag runs',
+            'Hold still next to something to pick, steal, poison, or knock out',
+            'Tap Q R F and TAB in the bar below, hold a second finger to breathe fire',
+            ''
+          ]
+        : [
+            'WASD / Arrows  move      Shift  sneak      Space  dragon fire      Tab  swap',
+            'E (hold)  pick a lock, steal, poison, or knock out a guard you sneak up behind',
+            'Q  smoke powder      R  whisper bell      F  bone flute (opens a door, loud)',
+            ''
+          ]),
+      'Stay out of the cones. Torchlight gives you away; shadows hide you.',
+      'Running is loud. Guards hunt where they last saw you, and notice the fallen.',
+      '',
+      (TOUCH.capable ? 'Difficulty (tap to change):   ' : 'Difficulty (press 1, 2 or 3):   ') +
+        DIFFS.map(
+          (d, i) => (i === diff ? '[ ' : '  ') + (i + 1) + ' ' + d.name + (i === diff ? ' ]' : '  ')
+        ).join('   '),
+      DIFFS[diff].blurb
+    ];
+    if (SAVED) {
+      const next = SAVED.stage === 'court' ? SAVED.lvl + 1 : SAVED.lvl;
+      lines.push(fill(lineText(TEXT.menus.saved), { n: next + 1, name: LEVELS[next].name }));
+    }
+    // remember where the tappable lines landed
+    const st = panelStep(lines.length),
+      at = (idx) => [154 + idx * st - 14, 154 + idx * st + 12];
+    UI.diffBand = at(9);
+    UI.newGameBand = SAVED ? at(lines.length - 1) : null;
     panel(
       TEXT.title,
-      [
-        TEXT.tagline,
-        '',
-        ...(TOUCH.capable
-          ? [
-              'Drag anywhere to walk: a short drag sneaks, a long drag runs',
-              'Hold still next to something to pick, steal, poison, or knock out',
-              'Tap Q R F and TAB in the bar below, hold a second finger to breathe fire',
-              ''
-            ]
-          : [
-              'WASD / Arrows  move      Shift  sneak      Space  dragon fire      Tab  swap',
-              'E (hold)  pick a lock, steal, poison, or knock out a guard you sneak up behind',
-              'Q  smoke powder      R  whisper bell      F  bone flute (opens a door, loud)',
-              ''
-            ]),
-        'Stay out of the cones. Torchlight gives you away; shadows hide you.',
-        'Running is loud. Guards hunt where they last saw you, and notice the fallen.',
-        '',
-        (TOUCH.capable ? 'Difficulty (tap to change):   ' : 'Difficulty (press 1, 2 or 3):   ') +
-          DIFFS.map(
-            (d, i) =>
-              (i === diff ? '[ ' : '  ') + (i + 1) + ' ' + d.name + (i === diff ? ' ]' : '  ')
-          ).join('   '),
-        DIFFS[diff].blurb
-      ],
-      'Press Enter to begin. Chapter I: The Hollow Crown'
+      lines,
+      (SAVED ? 'Press Enter to continue' : 'Press Enter to begin') + '. Chapter I: The Hollow Crown'
     );
   } else if (mode === 'brief') {
     const d = LEVELS[lvl];
@@ -687,12 +723,26 @@ function draw() {
       ['Mission ' + (lvl + 1) + ': ' + d.house, ''].concat(d.intro.map(lineText), extra, fin),
       'Press Enter to begin'
     );
+    drawCaseLink();
   } else if (mode === 'court') {
-    panel(TEXT.menus.court.title, TEXT.menus.court.lines, 'Press 1, 2 or 3');
+    const st = TEXT.stairs[lvl + 1];
+    panel(
+      TEXT.menus.stairsTitle,
+      [st.intro, '', ...st.options.map((o, k) => k + 1 + '   ' + o.label), '', st.foot],
+      'Press 1, 2 or 3'
+    );
+    drawCaseLink();
+  } else if (mode === 'pause') {
+    drawWorld();
+    drawHud();
+    panel(TEXT.menus.pause.title, TEXT.menus.pause.lines, 'Press a number', '#c8b4ff', true);
+  } else if (mode === 'casefile') {
+    drawCaseFile();
   } else if (mode === 'play') {
     drawWorld();
     drawHud();
     drawTouch();
+    drawPauseIcon();
   } else if (mode === 'choice' && G.d.finale) {
     drawWorld();
     drawHud();
@@ -739,14 +789,8 @@ function draw() {
       true
     );
   } else if (mode === 'end') {
-    const epi = {
-      bribe: 'The steward drinks your coin and your secrets. Grell trusts no one now.',
-      blackmail: 'The chamberlain will keep your secret until he cannot. Tick, tick.',
-      poison: 'Grell wakes with a headache and a signature he does not remember.',
-      null: 'You took no favors, and owe none.'
-    }[perk];
     const rank = stats.caught === 0 ? 'Ghost' : stats.caught < 3 ? 'Courier' : 'Loud';
-    const E = G.ending || { title: 'Chapter I Complete', lines: [epi], col: '#f0b44c' };
+    const E = G.ending || { title: 'The End', lines: [], col: '#f0b44c' };
     panel(
       E.title,
       E.lines.concat([

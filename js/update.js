@@ -163,7 +163,13 @@ function findTarget(A) {
     const dd = Math.hypot(d.x * T + 16 - A.x, d.y * T + 16 - A.y);
     if (dd < 44 && dd < bd) {
       bd = dd;
-      tgt = { kind: 'door', ref: d, need: 0.9, x: d.x * T + 16, y: d.y * T + 16 };
+      tgt = {
+        kind: 'door',
+        ref: d,
+        need: 0.9 * (G.fx.pick || 1),
+        x: d.x * T + 16,
+        y: d.y * T + 16
+      };
     }
   }
   for (const it of G.items) {
@@ -179,7 +185,7 @@ function findTarget(A) {
         tgt = {
           kind: 'item',
           ref: it,
-          need: it.type === 'H' ? 1.6 : it.type === 'C' ? 0.8 : 1.2,
+          need: it.type === 'H' ? 1.6 * (G.fx.pick || 1) : it.type === 'C' ? 0.8 : 1.2,
           x: it.x,
           y: it.y
         };
@@ -335,7 +341,7 @@ function update(dt) {
   // forge vents: Shiloh burns, Ashling does not
   for (const v of G.vents) {
     const c = (G.time + v.ph) % 4;
-    v.on = c < 1.4;
+    v.on = c < (G.fx.vents || 1.4);
     v.warn = c > 3.3;
     const vx = v.x * T + 16,
       vy = v.y * T + 16;
@@ -374,7 +380,7 @@ function update(dt) {
     G.noiseT -= dt;
     if (G.noiseT <= 0) {
       G.noiseT = 0.7;
-      lureNear(A.x, A.y, (G.active === 'shiloh' ? 4 : 5) * T, true);
+      lureNear(A.x, A.y, (G.active === 'shiloh' ? 4 : 5) * T * (G.fx.noise || 1), true);
       G.rings.push({ x: A.x, y: A.y, t: 0.35, r: 30, c: '150,100,200' });
     }
   }
