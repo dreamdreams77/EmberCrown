@@ -29,7 +29,7 @@ function introCine(short){
   const A=G.wren;
   if(short||settings.cinema==='short'){
     startCine('intro',{dur:1.5,minSkip:.2,short:true,title:true,
-      cam:u=>({x:A.x,y:A.y,z:1.22-.22*ease(u*1.3)})});
+      cam:u=>({x:A.x,y:A.y,z:1.22-.22*ease(u*1.3)}),onEnd:()=>{G.grace=2.2;}});
     return;
   }
   const W=V.ww,H=V.wh,lab=G.d.labels,seen={},pts=[];
@@ -56,7 +56,7 @@ function introCine(short){
       const k=Math.min(n-1,Math.floor((t-HOLD)/(MOVE+HOLD2))+1),st=HOLD+(k-1)*(MOVE+HOLD2);
       return seq[k].cap&&t-st>MOVE*.55?{text:seq[k].cap,a:Math.min(1,(t-st-MOVE*.55)/.25)*Math.min(1,(st+MOVE+HOLD2-t)/.2+.2)}:null;
     },
-    onEnd:()=>{say(G.flight?'Ashling':'Wren',G.d.opening);}
+    onEnd:()=>{G.grace=2.2;say(G.flight?'Ashling':'Wren',G.d.opening);}
   });
 }
 

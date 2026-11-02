@@ -209,10 +209,10 @@ function drawProp(c,p,th,ruin){
 }
 
 /* ---------- foreground layer: lintels over doorways, rafters, drapery ---------- */
-const FG={cv:document.createElement('canvas')};
+const FG={cv:document.createElement('canvas'),sc:1};
 function bakeForeground(){
   const gw=G.gw,gh=G.gh,W=gw*T,H=gh*T,s=ST.sc,th=G.d.th;
-  const fs_=Math.max(1,s*.75);FG.cv.width=Math.ceil(W*fs_);FG.cv.height=Math.ceil(H*fs_);
+  const fs_=Math.max(1,s*.75);FG.sc=fs_;FG.cv.width=Math.ceil(W*fs_);FG.cv.height=Math.ceil(H*fs_);
   const c=FG.cv.getContext('2d');c.setTransform(fs_,0,0,fs_,0,0);c.clearRect(0,0,W,H);
   if(G.flight)return;
   const p=themePal(),rnd=mulberry(777+LEVELS.indexOf(G.d)*19+(G.state==='ruin'?5:0));

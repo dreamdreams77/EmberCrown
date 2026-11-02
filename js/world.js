@@ -419,11 +419,11 @@ function drawWorld(){
   if(G.dirty||!G.lightsBaked){bakeStatic();G.dirty=false;}
   c.setTransform(1,0,0,1,0,0);
   c.fillStyle='#050308';c.fillRect(0,0,cv.width,cv.height);
-  drawBackdrop();
+  if(voidVisible())drawBackdrop();
   setWorldTransform();
   const W=G.gw*T,H=G.gh*T;
   c.imageSmoothingEnabled=true;
-  c.drawImage(ST.cv,0,0,ST.cv.width,ST.cv.height,0,0,W,H);
+  blitVisible(ST.cv,ST.sc);
   if(G.flight){
     // waves under the roofs: clip out wall tiles
     c.save();c.beginPath();
@@ -489,7 +489,7 @@ function drawWorld(){
   }
   for(const g of G.guards)drawMarkers(g);
   drawRings();
-  c.imageSmoothingEnabled=true;c.drawImage(FG.cv,0,0,FG.cv.width,FG.cv.height,0,0,W,H);
+  c.imageSmoothingEnabled=true;blitVisible(FG.cv,FG.sc);
   if(G.state!=='ruin')drawChandeliers();
   drawParticles();
   drawFlyers();

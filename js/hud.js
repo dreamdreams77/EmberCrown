@@ -12,10 +12,9 @@ function wrapText(c,text,maxW){
   if(cur)lines.push(cur);return lines;
 }
 function panelBox(c,x,y,w,h,r,glow){
-  c.save();
-  c.shadowColor='rgba(0,0,0,.5)';c.shadowBlur=10;c.shadowOffsetY=2;
+  c.fillStyle='rgba(0,0,0,.34)';rr(c,x+1,y+3,w,h,r);c.fill();
   const g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'rgba(32,22,38,.90)');g.addColorStop(1,'rgba(14,9,20,.90)');
-  c.fillStyle=g;rr(c,x,y,w,h,r);c.fill();c.restore();
+  c.fillStyle=g;rr(c,x,y,w,h,r);c.fill();
   c.strokeStyle=glow||'rgba(226,170,70,.55)';c.lineWidth=1;rr(c,x+.5,y+.5,w-1,h-1,r);c.stroke();
   c.strokeStyle='rgba(255,255,255,.06)';rr(c,x+2.5,y+2.5,w-5,h-5,Math.max(2,r-2));c.stroke();
 }
@@ -58,21 +57,31 @@ function discover(){
   if(!G.fog){G.fog=[];for(let y=0;y<gh;y++)G.fog[y]=new Array(gw).fill(false);}
   const A=G.active==='wren'?G.wren:G.ash,tx=Math.floor(A.x/T),ty=Math.floor(A.y/T);
   for(let y=ty-5;y<=ty+5;y++)for(let x=tx-6;x<=tx+6;x++)
-    if(x>=0&&y>=0&&x<gw&&y<gh&&Math.hypot(x-tx,(y-ty)*1.15)<6)G.fog[y][x]=true;
+    if(x>=0&&y>=0&&x<gw&&y<gh&&Math.hypot(x-tx,(y-ty)*1.15)<6&&!G.fog[y][x]){G.fog[y][x]=true;G.fogRev=(G.fogRev||0)+1;}
 }
+const MMC={cv:null,key:'',G:null};
 function drawMinimap(x,y,w,h){
   const c=ctx,sx=w/G.gw,sy=h/G.gh,p=themePal();
   panelBox(c,x-4,y-4,w+8,h+8,6);
   c.save();rr(c,x,y,w,h,3);c.clip();
-  c.fillStyle='#07050b';c.fillRect(x,y,w,h);
-  for(let j=0;j<G.gh;j++)for(let i=0;i<G.gw;i++){
-    const ch=G.grid[j][i];if(ch===' ')continue;
-    const known=G.fog&&G.fog[j][i]||G.flight;
-    if(ch==='#')c.fillStyle=known?p.wt:'rgba(80,70,90,.18)';
-    else c.fillStyle=known?sh(p.f2,2.2):'rgba(60,50,70,.14)';
-    c.fillRect(x+i*sx,y+j*sy,sx+.5,sy+.5);
+  // the tile layer only changes when new ground is uncovered, so it is cached
+  const key=(G.fogRev||0)+'|'+G.state+'|'+Math.round(w)+'|'+Math.round(h)+'|'+Object.values(G.doors).filter(d=>d.open).length+'|'+G.gw;
+  if(!MMC.cv||MMC.key!==key||MMC.G!==G){
+    MMC.key=key;MMC.G=G;
+    const cv_=MMC.cv||(MMC.cv=document.createElement('canvas')),k=2;
+    cv_.width=Math.ceil(w*k);cv_.height=Math.ceil(h*k);
+    const m=cv_.getContext('2d');m.setTransform(k,0,0,k,0,0);
+    m.fillStyle='#07050b';m.fillRect(0,0,w,h);
+    for(let j=0;j<G.gh;j++)for(let i=0;i<G.gw;i++){
+      const ch=G.grid[j][i];if(ch===' ')continue;
+      const known=G.fog&&G.fog[j][i]||G.flight;
+      if(ch==='#')m.fillStyle=known?p.wt:'rgba(80,70,90,.18)';
+      else m.fillStyle=known?sh(p.f2,2.2):'rgba(60,50,70,.14)';
+      m.fillRect(i*sx,j*sy,sx+.5,sy+.5);
+    }
+    for(const kk in G.doors){const d=G.doors[kk];if(!d.open&&G.fog&&G.fog[d.y][d.x]){m.fillStyle='#d8a24a';m.fillRect(d.x*sx,d.y*sy,sx+.5,sy+.5);}}
   }
-  for(const k in G.doors){const d=G.doors[k];if(!d.open&&G.fog&&G.fog[d.y][d.x]){c.fillStyle='#d8a24a';c.fillRect(x+d.x*sx,y+d.y*sy,sx+.5,sy+.5);}}
+  c.drawImage(MMC.cv,x,y,w,h);
   const pulse=.6+.4*Math.sin(G.time*5);
   const dot=(px,py,r,col)=>{c.fillStyle=col;circ(c,x+px/T*sx,y+py/T*sy,r);c.fill();};
   for(const it of G.items){
@@ -393,24 +402,27 @@ function drawScene(dt,variant){
 }
 
 /* ---------- full-screen effects (all world modes) ---------- */
+const OVC={cv:document.createElement('canvas'),red:document.createElement('canvas'),key:''};
+function buildOverlays(){
+  const th=G.d.th,w=Math.max(8,Math.ceil(V.w/3)),hh=Math.max(8,Math.ceil(V.h/3)),key=w+'x'+hh+'|'+(th.grade||'');
+  if(OVC.key===key)return;OVC.key=key;
+  OVC.cv.width=OVC.red.width=w;OVC.cv.height=OVC.red.height=hh;
+  let c=OVC.cv.getContext('2d');
+  if(th.grade){c.globalAlpha=.55;c.fillStyle=th.grade;c.fillRect(0,0,w,hh);c.globalAlpha=1;}
+  let g=c.createRadialGradient(w/2,hh/2,Math.min(w,hh)*.42,w/2,hh/2,Math.max(w,hh)*.78);
+  g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.5)');c.fillStyle=g;c.fillRect(0,0,w,hh);
+  c=OVC.red.getContext('2d');c.clearRect(0,0,w,hh);
+  g=c.createRadialGradient(w/2,hh/2,Math.min(w,hh)*.25,w/2,hh/2,Math.max(w,hh)*.72);
+  g.addColorStop(0,'rgba(200,24,24,0)');g.addColorStop(1,'rgba(200,24,24,1)');c.fillStyle=g;c.fillRect(0,0,w,hh);
+}
 function drawFx(){
   const c=ctx,W=V.w,H=V.h;
   c.setTransform(V.dpr,0,0,V.dpr,0,0);
-  const th=G.d.th;
-  // colour grade per area
-  if(th.grade&&Q.tier<2){c.globalCompositeOperation='soft-light';c.fillStyle=th.grade;c.fillRect(0,0,W,H);c.globalCompositeOperation='source-over';}
-  if(G.alert>.45&&mode==='play'){
-    const a=(G.alert-.45)*.9*(.75+.25*Math.sin(G.time*8));
-    const g=c.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.75);
-    g.addColorStop(0,'rgba(190,20,20,0)');g.addColorStop(1,'rgba(190,20,20,'+a+')');c.fillStyle=g;c.fillRect(0,0,W,H);
-  }
-  if(G.hurtFlash>0){
-    const a=Math.min(.6,G.hurtFlash*1.6);
-    const g=c.createRadialGradient(W/2,H/2,Math.min(W,H)*.2,W/2,H/2,Math.max(W,H)*.7);
-    g.addColorStop(0,'rgba(220,30,30,0)');g.addColorStop(1,'rgba(220,30,30,'+a+')');c.fillStyle=g;c.fillRect(0,0,W,H);
-  }
-  { const g=c.createRadialGradient(W/2,H/2,Math.min(W,H)*.42,W/2,H/2,Math.max(W,H)*.78);
-    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.5)');c.fillStyle=g;c.fillRect(0,0,W,H); }
+  buildOverlays();
+  c.imageSmoothingEnabled=true;
+  c.drawImage(OVC.cv,0,0,W,H);
+  const ra=Math.max(G.alert>.45&&mode==='play'?(G.alert-.45)*.9*(.75+.25*Math.sin(G.time*8)):0,G.hurtFlash>0?Math.min(.6,G.hurtFlash*1.6):0);
+  if(ra>.01){c.globalAlpha=Math.min(.8,ra);c.drawImage(OVC.red,0,0,W,H);c.globalAlpha=1;}
   if(G.flash){const a=Math.min(.6,G.flash.t*1.2);c.fillStyle='rgba('+G.flash.c+','+a+')';c.fillRect(0,0,W,H);}
   if(G.iris){
     const k=(performance.now()-G.iris.st)/G.iris.dur;

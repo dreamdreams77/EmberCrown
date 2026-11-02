@@ -222,7 +222,7 @@ function loadLevel(i){
     time:0,gems:0,msg:null,msgT:0,fireSaid:false,doneSaid:false,sneak:false,gad:{...d.gadgets},exitOpen:false,flight:!!d.flight,vents:[],peds:[],ventSaid:false,gain:1,choice:null,outLines:[],
     host:d.choice?{x:0,y:0,on:false,host:true,face:0,ph:0}:null,
     hitstop:0,ts:1,tsT:1,punch:0,cine:null,bars:0,
-    foes:[],proj:[],pick:[],shock:[],tele:[],fx:[],cinders:0,hp:4,maxHp:4,inv:0,hurtFlash:0,
+    grace:0,graceRamp:1.6,foes:[],proj:[],pick:[],shock:[],tele:[],fx:[],cinders:0,hp:4,maxHp:4,inv:0,hurtFlash:0,
     strike:{cd:0,combo:0,last:-9,pend:0,ang:0,cb:0},roll:{t:0,cd:0,a:0,grace:0},nova:{cd:0,pend:0},phoenixUsed:false,defeat:null,
     gh:d.map.length,gw:d.map[0].length,toasts:[],shake:0,intro:0,dirty:true,gotRelics:[],gotLore:[],
     st:{stuns:0,detect:0,maxAlert:0,barrels:0,secrets:0},dash:{t:0,cd:0,a:0,hit:null,ch:1,max:1,grace:0},
@@ -267,6 +267,11 @@ function loadLevel(i){
     return{x:wp[0][0]*T+16,y:wp[0][1]*T+16,wp:wp.map(p=>[p[0]*T+16,p[1]*T+16]),i:1,
     face:Math.atan2(wp[1][1]-wp[0][1],wp[1][0]-wp[0][0]),stun:0,pause:0,lure:null,back:null,ret:false,seeing:false,spd:spd*K.spd,rm:d.flight?.8:1,
     kind:kd||'guard',kr:K.kr,half:K.half,ph:Math.random()*6,was:false,seen:null,bang:0,quest:0};});
+  for(const gd of g.guards){ // fairness: nobody starts a patrol on top of the player
+    if(Math.hypot(gd.x-g.wren.x,gd.y-g.wren.y)>6*T)continue;
+    let bi=0,bd=-1;gd.wp.forEach((w,k)=>{const dd=Math.hypot(w[0]-g.wren.x,w[1]-g.wren.y);if(dd>bd){bd=dd;bi=k;}});
+    gd.x=gd.wp[bi][0];gd.y=gd.wp[bi][1];gd.i=(bi+1)%gd.wp.length;gd.face=Math.atan2(gd.wp[gd.i][1]-gd.y,gd.wp[gd.i][0]-gd.x);gd.vf=gd.face;
+  }
   if(R.fled>0)g.guards.splice(Math.max(1,g.guards.length-R.fled),Math.min(R.fled,g.guards.length-1));
   for(const x of g.guards)x.spd*=R.chaos;
   if(d.finale){
@@ -808,7 +813,9 @@ function update(dt){
     }
     g.was=g.seeing;
   }
-  if(best>0)G.alert+=best*dt*G.gain;else G.alert-=dt*.22*G.decay;
+  const gm=G.grace>0?0:G.graceRamp>0?1-G.graceRamp/1.6:1;
+  if(G.grace>0)G.grace-=dt;else if(G.graceRamp>0)G.graceRamp-=dt;
+  if(best>0)G.alert+=best*dt*G.gain*gm;else G.alert-=dt*.22*G.decay;
   G.alert=Math.max(0,G.alert);
   G.st.maxAlert=Math.max(G.st.maxAlert,Math.min(1,G.alert));
   for(const g of G.guards){if(!g.eng)stepGuard(g,dt);}

@@ -16,10 +16,10 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function layout(){
   const r=cv.getBoundingClientRect();
   V.w=Math.max(120,r.width);V.h=Math.max(120,r.height);
-  V.dpr=Math.min(window.devicePixelRatio||1,Q.dprCap);
+  V.coarse=touch.on||matchMedia('(pointer:coarse)').matches;
+  V.dpr=Math.min(window.devicePixelRatio||1,Q.dprCap,Math.max(1,Math.sqrt((V.coarse?2.3e6:5e6)/(V.w*V.h))));
   const pw=Math.round(V.w*V.dpr),ph=Math.round(V.h*V.dpr);
   if(cv.width!==pw||cv.height!==ph){cv.width=pw;cv.height=ph;}
-  V.coarse=touch.on||matchMedia('(pointer:coarse)').matches;
   V.U=clamp(Math.min(V.w,V.h*1.6)/760,.8,1.3);
   if(G){G.dirty=true;}
 }
@@ -57,6 +57,7 @@ function camUpdate(dt,snap){
     const B=G.boss;if(B&&B.eng&&!B.dead){const d=Math.hypot(B.x-A.x,B.y-A.y);if(d<nd+T*2){near=B;nd=d;}}
     if(near){tx+=(near.x-A.x)*.28;ty+=(near.y-A.y)*.28;}
     if(V.wide){tz=fit;}
+    if(V.dbgZoom)tz*=V.dbgZoom;
     tz*=1+(G.punch||0)*.05;
     const kk=1-Math.exp(-dt*(V.wide?3.2:4.5));
     V.sc+=(tz-V.sc)*(snap?1:kk);
@@ -86,6 +87,7 @@ function viewRect(){const vw=V.w/V.sc,vh=V.h/V.sc;return{x:V.cx-vw/2,y:V.cy-vh/2
 /* ---------- baked static layer ---------- */
 const ST={cv:document.createElement('canvas'),sc:1};
 const LT={cv:document.createElement('canvas'),k:4};
+const GL={cv:document.createElement('canvas')};
 const spriteCache={};
 function lightSprite(){
   if(spriteCache.light)return spriteCache.light;
@@ -428,16 +430,32 @@ function drawDarkness(){
   const lc=LT.cv.getContext('2d');
   const list=collectLights();
   drawLights(lc,list,amb);
-  ctx.imageSmoothingEnabled=true;
-  ctx.drawImage(LT.cv,0,0,lw,lh,0,0,lw*k,lh*k);
-  // colored glows
-  ctx.globalCompositeOperation='lighter';
+  // coloured light is composed once at low resolution, then added in a single pass
+  if(GL.cv.width!==lw||GL.cv.height!==lh){GL.cv.width=lw;GL.cv.height=lh;}
+  const gc=GL.cv.getContext('2d');
+  gc.globalCompositeOperation='source-over';gc.globalAlpha=1;gc.clearRect(0,0,lw,lh);
+  gc.globalCompositeOperation='lighter';
   for(const l of list){
     if(!l.gl)continue;
-    ctx.globalAlpha=clamp(l.gl*.5*l.a,0,.7);
-    const r=l.r*1.15;ctx.drawImage(glowSprite(l.col),l.x-r,l.y-r,r*2,r*2);
+    gc.globalAlpha=clamp(l.gl*.5*l.a,0,.7);
+    const rr_=l.r*1.15;gc.drawImage(glowSprite(l.col),(l.x-rr_)/k,(l.y-rr_)/k,rr_*2/k,rr_*2/k);
   }
-  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  gc.globalAlpha=1;gc.globalCompositeOperation='source-over';
+  ctx.imageSmoothingEnabled=true;
+  blitVisible(LT.cv,1/k,k);
+  ctx.globalCompositeOperation='lighter';blitVisible(GL.cv,1/k,k);ctx.globalCompositeOperation='source-over';
+}
+/* draw only the part of a baked layer that is on screen: src px per world unit = sc */
+function blitVisible(src,sc,upscale){
+  const W=G.gw*T,H=G.gh*T,vr=viewRect(),m=T*2;
+  const x0=Math.max(0,Math.floor(vr.x-m)),y0=Math.max(0,Math.floor(vr.y-m)),x1=Math.min(W,Math.ceil(vr.x+vr.w+m)),y1=Math.min(H,Math.ceil(vr.y+vr.h+m));
+  if(x1<=x0||y1<=y0)return;
+  ctx.drawImage(src,x0*sc,y0*sc,(x1-x0)*sc,(y1-y0)*sc,x0,y0,x1-x0,y1-y0);
+}
+function voidVisible(){
+  const vr=viewRect(),x0=Math.floor(vr.x/T),x1=Math.floor((vr.x+vr.w)/T),y0=Math.floor(vr.y/T),y1=Math.floor((vr.y+vr.h)/T);
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)if(x<0||y<0||x>=G.gw||y>=G.gh||G.grid[y][x]===' ')return true;
+  return false;
 }
 
 /* ---------- characters ---------- */
