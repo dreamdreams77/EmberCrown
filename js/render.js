@@ -285,6 +285,7 @@ function bakeStatic(){
     }
   }
   if(!ruin&&!G.flight)autoRugs(c,th,rnd);
+  if(typeof bakeDetail==='function')bakeDetail(c,th,ruin);
   if(G.d.vault){const st=VSTYLE_OF[G.d.vault.inspect[2]]||'candle',dr=mulberry(555+lvl);for(const [dx,dy] of G.d.vault.deco||[])drawVaultDeco(c,st,dx,dy,dr);}
   // rune circle
   if(G.d.finale){
@@ -319,6 +320,7 @@ function bakeStatic(){
     if(G.grid[y][x]!=='#')continue;
     wallTile(c,x,y,p,th,rnd,G.flight);
   }
+  if(typeof bakeWallDetail==='function')bakeWallDetail(c,th);
   // sea foam around roofs
   if(G.flight){
     c.strokeStyle='rgba(220,245,255,.22)';c.lineWidth=2;
@@ -527,7 +529,7 @@ function drawGuard(g){
     shadowAt(g.x,g.y+4,rad*1.05,rad*.55,.38);
     c.save();c.translate(g.x,g.y);c.rotate(vfa(g));if(big!==1)c.scale(big,big);
     const sw=Math.sin(g.ph*1.3);
-    c.fillStyle=stun?'#3a3a44':'#201a1c';ell(c,sw*3.4,-4.4,3.4,2.3);c.fill();ell(c,-sw*3.4,4.4,3.4,2.3);c.fill();
+    c.fillStyle=stun?'#3a3a44':'#201a1c';c.strokeStyle='rgba(0,0,0,.6)';c.lineWidth=.8;ell(c,sw*3.4,-4.4,3.4,2.3);c.fill();c.stroke();ell(c,-sw*3.4,4.4,3.4,2.3);c.fill();c.stroke();
     if(g.kind==='archer'||(g.boss&&g.kind==='candle')){ // cloak
       c.fillStyle=stun?'#555':sh(col,.7);c.beginPath();c.moveTo(1,-8);c.quadraticCurveTo(-12,-8,-13,0);c.quadraticCurveTo(-12,8,1,8);c.closePath();c.fill();}
     // spear (not archers/bosses)
@@ -549,9 +551,21 @@ function drawGuard(g){
     c.strokeStyle='rgba(0,0,0,.4)';circ(c,0,-9,4.2);c.stroke();circ(c,0,9,4.2);c.stroke();
     // hands
     c.fillStyle='#3a2a20';circ(c,7,9.5,1.8);c.fill();
-    // helmet
-    c.fillStyle=stun?'#8a8a94':'#9aa0b0';circ(c,1,0,5.6);c.fill();
-    c.strokeStyle='rgba(0,0,0,.5)';circ(c,1,0,5.6);c.stroke();
+    // helmet: crested helm for spears, cowl for archers, bucket helm and plume for brutes
+    const hc=stun?'#8a8a94':'#9aa0b0';
+    if(g.kind==='archer'){
+      c.fillStyle=stun?'#5a5a64':sh(col,.8);c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=1;
+      c.beginPath();c.moveTo(-4.6,-3);c.lineTo(-10,0);c.lineTo(-4.6,3);c.closePath();c.fill();c.stroke();
+      circ(c,1,0,5.6);c.fill();c.stroke();
+      c.fillStyle=stun?'#6a6a74':sh(col,1.1);ell(c,-1,0,3,4.2);c.fill();
+    } else if(g.kind==='brute'){
+      c.fillStyle=hc;circ(c,1,0,6.3);c.fill();c.strokeStyle='rgba(0,0,0,.6)';c.lineWidth=1.2;c.stroke();
+      c.fillStyle=stun?'#5a5a64':'#58606f';c.fillRect(-5,-1.5,12,3);
+      c.fillStyle=stun?'#777':'#c04040';ell(c,-5,0,3.4,2.4);c.fill();
+    } else {
+      c.fillStyle=hc;circ(c,1,0,5.6);c.fill();c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=1;c.stroke();
+      c.fillStyle='rgba(255,255,255,.25)';ell(c,-1,-1.6,2.6,1.2);c.fill();
+    }
     c.fillStyle=trim;c.fillRect(-4,-1,10,2);
     {const sk=['#e8c8a8','#d8b090','#c89a78','#b88a68'][Math.floor(g.ph*7)%4];
      c.fillStyle=stun?'#b8b8c0':sk;ell(c,4.1,0,2.8,3.3);c.fill();

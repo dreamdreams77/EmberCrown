@@ -371,3 +371,6 @@ Saves record the choices. Older saves with the single Gallowmere choice still lo
 - Mastery: XP per mission (rank, kills, takedowns, secrets, gems), 12 levels, passive bonuses. Save fields `run.items`, `run.equipped`, `run.mastery` are optional.
 - `js/journal.js`: one tabbed modal (Hero, Gear, Forge, Quests, Case, Houses, Codex), opened with J/I or from the pause/brief/win menus. Quests tab reads `window.Quests.journal()` (array of `{id,title,desc,state,house}`) and tolerates its absence. Keys: arrows or A/D change tab, 1-7 jump, W/S move the cursor, Enter uses it, Esc closes.
 - `ui2.css` holds journal/gear/mastery styling; `tests/rp1.js` covers it.
+
+## Art pass
+Shiloh and Ashling use rope-chain secondary motion (cloak, scarf, tail; wings and tail grow with ember gems), with hurt and defeat poses. js/atmos.js bakes per-house floor and wall detail (called from bakeStatic) and draws a cheap haze, shaft, glint and heat overlay hooked onto drawPrompt. tests/art_shots.js and tests/art_poses.js take screenshots and count canvas calls.
