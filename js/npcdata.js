@@ -211,7 +211,7 @@ const NPCDATA=[
       {l:"Never mind."}]},
     mask:{t:"The cloakroom, south-west. Silver masks on the rack. Guards see a mask, not a face. For a while."},
     hide:{t:"Veyra never counts the staff. We are furniture. Furniture hears everything."}}},
-  {id:'sera',name:'Sera',role:'Masked maid',x:22,y:4,look:{k:'servant',skin:'#e8c8a8',cloth:'#6a3a5a',trim:'#e8d8c0',hat:'cap',apron:1,mask:1},
+  {id:'sera',name:'Sera',role:'Masked maid',x:16,y:4,look:{k:'servant',skin:'#e8c8a8',cloth:'#6a3a5a',trim:'#e8d8c0',hat:'cap',apron:1,mask:1},
    entry:[{if:'q:locket=1',n:'ready'},{if:'q:locket=0',n:'wait'},{n:'s'}],
    tree:{
     s:{t:"I lost Lady Veyra's locket while the dancers spun. If she finds it gone, I am finished. Could you...?",c:[

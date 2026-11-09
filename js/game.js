@@ -8,7 +8,7 @@ const HOUSE_NAMES={marrow:'Marrow',grell:'Grell',ostrander:'Ostrander',sable:'Sa
 let houses={};
 function resetHouses(){houses={};for(const k in HOUSE_NAMES)houses[k]={favor:0,fear:0,ruin:0};}
 resetHouses();
-const run={relics:[],lore:[],ranks:{},secrets:{},talents:[],cinders:0,disc:[]};      // this playthrough
+const run={relics:[],lore:[],ranks:{},secrets:{},talents:[],cinders:0,disc:[],quests:{},npc:{flags:{}}};      // this playthrough
 const meta={relics:[],lore:[],best:{},disc:[]};                  // remembered between playthroughs (codex)
 const stats={gems:0,caught:0,time:0,byLvl:[]};
 const keys={};
@@ -40,6 +40,7 @@ function applyOutcome(){
     L.push(G.ending.sum);
   }
   const sa=stairsAction(lvl);if(sa&&sa.led)add(sa.led[0],sa.led[1],1,sa.led[2]);
+  if(window.NPC)NPC.outcome(L);
   G.outLines=L;
 }
 function stairsAction(i){const st=STAIRS[i];return st&&perks[i]!=null?st.options[perks[i]]:null;}
@@ -101,7 +102,7 @@ function loadSave(){
 function writeSave(stage,next,complete){
   const s={v:3,meta:{relics:meta.relics,lore:meta.lore,best:meta.best,disc:meta.disc}};
   if(complete)s.complete=true;
-  else s.run={stage,next,diff,stairs:perks,houses,stats:{gems:stats.gems,caught:stats.caught,time:stats.time,byLvl:Array.from(stats.byLvl,v=>v||0)},relics:run.relics,lore:run.lore,ranks:run.ranks,secrets:run.secrets,talents:run.talents,cinders:run.cinders,disc:run.disc};
+  else s.run={stage,next,diff,stairs:perks,houses,stats:{gems:stats.gems,caught:stats.caught,time:stats.time,byLvl:Array.from(stats.byLvl,v=>v||0)},relics:run.relics,lore:run.lore,ranks:run.ranks,secrets:run.secrets,talents:run.talents,cinders:run.cinders,disc:run.disc,quests:run.quests,npc:run.npc};
   if(!complete)runStage={stage,next};
   lsSet(SAVE_KEY,s);
   saved=complete?null:s;
@@ -110,13 +111,13 @@ function continueGame(){
   const s=saved;if(!s||!s.run)return false;
   const r=s.run;diff=r.diff;perks=r.stairs||(r.perk?{1:Math.max(0,['bribe','blackmail','poison'].indexOf(r.perk))}:{});houses=r.houses;
   stats.gems=r.stats.gems;stats.caught=r.stats.caught;stats.time=r.stats.time;stats.byLvl=r.stats.byLvl.slice();
-  run.relics=(r.relics||[]).slice();run.lore=(r.lore||[]).slice();run.ranks=r.ranks||{};run.secrets=r.secrets||{};run.talents=(r.talents||[]).slice();run.cinders=r.cinders||0;run.disc=(r.disc||[]).slice();runStage={stage:r.stage,next:r.next};
+  run.relics=(r.relics||[]).slice();run.lore=(r.lore||[]).slice();run.ranks=r.ranks||{};run.secrets=r.secrets||{};run.talents=(r.talents||[]).slice();run.cinders=r.cinders||0;run.disc=(r.disc||[]).slice();run.quests=r.quests||{};run.npc=r.npc||{flags:{}};runStage={stage:r.stage,next:r.next};
   if(r.stage==='court'){lvl=Math.max(0,r.next-1);setMode('court');}else startBrief(r.next);
   return true;
 }
 function newGame(){
   stats.gems=0;stats.caught=0;stats.time=0;stats.byLvl=[];perks={};resetHouses();
-  run.relics=[];run.lore=[];run.ranks={};run.secrets={};run.talents=[];run.cinders=0;run.disc=[];
+  run.relics=[];run.lore=[];run.ranks={};run.secrets={};run.talents=[];run.cinders=0;run.disc=[];run.quests={};run.npc={flags:{}};
   saved=null;runStage=null;lsSet(SAVE_KEY,{v:3,meta:{relics:meta.relics,lore:meta.lore,best:meta.best,disc:meta.disc}});
   startBrief(0);
 }
@@ -311,6 +312,7 @@ function loadLevel(i){
   if(!d.flight&&hasT('pockets')){g.gad.smoke++;g.gad.bell++;}
   buildProps(g);
   initInteractables(g);
+  if(window.NPC)NPC.init(g,i);
   g.chand=(d.chand||[]).map(c=>({x:c[0]*T,y:c[1]*T,ph:Math.random()*6}));
   return g;
 }
@@ -357,6 +359,7 @@ function pauseGame(on){
   else if(!on&&mode==='pause'){setMode('play');}
 }
 function press(k){
+  if(window.NPC&&NPC.key(k))return;
   if(typeof UI!=='undefined'&&UI.handleKey(k))return;
   if(mode==='title'&&['1','2','3'].includes(k)){diff=+k-1;if(typeof UI!=='undefined')UI.onMode('title');Aud.S.click();}
   else if(mode==='title'&&k==='enter'){if(saved&&continueGame()){}else newGame();}
@@ -489,6 +492,7 @@ function stepGuard(g,dt){
   if(moveG(g,w[0],w[1],dt,g.spd)){g.i=(g.i+1)%g.wp.length;g.pause=.6;}
 }
 function completeTarget(t){
+  if(t.kind==='npc'||t.kind==='qobj'){NPC.activate(t);return;}
   if(t.kind==='insp'){readInspect(t.ref);return;}
   if(t.kind==='torch'){snuffTorch(t.ref);return;}
   if(t.kind==='chest'){openChest(t.ref);return;}
@@ -631,6 +635,7 @@ function findTarget(A){
   if(A===G.wren&&!G.flight)for(const tr of G.torches||[]){if(tr.out||tr.pipe)continue;const dd=Math.hypot(tr.x-A.x,tr.y+6-A.y)+12;if(dd<46&&dd<bd){bd=dd;tgt={kind:'torch',ref:tr,need:.45*(hasT('quick')?.7:1),x:tr.x,y:tr.y,label:'Snuff torch'};}}
   for(const n of G.insp||[]){if(n.done)continue;const dd=Math.hypot(n.x-A.x,n.y-A.y);if(dd<36&&dd<bd){bd=dd;tgt={kind:'insp',ref:n,need:.55,x:n.x,y:n.y,label:'Examine'};}}
   for(const ch of G.chests||[]){if(ch.open)continue;const dd=Math.hypot(ch.x-A.x,ch.y-A.y);if(dd<38&&dd<bd){bd=dd;tgt={kind:'chest',ref:ch,need:1,x:ch.x,y:ch.y,label:'Open chest'};}}
+  if(window.NPC){const nt=NPC.target(A,bd);if(nt)tgt=nt;}
   return tgt;
 }
 function explode(it){
@@ -691,9 +696,11 @@ function collectItem(it,by){
   }
 }
 function update(dt){
+  if(G.talk)return;
   G.time+=dt;
   if(G.cine){stepCine(dt);return;}
   stats.time+=dt;
+  if(window.NPC)NPC.update(dt);
   G.candlesLit=G.items.filter(i=>i.type==='C'&&!i.done).length;
   const A=G.active==='wren'?G.wren:G.ash;
   const dashing=G.dash.t>0;
@@ -794,7 +801,7 @@ function update(dt){
   }
   // forge vents: Shiloh burns, Ashling does not
   for(const v of G.vents){
-    const c=(G.time+v.ph)%4,was=v.on;v.on=c<(G.bsx&&G.bsx.vents||1.4);v.warn=c>3.3;
+    const c=(G.time+v.ph)%4,was=v.on;v.on=!(G.ventOff>0)&&c<(G.bsx&&G.bsx.vents||1.4);v.warn=c>3.3;
     if(v.on&&!was){Aud.S.ember();}
     if(v.on&&Math.random()<.6)pt(v.x*T+16+(Math.random()-.5)*14,v.y*T+16,(Math.random()-.5)*20,-50-Math.random()*40,.9,2+Math.random()*2,'#ffa040',{add:true,g:-20});
     if(v.on&&!G.flight&&Math.hypot(G.wren.x-(v.x*T+16),G.wren.y-(v.y*T+16))<17){
@@ -891,7 +898,7 @@ function update(dt){
     if(g.stun>0){g.was=false;continue;}
     for(const t of targets){
       const isActive=t.host?true:(t===G.wren)===(G.active==='wren');
-      let mul=(t===G.ash?1.45:1)*(isActive?1:.6)*G.rangeMul;
+      let mul=(t===G.ash?1.45:1)*(isActive?1:.6)*G.rangeMul*(G.maskT>0?.65:1);
       if(t!==G.ash){if(t._LT!==G.time){t._LT=G.time;t._L=lightAt(t.x,t.y);}mul*=.78+.55*t._L;if(t===G.wren)G.expo=t._L;}
       if(t===G.wren&&G.sneak)mul*=hasT('cloak')?.45:.6;
       const range=5.2*T*mul*(g.rm||1)*(g.kr||1),dx=t.x-g.x,dy=t.y-g.y,dist=Math.hypot(dx,dy);

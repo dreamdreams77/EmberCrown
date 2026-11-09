@@ -641,7 +641,7 @@ function drawCones(){
   const c=ctx;
   for(const g of G.guards){
     if(g.stun>0||g.dead||g.eng)continue;
-    const range=5.2*T*G.rangeMul*(g.rm||1)*(g.kr||1);
+    const range=5.2*T*G.rangeMul*(G.maskT>0?.65:1)*(g.rm||1)*(g.kr||1);
     const pts=visPoly(g,range,g.half||.62);
     const seeing=g.seeing,alert=g.lure||g.ret;
     const col=seeing?'255,84,62':alert?'255,196,96':'255,238,176';

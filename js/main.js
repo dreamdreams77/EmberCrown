@@ -66,6 +66,6 @@ function boot(){
   setMode('title');
   requestAnimationFrame(frame);
   /* test hook */
-  window.__ec={PERF,get G(){return G;},get mode(){return mode;},stats,keys,touch,houses,run,meta,Q,V,get lvl(){return lvl;},startBrief,startPlay,loadLevel,newGame,continueFromWin,makeChoice,pauseGame,swapChar,explode,openCrack,finishLevel,update:dt=>update(dt)};
+  window.__ec={PERF,get G(){return G;},get mode(){return mode;},stats,keys,touch,get houses(){return houses;},run,meta,Q,V,get lvl(){return lvl;},startBrief,startPlay,loadLevel,newGame,continueFromWin,makeChoice,pauseGame,swapChar,explode,openCrack,finishLevel,update:dt=>update(dt)};
 }
 boot();

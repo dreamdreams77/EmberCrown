@@ -47,6 +47,15 @@ function init(g,i){
     if(n.show&&!cond(n.show,nq))continue;
     nq.npcs.push(Object.assign({},n,{px:n.x*T+16,py:n.y*T+16,face:Math.PI*.5,ph:Math.random()*6,fade:1,gone:false,fading:false,follow:false,free:false,dest:null,met:false}));
   }
+  { // clear decor props from contact tiles (and their neighbours) so nobody stands inside a crate
+    const spots=[...nq.npcs.map(n=>[n.x,n.y]),...(D.objs||[]).map(o=>[o.x,o.y])];
+    g.props=g.props.filter(p=>{
+      const hit=spots.some(([sx,sy])=>sx>=p.x-1&&sx<=p.x+p.w&&sy>=p.y-1&&sy<=p.y+p.h);
+      if(hit)for(let a=0;a<p.w;a++)for(let b=0;b<p.h;b++)g.pblock.delete(pkey(p.x+a,p.y+b));
+      return !hit;
+    });
+    for(const [sx,sy] of spots)g.pblock.delete(pkey(sx,sy));
+  }
   for(const o of D.objs||[])nq.objs.push(Object.assign({},o,{px:o.x*T+16,py:o.y*T+16,done:false,cd:0,p:0,hint:false,ph:Math.random()*6}));
   if(D.route){
     nq.route={x:D.route.x,y:D.route.y,lever:D.route.lever,open:false,hint:nq.st==='favor'};
@@ -536,3 +545,4 @@ function markers(){
 window.Quests=Quests;
 return{init,update,target,activate,key,outcome,briefHtml,markers,ents,drawBack,drawFront,stand,cond,qev,qstart,openTalk,choose,closeTalk,QDEF,HOUSEFX};
 })();
+window.NPC=NPC;
