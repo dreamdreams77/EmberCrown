@@ -189,7 +189,7 @@ const UI=(()=>{
         let fin='';if(d.finale){const hc=houseCounts();fin='<div class="stand"><span>Favor sends +'+Math.min(3,hc.f)+' whisper bells &middot; Fear stands down '+Math.min(3,hc.e)+' guards &middot; Ruin: he starts at '+(100-8*hc.r)+' HP</span></div>';}
         const rel=run.relics.length?'<div class="relrow">'+run.relics.map(k=>'<span title="'+RELICS[k].name+'">'+ricon(RELICS[k].icon)+'</span>').join('')+'</div>':'';
         screen('brief','<div class="bleft">'+sigil(d.sigil)+'<div class="mnum">Mission '+(lvl+1)+' of '+LEVELS.length+'</div><h2>'+d.name+'</h2><div class="house">'+d.house+'</div>'+rel+'</div>'+
-        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+btn('Begin mission','begin','primary big')+'<div class="row">'+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+btn('Gear &amp; hero','journal','ghost small')+(lvl>0?btn('Case file','case','ghost small'):'')+'</div><p class="foot">press <kbd>Enter</kbd> &middot; <kbd>J</kbd> journal</p></div>');
+        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+(window.NPC?NPC.briefHtml(lvl):'')+btn('Begin mission','begin','primary big')+'<div class="row">'+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+btn('Gear &amp; hero','journal','ghost small')+(lvl>0?btn('Case file','case','ghost small'):'')+'</div><p class="foot">press <kbd>Enter</kbd> &middot; <kbd>J</kbd> journal</p></div>');
       },
       court(){
         const st=STAIRS[lvl+1];if(!st){startBrief(lvl+1);return;}

@@ -374,3 +374,9 @@ Saves record the choices. Older saves with the single Gallowmere choice still lo
 
 ## Art pass
 Shiloh and Ashling use rope-chain secondary motion (cloak, scarf, tail; wings and tail grow with ember gems), with hurt and defeat poses. js/atmos.js bakes per-house floor and wall detail (called from bakeStatic) and draws a cheap haze, shaft, glint and heat overlay hooked onto drawPrompt. tests/art_shots.js and tests/art_poses.js take screenshots and count canvas calls.
+
+## 16. NPCs, quests and house standing
+- `js/npcdata.js` (data) and `js/npcs.js` (engine, dialogue overlay). 2-3 contacts and 1-2 optional tasks per mission; hold E / ACT near a contact. Dialogue choices queue house changes that apply only when the mission is won; cinders, items (`window.giveItem?.(id)`, else a gadget fallback), clues and quest starts apply at once.
+- `window.Quests = {journal(), active(), complete(id)}`; state saved in `run.quests` and `run.npc.flags`. `NPC.markers()` lists contacts and quest objects for minimaps.
+- House standing (Favor/Fear/Ruin, from the Back Stairs and earlier deeds) changes dialogue, prices, hidden passages and guard counts; it is spelled out on the briefing.
+- Beats: Gallowmere dinner gong, Spire lamp crank, Thornwick sconce passage and bell muffle, Ironvale steam valve, Dunmoor silver mask and chandelier, Candlemaker plaque sequence. Tests: `tests/np1.js`, `tests/np2.js`.

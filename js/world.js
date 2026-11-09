@@ -448,6 +448,7 @@ function drawWorld(){
   drawPots();
   drawBraziers();
   drawChestsInsp();
+  if(window.NPC)NPC.drawBack();
   drawPickups();
   drawCritters();
   drawFlames();
@@ -461,6 +462,7 @@ function drawWorld(){
   if(G.host&&G.host.on)ents.push([G.host.y,big(G.host,()=>drawHost(G.host),1.22)]);
   if(!G.wren.hidden)ents.push([G.wren.y,big(G.wren,()=>drawWren(G.wren,G.active==='wren'),1.25)]);
   if(G.ash.on)ents.push([G.ash.y+(G.flight?30:0),big(G.ash,()=>drawAsh(G.ash,G.active==='ash'),G.flight?1:1.22*(1+Math.min(12,stats.gems)*.016))]);
+  if(window.NPC)NPC.ents(ents);
   ents.sort((a,b)=>a[0]-b[0]);
   drawDarkness();
   drawSmokeClouds();
@@ -488,6 +490,7 @@ function drawWorld(){
     c.strokeStyle='rgba(255,130,60,.35)';circ(c,q.x,q.y,18+(1-k)*20);c.stroke();
   }
   for(const g of G.guards)drawMarkers(g);
+  if(window.NPC)NPC.drawFront();
   drawRings();
   c.imageSmoothingEnabled=true;blitVisible(FG.cv,FG.sc);
   if(G.state!=='ruin')drawChandeliers();
