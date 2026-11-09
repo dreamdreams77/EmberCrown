@@ -8,7 +8,7 @@ const dir=__dirname+'/shots';require('fs').mkdirSync(dir,{recursive:true});
     const ctxo=dev==='d'?{viewport:{width:900,height:560}}:{viewport:{width:740,height:360},hasTouch:true,isMobile:true,deviceScaleFactor:1};
     const p=await (await b.newContext(ctxo)).newPage();
     p.on('pageerror',e=>errs.push('PAGEERR '+e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text());});
-    await p.goto('http://localhost:8211/index.html');await p.waitForTimeout(500);
+    await p.goto('http://localhost:8123/index.html');await p.waitForTimeout(500);
     await p.evaluate(()=>{window.__cnt=0;const pr=CanvasRenderingContext2D.prototype;
       for(const k of Object.getOwnPropertyNames(pr)){const d=Object.getOwnPropertyDescriptor(pr,k);if(typeof d.value==='function'&&!['getImageData','measureText','save','restore'].includes(k)){const f=d.value;pr[k]=function(){window.__cnt++;return f.apply(this,arguments);};}}});
     for(const L of lv){

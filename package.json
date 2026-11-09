@@ -1,0 +1,9 @@
+{
+  "name": "embercrown",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stealth-action RPG in plain JavaScript and canvas",
+  "scripts": { "test": "node tests/run.js", "serve": "python3 -m http.server 8123" },
+  "devDependencies": { "playwright": "^1.48.0" },
+  "license": "MIT"
+}

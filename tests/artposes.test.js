@@ -5,7 +5,7 @@ const tag=process.argv[2]||'p';const dir=__dirname+'/shots';
   const b=await chromium.launch();const errs=[];
   const p=await (await b.newContext({viewport:{width:900,height:560}})).newPage();
   p.on('pageerror',e=>errs.push('PAGEERR '+e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text());});
-  await p.goto('http://localhost:8211/index.html');await p.waitForTimeout(500);
+  await p.goto('http://localhost:8123/index.html');await p.waitForTimeout(500);
   await p.evaluate(()=>{__ec.newGame();__ec.startBrief(1);__ec.startPlay();const G=__ec.G;G.cine=null;G.grace=99;G.bars=0;__ec.V.dbgZoom=2.6;});
   await p.waitForTimeout(600);
   const poses=[

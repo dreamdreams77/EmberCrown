@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
   const b=await chromium.launch();const errs=[];
   const p=await (await b.newContext({viewport:{width:900,height:560}})).newPage();
   p.on('pageerror',e=>errs.push('PAGEERR '+e.message+'\n'+e.stack));p.on('console',m=>{if(m.type()==='error')errs.push(m.text());});
-  await p.goto('http://localhost:8213/index.html');await p.waitForTimeout(400);
+  await p.goto('http://localhost:8123/index.html');await p.waitForTimeout(400);
   const ev=(f,a)=>p.evaluate(f,a);
   const setup=()=>ev(()=>{__ec.newGame();__ec.startBrief(1);__ec.startPlay();const G=__ec.G;G.cine=null;G.grace=0;G.guards.forEach(g=>g.stun=1e9);G.foes.length=0;G.pick.length=0;G.wren.x=12*32+16;G.wren.y=10*32+16;G.ash.on=true;G.ash.x=G.wren.x-20;G.ash.y=G.wren.y;G.hp=G.maxHp;G.inv=0;});
   // mite explodes and hurts
