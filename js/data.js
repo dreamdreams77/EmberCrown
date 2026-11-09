@@ -56,10 +56,10 @@ const VAULTS=[
  mkVault('E',[24,12],['Marrow Reliquary','Bones arranged by size, tenderly. The egg was not the first thing they tried to keep.'],[['cinder','cinder'],['cinder','cinder','cinder']]),
  mkVault('E',[24,7],["Grell's Real Treasury",'Empty, except for a ledger: every coin has already been spent twice.'],[['cinder','cinder'],['wisp','cinder','cinder']]),
  null,
- mkVault('N',[7,14],['The Unsung Song','Notes scratched into the stone. Whoever carved them could not read music, only feel it.'],[['cinder','wisp'],['husk']]),
- mkVault('E',[24,8],['Forge-Heart Chamber','The first anvil of House Kest, cracked in two. It rang once when it broke, and nobody has forgotten the sound.'],[['husk','cinder'],['wisp','wisp','cinder']]),
- mkVault('E',[24,9],["Veyra's Mirror",'A mirror turned to face the wall. The back is covered in tally marks, one per guest.'],[['wisp','cinder','cinder'],['husk','wisp']]),
- mkVault('N',[4,14],["Candle-Wright's Vault",'Wicks without wax, wax without wicks. Whoever made five candles meant to make a sixth.'],[['husk','cinder','cinder'],['wisp','wisp','husk']])
+ mkVault('N',[7,14],['The Unsung Song','Notes scratched into the stone. Whoever carved them could not read music, only feel it.'],[['cinder','wisp'],['husk','mite'],['cantor']]),
+ mkVault('E',[24,8],['Forge-Heart Chamber','The first anvil of House Kest, cracked in two. It rang once when it broke, and nobody has forgotten the sound.'],[['husk','cinder'],['wisp','mite','mite']]),
+ mkVault('E',[24,9],["Veyra's Mirror",'A mirror turned to face the wall. The back is covered in tally marks, one per guest.'],[['warder','cinder','cinder'],['husk','wisp']]),
+ mkVault('N',[4,14],["Candle-Wright's Vault",'Wicks without wax, wax without wicks. Whoever made five candles meant to make a sixth.'],[['husk','cinder','cinder'],['wisp','warder','husk']])
 ];
 
 const LEVELS=[

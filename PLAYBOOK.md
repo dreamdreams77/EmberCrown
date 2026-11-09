@@ -380,3 +380,11 @@ Shiloh and Ashling use rope-chain secondary motion (cloak, scarf, tail; wings an
 - `window.Quests = {journal(), active(), complete(id)}`; state saved in `run.quests` and `run.npc.flags`. `NPC.markers()` lists contacts and quest objects for minimaps.
 - House standing (Favor/Fear/Ruin, from the Back Stairs and earlier deeds) changes dialogue, prices, hidden passages and guard counts; it is spelled out on the briefing.
 - Beats: Gallowmere dinner gong, Spire lamp crank, Thornwick sconce passage and bell muffle, Ironvale steam valve, Dunmoor silver mask and chandelier, Candlemaker plaque sequence. Tests: `tests/np1.js`, `tests/np2.js`.
+
+## 16. Tactics, parry and the Ashen Cantor (js/tactics.js)
+
+**Guards.** The first guard to spot you shouts for up to two allies within 6.5 tiles: brutes hold the line, guards flank from the side, archers take overwatch, hounds follow your scent trail (dots show while they do; sneaking lays a thinner trail, smoke wipes it). Guards who lose you sweep the spot, then check two side points.
+
+**Shiloh.** The first swing of a chain is a ready blade: an attack landing in its 0.2 s window is a PARRY. A roll or dash that dodges a hit is a PERFECT DODGE. Either grants a 1.6 s counter (next strike is a heavy riposte). Hold strike 0.55 s and release for a guard-break swing. Third hit is a finisher burst. Ashling: burn a foe, then dash or nova it for an Ember Flare. Equipment hooks via equipBonus(key): dmg, parry (s), roll (s), finisher.
+
+**Foes and bosses.** Pyre Mite (0.8 s fuse, blast hurts foes), Hollow Chanter (wards allies; kill it to drop wards), husks screen wisps, hurt cinderlings retreat. Ashen Cantor: optional vault mini-boss (The Unsung Song) with beam sweep, choir ward and hymn rings. Warden: falling bell-stones (bait him under one) and a Cracked Bell phase at 25%. Candlemaker: lit candles fire telegraphed sparks, chain-blinks in phase 2, double rings in phase 3. Victories pay bonus cinders, more if flawless.
