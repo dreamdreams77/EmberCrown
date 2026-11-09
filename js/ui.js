@@ -51,15 +51,18 @@ const UI=(()=>{
   function clear(){root.innerHTML='';modal=null;}
   function screen(cls,html){
     if(loseTimer&&cls.indexOf('lose')<0){clearTimeout(loseTimer);loseTimer=null;}
-    root.innerHTML='<div class="screen '+cls+'">'+html+'</div>';
+    modal=null;root.innerHTML='<div class="screen '+cls+'">'+html+'</div>';
     const s=root.firstChild;s.addEventListener('click',onClick);
     return s;
   }
   function onClick(e){
     const b=e.target.closest('[data-a]');if(!b||b.disabled)return;
     Aud.init();b.blur();
-    if(b.dataset.a.startsWith('buy:')){if(buyTalent(b.dataset.a.slice(4))){const m=modal;if(m)m.firstChild.innerHTML=forgeHTML();}else Aud.S.back();return;}
-    act(b.dataset.a,b);
+    const a=b.dataset.a;
+    if(a.startsWith('buy:')){if(buyTalent(a.slice(4)))jrender();else Aud.S.back();return;}
+    if(b.dataset.slot)J.slot=b.dataset.slot;
+    if(modal&&modal.querySelector('.jr')&&Journal.act(a)){Aud.S.click();jrender(a.startsWith('jt:'));return;}
+    act(a,b);
   }
   function diffChips(){return DIFFS.map((d,i)=>'<button type="button" tabindex="-1" class="chip'+(i===diff?' on':'')+'" data-a="diff'+i+'"><b>'+(i+1)+'</b> '+d.name+'</button>').join('');}
   function act(a,b){
@@ -75,10 +78,11 @@ const UI=(()=>{
       case'resume':pauseGame(false);break;
       case'restart':pauseGame(false);startPlay();break;
       case'how':openModal(howHTML());break;
-      case'codex':openModal(codexHTML());break;
-      case'case':openModal(caseHTML());break;
+      case'codex':openJournal('codex');break;
+      case'case':openJournal('case');break;
+      case'journal':openJournal(J.tab);break;
       case'close':closeModal();persistRun();if(mode==='brief'||mode==='win')show(mode);break;
-      case'forge':openModal(forgeHTML());break;
+      case'forge':openJournal('forge');break;
       case'sfx':settings.sfx=!settings.sfx;Aud.setOpt('sfx',settings.sfx);saveSettings();refresh();break;
       case'music':settings.music=!settings.music;Aud.setOpt('music',settings.music);saveSettings();refresh();break;
       case'minimap':settings.minimap=!settings.minimap;saveSettings();refresh();break;
@@ -110,41 +114,61 @@ const UI=(()=>{
     '<div class="wide"><h3>The goal</h3><p>Stay out of the yellow cones. Do not let Suspicion fill. Burn beacons with Ashling, steal with Shiloh. Learn enemy attack tells (red telegraphs), dodge with roll or dash, and spend cinders at the Ember Forge between missions. Hunt cracked walls, vault trials, relics and lore.</p></div></div>'+
     btn('Close','close','primary');
   }
-  function codexHTML(){
-    const rl=RELIC_KEYS.map(k=>{const have=meta.relics.includes(k)||run.relics.includes(k),r=RELICS[k];
-      return'<div class="cx '+(have?'':'locked')+'">'+ricon(have?r.icon:'')+'<div><b>'+(have?r.name:'Unknown relic')+'</b><span>'+(have?r.desc:'Hidden behind a cracked wall somewhere.')+'</span></div></div>';}).join('');
-    const lore=LORE.map((l,i)=>l.map(s=>{const have=meta.lore.includes(s.t);
-      return'<div class="cx lore '+(have?'':'locked')+'"><div><b>'+(have?s.t:'???')+'</b><span>'+(have?s.x:'Found in '+LEVELS[i].name+'.')+'</span></div></div>';}).join('')).join('');
-    const disc=meta.disc.length?meta.disc.map(t=>'<div class="cx lore"><div><b>'+t+'</b></div></div>').join(''):'<div class="cx lore locked"><div><b>???</b><span>Examine the glinting bones and notes you find in each level.</span></div></div>';
-    return'<h2>Codex</h2><div class="codex"><h3>Relics</h3>'+rl+'<h3>Lore</h3>'+lore+'<h3>Discoveries ('+meta.disc.length+')</h3>'+disc+'</div>'+btn('Close','close','primary');
-  }
-  function caseHTML(){
-    const done=CLUES.map((c,i)=>run.ranks[i]!=null?c:null);
-    const clues=done.map((c,i)=>'<div class="cx lore '+(c?'':'locked')+'"><div><b>'+(i+1)+'. '+(c?LEVELS[i].name:'???')+'</b><span>'+(c||'Not found yet.')+'</span></div></div>').join('');
-    const verdict=done.every(Boolean)?'<p class="lead" style="text-align:center"><i>Quill wrote the war. I carried it.</i></p>':'';
-    const mood=k=>{const h=houses[k];return h.ruin>0?'in ruins':h.fear>0?'afraid of you':h.favor>0?'owes you':'does not know your name';};
-    const hs=Object.keys(HOUSE_NAMES).map(k=>'<div class="cx lore"><div><b>House '+HOUSE_NAMES[k]+'</b><span>'+mood(k)+'</span></div></div>').join('');
-    const st=[];for(let i=1;i<STAIRS.length;i++){const a=stairsAction(i);if(a)st.push('<div class="cx lore"><div><b>'+LEVELS[i].name+'</b><span>You '+a.short+'.</span></div></div>');}
-    return'<h2>Case File</h2><div class="codex"><h3>Clues</h3>'+clues+verdict+'<h3>Where the houses stand</h3>'+hs+(st.length?'<h3>On the back stairs</h3>'+st.join(''):'')+'</div>'+btn('Close','close','primary');
-  }
-  function forgeHTML(){
-    const col=(br,title)=>'<div class="fcol"><h3>'+title+'</h3>'+TALENTS.filter(t=>t.branch===br).map(t=>{
-      const own=hasT(t.id),rq=talentReq(t),locked=!own&&rq&&!hasT(rq),aff=canBuy(t);
-      const st=own?'own':locked?'locked':aff?'buy':'poor';
-      return'<button type="button" tabindex="-1" class="tal '+st+'" data-a="buy:'+t.id+'"><b>'+t.name+'</b><span>'+t.desc+'</span><i>'+(own?'Learned':locked?'Needs '+TALENTS.find(x=>x.id===rq).name:t.cost+' cinders')+'</i></button>';}).join('')+'</div>';
-    return'<h2>The Ember Forge</h2><p class="forgec">'+run.cinders+' cinders</p><div class="forge">'+col('wren','Shiloh')+col('ash','Ashling')+col('both','Shared')+'</div>'+btn('Close','close','primary');
+  function xpHTML(){
+    const x=G&&G.xp;if(!x)return'';
+    const a=x.after,b=x.before;
+    const drop=G.itemDrops&&G.itemDrops.length?G.itemDrops.map(i=>'<span class="drop" style="--rc:'+RARITY[i.rar].c+'">'+i.name+'</span>').join(''):'';
+    return'<div class="xprow"><div class="mlvl sm"><small>Mastery</small><b>'+a.L+'</b></div><div class="mtxt"><div class="xpt"><b>+'+x.gain+' XP</b><span>'+a.title+(x.up?' &middot; <em>LEVEL UP</em>':'')+'</span></div>'+
+      '<div class="bar"><i style="width:'+Math.round(a.frac*100)+'%"></i></div>'+(drop?'<div class="drops">'+drop+'</div>':'')+'</div></div>';
   }
   function forgeBadge(){return anyAffordable()?' <em class="dot"></em>':'';}
-  function openModal(html){
+  function openModal(html,cls){
     closeModal();
-    const m=document.createElement('div');m.className='modal';m.innerHTML='<div class="card">'+html+'</div>';
-    m.addEventListener('click',e=>{if(e.target===m){Aud.S.back();closeModal();}else onClick(e);});
+    const m=document.createElement('div');m.className='modal';m.innerHTML='<div class="card '+(cls||'')+'">'+html+'</div>';
+    m.addEventListener('click',e=>{if(e.target===m){Aud.S.back();closeModal();}else{J.kbd=false;onClick(e);}});
     root.appendChild(m);modal=m;
   }
   function closeModal(){if(modal){modal.remove();modal=null;}}
+  function openJournal(tab){
+    if(tab&&JTABS.some(t=>t[0]===tab))J.tab=tab;J.cur=-1;J.kbd=false;
+    openModal(Journal.html(),'jcard');
+  }
+  function jrender(top){ // re-render the journal in place, keeping scroll
+    if(!modal)return;const card=modal.firstChild,old=card.querySelector('.jbody'),sc=old?old.scrollTop:0,tb=card.querySelector('.jtabs'),ts=tb?tb.scrollLeft:0;
+    card.innerHTML=Journal.html();
+    const nb=card.querySelector('.jbody');if(nb&&!top)nb.scrollTop=sc;
+    const nt=card.querySelector('.jtabs');if(nt){nt.scrollLeft=ts;const on=nt.querySelector('.on');if(on&&top)on.scrollIntoView({inline:'nearest',block:'nearest'});}
+    Journal.markCursor(card);
+  }
+  function jkey(k){ // keyboard inside the journal
+    const card=modal.firstChild,ids=JTABS.map(t=>t[0]);
+    J.kbd=true;
+    const ti=ids.indexOf(J.tab);
+    if(k==='arrowleft'||k==='a'||k==='q'){J.tab=ids[(ti+ids.length-1)%ids.length];J.cur=-1;Aud.S.click();jrender(true);}
+    else if(k==='arrowright'||k==='d'||k==='e'||k==='tab'){J.tab=ids[(ti+1)%ids.length];J.cur=-1;Aud.S.click();jrender(true);}
+    else if(/^[1-7]$/.test(k)){J.tab=ids[+k-1];J.cur=-1;Aud.S.click();jrender(true);}
+    else if(k==='arrowdown'||k==='s'||k==='arrowup'||k==='w'){
+      const n=Journal.focusables(card).length;if(!n)return true;
+      const d=(k==='arrowdown'||k==='s')?1:-1;J.cur=J.cur<0?(d>0?0:n-1):(J.cur+d+n)%n;Journal.markCursor(card);Aud.S.click();
+    }
+    else if(k==='enter'||k===' '){
+      const f=Journal.focusables(card);
+      if(J.cur>=0&&f[J.cur])f[J.cur].click();else{Aud.S.back();closeModal();}
+    }
+    return true;
+  }
   function handleKey(k){
+    if(modal&&modal.querySelector('.jr')){
+      if(k==='escape'||k==='j'||k==='i'||k==='x'){Aud.S.back();closeModal();persistRun();if(mode==='brief'||mode==='win')show(mode);return true;}
+      return jkey(k);
+    }
     if(modal&&(k==='escape'||k==='enter')){Aud.S.back();closeModal();return true;}
-    return !!modal;
+    if(modal)return true;
+    if((k==='j'||k==='i')&&['play','pause','brief','win','court','title'].includes(mode)){
+      if(mode==='play'){if(G&&G.cine)return false;pauseGame(true);}
+      openJournal();return true;
+    }
+    return false;
   }
   /* ---------- screens ---------- */
   function show(m){
@@ -156,7 +180,7 @@ const UI=(()=>{
         screen('title','<div class="logo"><div class="crown">'+sigil('hallow')+'</div><h1>EMBERCROWN</h1><p class="tag">A spy. A runt dragon. Seven feuding houses. One engineered war.</p></div>'+
         '<div class="menu">'+(cont?btn('Continue<small>'+label+'</small>','continue','primary big')+btn(confirmNew?'Tap again: erase save':'New Game','new','ghost'):btn('Begin','new','primary big'))+
         '<div class="diffrow"><span>Difficulty</span>'+diffChips()+'</div><p class="blurb">'+DIFFS[diff].blurb+'</p>'+
-        '<div class="row">'+btn('How to play','how','ghost small')+btn('Codex','codex','ghost small')+'</div></div>'+
+        '<div class="row">'+btn('How to play','how','ghost small')+btn('Journal','journal','ghost small')+'</div></div>'+
         '<p class="foot">Chapter I &middot; The Hollow Crown &nbsp;&middot;&nbsp; press <kbd>Enter</kbd></p>');
       },
       brief(){
@@ -165,13 +189,13 @@ const UI=(()=>{
         let fin='';if(d.finale){const hc=houseCounts();fin='<div class="stand"><span>Favor sends +'+Math.min(3,hc.f)+' whisper bells &middot; Fear stands down '+Math.min(3,hc.e)+' guards &middot; Ruin: he starts at '+(100-8*hc.r)+' HP</span></div>';}
         const rel=run.relics.length?'<div class="relrow">'+run.relics.map(k=>'<span title="'+RELICS[k].name+'">'+ricon(RELICS[k].icon)+'</span>').join('')+'</div>':'';
         screen('brief','<div class="bleft">'+sigil(d.sigil)+'<div class="mnum">Mission '+(lvl+1)+' of '+LEVELS.length+'</div><h2>'+d.name+'</h2><div class="house">'+d.house+'</div>'+rel+'</div>'+
-        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+btn('Begin mission','begin','primary big')+'<div class="row">'+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+(lvl>0?btn('Case file','case','ghost small'):'')+'</div><p class="foot">press <kbd>Enter</kbd></p></div>');
+        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+btn('Begin mission','begin','primary big')+'<div class="row">'+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+btn('Gear &amp; hero','journal','ghost small')+(lvl>0?btn('Case file','case','ghost small'):'')+'</div><p class="foot">press <kbd>Enter</kbd> &middot; <kbd>J</kbd> journal</p></div>');
       },
       court(){
         const st=STAIRS[lvl+1];if(!st){startBrief(lvl+1);return;}
         screen('court','<h2>The Back Stairs</h2><p class="lead">'+st.intro+'</p><div class="cards">'+st.options.map((o,k)=>
         '<button type="button" tabindex="-1" class="card3" data-a="perk'+(k+1)+'"><b>'+(k+1)+'</b><h3>'+o.name+'</h3><p>'+o.desc+'</p></button>').join('')+'</div>'+
-        '<p class="foot">'+st.foot+'</p><div class="row">'+btn('Case file','case','ghost small')+'</div>');
+        '<p class="foot">'+st.foot+'</p><div class="row">'+btn('Case file','case','ghost small')+btn('Gear &amp; hero','journal','ghost small')+'</div>');
       },
       choice(){
         if(G.d.finale){
@@ -193,10 +217,10 @@ const UI=(()=>{
         '<div class="rankrow"><div class="rank r'+G.rank+'">'+G.rank+'</div><div class="stats">'+
         '<div><b>'+G.gems+' / '+tot+'</b><span>Ember gems</span></div><div><b>'+fmt(G.time)+'</b><span>Time</span></div>'+
         '<div><b>'+G.secretsFound+' / '+G.secretsTotal+'</b><span>Secrets</span></div><div><b>'+G.st.stuns+'</b><span>Guards stunned</span></div></div></div>'+
-        relic+'<div class="outl">'+G.outLines.map(l=>'<p>'+l+'</p>').join('')+'</div>'+
+        relic+xpHTML()+'<div class="outl">'+G.outLines.map(l=>'<p>'+l+'</p>').join('')+'</div>'+
         '<div class="cinrow"><b>+'+(G.reward.loot+G.reward.rank+G.reward.secrets)+' cinders</b><span>loot '+G.reward.loot+' &middot; rank '+G.reward.rank+' &middot; secrets '+G.reward.secrets+'</span></div>'+
         '<p class="small">Total gems: '+stats.gems+' (more gems, longer dragon fire) &middot; Foes defeated: '+(G.st.kills||0)+' &middot; Takedowns: '+(G.st.takedowns||0)+'</p>'+
-        '<div class="row">'+btn('Ember Forge'+forgeBadge(),'forge','ghost')+btn('Continue','next','primary big')+'</div><p class="foot">press <kbd>Enter</kbd></p>');
+        '<div class="row">'+btn('Forge &amp; gear'+forgeBadge(),'forge','ghost')+btn('Continue','next','primary big')+'</div><p class="foot">press <kbd>Enter</kbd></p>');
       },
       lose(){
         const down=G&&G.defeat==='down';
@@ -206,7 +230,7 @@ const UI=(()=>{
       },
       pause(){
         screen('pause over','<h2>Paused</h2><div class="menu">'+btn('Resume','resume','primary big')+btn('Restart mission','restart','ghost')+
-        '<div class="row">'+btn('How to play','how','ghost small')+btn('Codex','codex','ghost small')+btn('Case file','case','ghost small')+'</div>'+toggles()+
+        '<div class="row">'+btn('Journal <kbd>J</kbd>','journal','primary small')+btn('How to play','how','ghost small')+'</div>'+toggles()+
         btn(confirmQuit?'Tap again: quit to title':'Quit to title','title','ghost small')+'</div>');
       },
       end(){
@@ -331,5 +355,5 @@ const UI=(()=>{
     addEventListener('touchstart',()=>{if(!touch.on){touch.on=true;document.body.classList.add('touch');layout();}},{passive:true,once:true});
     if(matchMedia('(pointer:coarse)').matches){touch.on=true;document.body.classList.add('touch');}
   }
-  return{init,onMode,refresh,tick,handleKey,show};
+  return{init,onMode,refresh,tick,handleKey,show,openJournal,get modalOpen(){return !!modal;}};
 })();

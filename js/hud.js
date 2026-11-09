@@ -267,7 +267,7 @@ function drawHud(){
     } else {
       slot('Fire','SPACE','fire','#ffb040',null,!wr||G.flight,null,true);
       if(G.ash.on||G.flight)slot('Dash','SHIFT','dash','#ff9a4a',G.dash.max>1?G.dash.ch:null,!wr&&G.dash.ch>0,dashPress,true,G.dash.ch<=0?G.dash.cd/dashCD():0);
-      if(hasT('nova')&&!G.flight)slot('Nova','E','nova','#ffd27a',null,!wr&&G.nova.cd<=0,novaPress,true,G.nova.cd>0?G.nova.cd/6:0);
+      if(hasT('nova')&&!G.flight)slot('Nova','E','nova','#ffd27a',null,!wr&&G.nova.cd<=0,novaPress,true,G.nova.cd>0?G.nova.cd/Math.max(2,6-equipBonus('nova')):0);
       if(G.flight)slot('Act','E','hand','#f0d080',null,true,null,true);
     }
   }

@@ -26,3 +26,16 @@ function buyTalent(id){
   return true;
 }
 function anyAffordable(){return TALENTS.some(canBuy);}
+
+/* "now -> next" preview shown in the Forge before you commit cinders */
+function talentFx(id){
+  const hp=4+(hasT('heart1')?1:0)+(hasT('heart2')?1:0);
+  const F={
+    quick:['Lock, steal and snuff time','100%','70%'],pockets:['Starting gadgets','as found','+1 smoke, +1 bell'],
+    silent:['Takedown sleep / strike damage','9s / 1','16s / 2, quiet'],cloak:['Enemy sight while sneaking','60%','45%'],
+    lung:['Fire range','+0','+18'],searing:['Fire stun / burn speed','5s / 100%','7s / 140%'],twin:['Ember Dash charges','1','2'],
+    nova:['Ember Nova','locked','6s cooldown blast'],heart1:['Hearts',String(hp),String(hp+1)],heart2:['Hearts',String(hp),String(hp+1)],
+    scav:['Cinders from every source','+0%','+30%'],phoenix:['Revive from a fatal blow','none','once per mission, 2 hearts']
+  };
+  return F[id]||null;
+}

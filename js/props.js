@@ -535,7 +535,8 @@ function openChest(ch){
   burst(ch.x,ch.y,40,'#ffd27a',170,1,3,{add:true,g:80});G.rings.push({x:ch.x,y:ch.y,t:.8,r:90,c:'255,210,120'});
   for(let i=0;i<9;i++)spawnPick('cinder',ch.x,ch.y,9);
   spawnPick('heart',ch.x,ch.y,1);
-  toast('Guardian\'s hoard','Cinders and a heart.','#ffd27a');
+  const it=itemReward('chest');
+  if(it)toast('Guardian\'s hoard',it.name,RARITY[it.rar].c);else toast('Guardian\'s hoard','Cinders and a heart.','#ffd27a');
 }
 function drawBraziers(){
   const c=ctx,t=G.time;

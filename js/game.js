@@ -8,7 +8,7 @@ const HOUSE_NAMES={marrow:'Marrow',grell:'Grell',ostrander:'Ostrander',sable:'Sa
 let houses={};
 function resetHouses(){houses={};for(const k in HOUSE_NAMES)houses[k]={favor:0,fear:0,ruin:0};}
 resetHouses();
-const run={relics:[],lore:[],ranks:{},secrets:{},talents:[],cinders:0,disc:[]};      // this playthrough
+const run={relics:[],lore:[],ranks:{},secrets:{},talents:[],cinders:0,disc:[],items:[],equipped:{},mastery:{xp:0}};      // this playthrough
 const meta={relics:[],lore:[],best:{},disc:[]};                  // remembered between playthroughs (codex)
 const stats={gems:0,caught:0,time:0,byLvl:[]};
 const keys={};
@@ -101,7 +101,7 @@ function loadSave(){
 function writeSave(stage,next,complete){
   const s={v:3,meta:{relics:meta.relics,lore:meta.lore,best:meta.best,disc:meta.disc}};
   if(complete)s.complete=true;
-  else s.run={stage,next,diff,stairs:perks,houses,stats:{gems:stats.gems,caught:stats.caught,time:stats.time,byLvl:Array.from(stats.byLvl,v=>v||0)},relics:run.relics,lore:run.lore,ranks:run.ranks,secrets:run.secrets,talents:run.talents,cinders:run.cinders,disc:run.disc};
+  else s.run={stage,next,diff,stairs:perks,houses,stats:{gems:stats.gems,caught:stats.caught,time:stats.time,byLvl:Array.from(stats.byLvl,v=>v||0)},relics:run.relics,lore:run.lore,ranks:run.ranks,secrets:run.secrets,talents:run.talents,cinders:run.cinders,disc:run.disc,items:run.items,equipped:run.equipped,mastery:run.mastery};
   if(!complete)runStage={stage,next};
   lsSet(SAVE_KEY,s);
   saved=complete?null:s;
@@ -110,13 +110,13 @@ function continueGame(){
   const s=saved;if(!s||!s.run)return false;
   const r=s.run;diff=r.diff;perks=r.stairs||(r.perk?{1:Math.max(0,['bribe','blackmail','poison'].indexOf(r.perk))}:{});houses=r.houses;
   stats.gems=r.stats.gems;stats.caught=r.stats.caught;stats.time=r.stats.time;stats.byLvl=r.stats.byLvl.slice();
-  run.relics=(r.relics||[]).slice();run.lore=(r.lore||[]).slice();run.ranks=r.ranks||{};run.secrets=r.secrets||{};run.talents=(r.talents||[]).slice();run.cinders=r.cinders||0;run.disc=(r.disc||[]).slice();runStage={stage:r.stage,next:r.next};
+  run.relics=(r.relics||[]).slice();run.lore=(r.lore||[]).slice();run.ranks=r.ranks||{};run.secrets=r.secrets||{};run.talents=(r.talents||[]).slice();run.cinders=r.cinders||0;run.disc=(r.disc||[]).slice();run.items=(r.items||[]).slice();run.equipped=Object.assign({},r.equipped);run.mastery={xp:(r.mastery&&r.mastery.xp)||0};runStage={stage:r.stage,next:r.next};
   if(r.stage==='court'){lvl=Math.max(0,r.next-1);setMode('court');}else startBrief(r.next);
   return true;
 }
 function newGame(){
   stats.gems=0;stats.caught=0;stats.time=0;stats.byLvl=[];perks={};resetHouses();
-  run.relics=[];run.lore=[];run.ranks={};run.secrets={};run.talents=[];run.cinders=0;run.disc=[];
+  run.relics=[];run.lore=[];run.ranks={};run.secrets={};run.talents=[];run.cinders=0;run.disc=[];run.items=[];run.equipped={};run.mastery={xp:0};
   saved=null;runStage=null;lsSet(SAVE_KEY,{v:3,meta:{relics:meta.relics,lore:meta.lore,best:meta.best,disc:meta.disc}});
   startBrief(0);
 }
@@ -306,9 +306,10 @@ function loadLevel(i){
     g.guests=ts.guests.map((s,k)=>({a:[s[0][0]*T+16,s[0][1]*T+16],b:[s[1][0]*T+16,s[1][1]*T+16],ph:k*1.7,
       x:s[0][0]*T+16,y:s[0][1]*T+16,c:['#d9a441','#6aa0d9','#c06a9a','#7fc08a'][k%4]}));
   }
-  if(hasT('twin')){g.dash.max=2;g.dash.ch=2;}
-  g.maxHp=4+(hasT('heart1')?1:0)+(hasT('heart2')?1:0);g.hp=g.maxHp;
+  g.dash.max=1+(hasT('twin')?1:0)+Math.floor(equipBonus('dash'));g.dash.ch=g.dash.max;
+  g.maxHp=4+(hasT('heart1')?1:0)+(hasT('heart2')?1:0)+Math.floor(equipBonus('hp'));g.hp=g.maxHp;
   if(!d.flight&&hasT('pockets')){g.gad.smoke++;g.gad.bell++;}
+  if(!d.flight){g.gad.smoke+=Math.floor(equipBonus('smoke'));g.gad.bell+=Math.floor(equipBonus('bell'));}
   buildProps(g);
   initInteractables(g);
   g.chand=(d.chand||[]).map(c=>({x:c[0]*T,y:c[1]*T,ph:Math.random()*6}));
@@ -617,7 +618,7 @@ function findTarget(A){
   for(const k in G.doors){
     const d=G.doors[k];if(d.open||d.sealed||d.gate)continue;
     const dd=Math.hypot(d.x*T+16-A.x,d.y*T+16-A.y);
-    if(dd<44&&dd<bd){bd=dd;tgt={kind:'door',ref:d,need:.9*(hasT('quick')?.7:1)*(G.bsx.pick||1),x:d.x*T+16,y:d.y*T+16,label:'Pick lock'};}
+    if(dd<44&&dd<bd){bd=dd;tgt={kind:'door',ref:d,need:.9*quickMul()*(G.bsx.pick||1),x:d.x*T+16,y:d.y*T+16,label:'Pick lock'};}
   }
   for(const it of G.items){
     if('OPLHC'.includes(it.type)&&!it.done&&
@@ -625,10 +626,10 @@ function findTarget(A){
       const dd=Math.hypot(it.x-A.x,it.y-A.y);
       if(dd<34&&dd<bd){bd=dd;
         const lab={O:G.d.song?'Take the ledger':lvl===0?'Steal the egg':G.d.timeshift?'Take the signet':'Swap the seal',P:G.flight?'Drop the letter':G.d.timeshift?'Plant the treaty':'Poison the cup',L:'Learn the Song',H:'Free Perrin',C:'Snuff the candle'}[it.type];
-        tgt={kind:'item',ref:it,need:(it.type==='H'?1.6:it.type==='C'?.8:1.2)*(hasT('quick')?.7:1)*(G.bsx.pick||1),x:it.x,y:it.y,label:lab};}
+        tgt={kind:'item',ref:it,need:(it.type==='H'?1.6:it.type==='C'?.8:1.2)*quickMul()*(G.bsx.pick||1),x:it.x,y:it.y,label:lab};}
     }
   }
-  if(A===G.wren&&!G.flight)for(const tr of G.torches||[]){if(tr.out||tr.pipe)continue;const dd=Math.hypot(tr.x-A.x,tr.y+6-A.y)+12;if(dd<46&&dd<bd){bd=dd;tgt={kind:'torch',ref:tr,need:.45*(hasT('quick')?.7:1),x:tr.x,y:tr.y,label:'Snuff torch'};}}
+  if(A===G.wren&&!G.flight)for(const tr of G.torches||[]){if(tr.out||tr.pipe)continue;const dd=Math.hypot(tr.x-A.x,tr.y+6-A.y)+12;if(dd<46&&dd<bd){bd=dd;tgt={kind:'torch',ref:tr,need:.45*quickMul(),x:tr.x,y:tr.y,label:'Snuff torch'};}}
   for(const n of G.insp||[]){if(n.done)continue;const dd=Math.hypot(n.x-A.x,n.y-A.y);if(dd<36&&dd<bd){bd=dd;tgt={kind:'insp',ref:n,need:.55,x:n.x,y:n.y,label:'Examine'};}}
   for(const ch of G.chests||[]){if(ch.open)continue;const dd=Math.hypot(ch.x-A.x,ch.y-A.y);if(dd<38&&dd<bd){bd=dd;tgt={kind:'chest',ref:ch,need:1,x:ch.x,y:ch.y,label:'Open chest'};}}
   return tgt;
@@ -830,7 +831,7 @@ function update(dt){
   const firing=G.active==='ash'&&fireHeld&&!dashing;
   if(firing!==G.fireOn){G.fireOn=firing;Aud.fire(firing);}
   if(firing){
-    const a=G.ash,range=62+Math.min(stats.gems,12)*8+(hasRelic('stormglass')?14:0)+(hasT('lung')?18:0);
+    const a=G.ash,range=62+Math.min(stats.gems,12)*8+(hasRelic('stormglass')?14:0)+(hasT('lung')?18:0)+equipBonus('fire');
     G.fireRange=range;
     for(let i=0;i<3;i++){
       const dd=Math.random()*range,sp=(Math.random()-.5)*.7,an=a.face+sp;
@@ -849,7 +850,7 @@ function update(dt){
         else{G.alert=Math.min(.95,G.alert+.5*dt);g.hurt=.1;
           if(Math.random()<dt*8){Aud.S.deflect();burst(g.x+Math.cos(g.face)*10,g.y+Math.sin(g.face)*10,3,'#cfd6e6',90,.25,1.4,{add:true});}
           if(!G.bruteSaid){G.bruteSaid=true;say('Ashling','The shield eats my fire! Get behind him.');}}
-      } else {g.stun=5+(hasT('searing')?2:0);g.ko=false;G.st.stuns++;G.alert=Math.min(.95,G.alert+.15);Aud.S.stun();floatText(g.x,g.y-20,'STUNNED','#ffd27a');}
+      } else {g.stun=5+(hasT('searing')?2:0)+equipBonus('stun');g.ko=false;G.st.stuns++;G.alert=Math.min(.95,G.alert+.15);Aud.S.stun();floatText(g.x,g.y-20,'STUNNED','#ffd27a');}
     }
     for(const f of foesInCone(a,range,.6))damageFoe(f,1.7*dt*(hasT('searing')?1.4:1),{fire:true,sx:a.x,sy:a.y});
     for(const pp of G.pots)if(pp.hp>0&&inCone(pp.x*T+16,pp.y*T+16))breakPot(pp);
@@ -892,8 +893,8 @@ function update(dt){
     for(const t of targets){
       const isActive=t.host?true:(t===G.wren)===(G.active==='wren');
       let mul=(t===G.ash?1.45:1)*(isActive?1:.6)*G.rangeMul;
-      if(t!==G.ash){if(t._LT!==G.time){t._LT=G.time;t._L=lightAt(t.x,t.y);}mul*=.78+.55*t._L;if(t===G.wren)G.expo=t._L;}
-      if(t===G.wren&&G.sneak)mul*=hasT('cloak')?.45:.6;
+      if(t!==G.ash){if(t._LT!==G.time){t._LT=G.time;t._L=lightAt(t.x,t.y)*(t===G.wren?1-Math.min(.6,equipBonus('shade')):1);}mul*=.78+.55*t._L;if(t===G.wren)G.expo=t._L;}
+      if(t===G.wren&&G.sneak)mul*=Math.max(.2,(hasT('cloak')?.45:.6)-equipBonus('sneak'));
       const range=5.2*T*mul*(g.rm||1)*(g.kr||1),dx=t.x-g.x,dy=t.y-g.y,dist=Math.hypot(dx,dy);
       let see=dist<range&&(dist<T*.9||angDiff(Math.atan2(dy,dx),g.face)<(g.half||.62))&&los(g.x,g.y,t.x,t.y);
       if(!see&&g.kind==='hound'&&dist<2.5*T*mul&&los(g.x,g.y,t.x,t.y))see=true; // the nose knows
@@ -995,6 +996,7 @@ function finishLevel(){
   const bonus={S:150,A:100,B:60,C:30}[G.rank]||0,secB=G.secretsFound*25+G.gotRelics.length*50;
   G.reward={loot:G.cinders,rank:cinderValue(bonus),secrets:cinderValue(secB)};
   run.cinders+=G.reward.loot+G.reward.rank+G.reward.secrets;
+  awardMastery(G);
   const last=lvl+1>=LEVELS.length;
   if(last)writeSave(null,null,true);
   else writeSave('court',lvl+1);

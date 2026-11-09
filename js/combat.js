@@ -6,7 +6,7 @@ const rrand=(a,b)=>a+Math.random()*(b-a);
 function spawnPick(type,x,y,val){
   G.pick.push({type,x,y,vx:rrand(-70,70),vy:rrand(-70,70),h:0,vz:rrand(90,170),val:val||1,t:0,ph:Math.random()*6});
 }
-function cinderValue(v){return Math.round(v*(hasT('scav')?1.3:1));}
+function cinderValue(v){return Math.round(v*(1+(hasT('scav')?.3:0)+equipBonus('cinder')));}
 function dropLoot(x,y,seed,rich){
   const r=mulberry(Math.floor((seed||Math.random())*1e6)),n=rich?5:1+Math.floor(r()*3);
   for(let i=0;i<n;i++)spawnPick('cinder',x,y,3+Math.floor(r()*5));
@@ -66,7 +66,7 @@ function teamChars(){
 function iframes(){return G.inv>0||G.dash.t>0||G.dash.grace>0||G.roll.t>0||G.roll.grace>0||G.god;}
 function hurtTeam(d,sx,sy,why){
   if(iframes()||G.cine)return false;
-  G.hp-=d;G.inv=1.15;G.hurtFlash=.4;G.hpShake=.5;
+  G.hp-=d;G.inv=1.15+equipBonus('inv');G.hurtFlash=.4;G.hpShake=.5;
   const A=activeChar(),ang=Math.atan2(A.y-sy,A.x-sx);
   A.kx=(A.kx||0)+Math.cos(ang)*230;A.ky=(A.ky||0)+Math.sin(ang)*230;
   hitstop(.075);shake(10);punch(.7);Aud.S.hurt();
@@ -312,7 +312,7 @@ function killFoe(f){
   Aud.S.foeDie();hitstop(.06);
   const n=2+Math.floor(Math.random()*2);
   for(let i=0;i<n;i++)spawnPick('cinder',f.x,f.y,f.kind==='husk'?9:5);
-  if(Math.random()<(f.kind==='husk'?.35:.1))spawnPick('heart',f.x,f.y,1);
+  if(Math.random()<(f.kind==='husk'?.35:.1)+equipBonus('vamp'))spawnPick('heart',f.x,f.y,1);
   if(typeof onFoeDeath==='function')onFoeDeath(f);
 }
 function foesInCone(a,range,half){
@@ -345,7 +345,7 @@ function strikePress(){
   Aud.S.swing();
 }
 function resolveStrike(){
-  const A=G.wren,ang=G.strike.ang,cb=G.strike.cb,reach=cb===2?44:36;
+  const A=G.wren,ang=G.strike.ang,cb=G.strike.cb,reach=(cb===2?44:36)+equipBonus('reach');
   let hit=0;
   const inArc=(o,r)=>{const dx=o.x-A.x,dy=o.y-A.y;return Math.hypot(dx,dy)<reach+(r||0)&&angDiff(Math.atan2(dy,dx),ang)<1.15;};
   G.fx.push({k:'slash',x:A.x,y:A.y,a:ang,t:.2,t0:.2,big:cb===2,col:'200,230,255'});
@@ -358,6 +358,7 @@ function resolveStrike(){
       floatText(g.x,g.y-24,'TAKEDOWN','#9fd8ff',12);hitstop(.1);punch(.6);shake(5);
       burst(g.x,g.y,18,'#bfe4ff',130,.4,2,{add:true});Aud.S.hit();
       if(!hasT('silent'))lureNear(g.x,g.y,2*T,true);
+      if(Math.random()<equipBonus('mend')&&G.hp<G.maxHp){G.hp++;Aud.S.heart();floatText(g.x,g.y-34,'+1 HEART','#ff7a8a',10);}
     } else if(g.kind==='brute'&&!behind){
       Aud.S.deflect();burst(g.x+Math.cos(g.face)*10,g.y+Math.sin(g.face)*10,8,'#cfd6e6',120,.3,1.6,{add:true});floatText(g.x,g.y-22,'BLOCKED','#cfd6e6',10);
       A.kx-=Math.cos(ang)*140;A.ky-=Math.sin(ang)*140;
@@ -371,7 +372,7 @@ function resolveStrike(){
   for(const f of G.foes){
     if(f.state==='dead'||!inArc(f,f.r))continue;
     const back=!foeFront(f,A.x,A.y);
-    damageFoe(f,(cb===2?2:1)+(hasT('silent')?1:0)+(back?1:0),{kx:Math.cos(ang)*(cb===2?260:150),ky:Math.sin(ang)*(cb===2?260:150),hs:.06,pn:.5,sh:5,back,sx:A.x,sy:A.y,stagger:cb===2});hit++;
+    damageFoe(f,(cb===2?2:1)+(hasT('silent')?1:0)+(back?1:0)+equipBonus('dmg')+(cb===2?equipBonus('finisher'):0),{kx:Math.cos(ang)*(cb===2?260:150),ky:Math.sin(ang)*(cb===2?260:150),hs:.06,pn:.5,sh:5,back,sx:A.x,sy:A.y,stagger:cb===2});hit++;
   }
   const B=G.boss;
   if(B&&!B.dead&&inArc(B,16)){bossHit(B,{type:'strike',combo:cb,sx:A.x,sy:A.y});hit++;}
@@ -385,13 +386,13 @@ function rollPress(){
   if(G.active!=='wren'||G.roll.cd>0||G.roll.t>0||G.cine)return;
   let a=A.face;const mx=(keys['d']||keys['arrowright']?1:0)-(keys['a']||keys['arrowleft']?1:0),my=(keys['s']||keys['arrowdown']?1:0)-(keys['w']||keys['arrowup']?1:0);
   if(mx||my)a=Math.atan2(my,mx);else if(touch.jx||touch.jy)a=Math.atan2(touch.jy,touch.jx);
-  G.roll={t:.3,cd:.85,a,grace:0};A.face=a;A.rollAnim=.3;
+  G.roll={t:.3+equipBonus('roll'),cd:Math.max(.4,.85-equipBonus('rollCd')),a,grace:0};A.face=a;A.rollAnim=.3;
   Aud.S.swing();burst(A.x,A.y+4,8,'#a89a88',60,.4,3,{k:'smoke',gr:6});
 }
 function novaPress(){
   const A=G.ash;
   if(G.active!=='ash'||!hasT('nova')||G.nova.cd>0||G.flight||G.cine)return;
-  G.nova.cd=6;G.nova.pend=.2;A.atk={kind:'nova',t:.55,t0:.55};A.novaAnim=.55;
+  G.nova.cd=Math.max(2,6-equipBonus('nova'));G.nova.pend=.2;A.atk={kind:'nova',t:.55,t0:.55};A.novaAnim=.55;
   Aud.S.nova();Aud.fire(false);
   G.rings.push({x:A.x,y:A.y,t:.9,r:130,c:'255,170,70'});
 }
@@ -472,7 +473,7 @@ function bossDeath(B){
   B.dead=true;B.st='dead';B.hp=0;B.deathT=0;B.stun=1e9;
   G.proj.length=0;G.tele.length=0;G.shock.length=0;
   for(const f of G.foes)if(f.state!=='dead')killFoe(f);
-  dropLoot(B.x,B.y,.5,true);for(let i=0;i<6;i++)spawnPick('cinder',B.x,B.y,12);spawnPick('heart',B.x,B.y,1);
+  dropLoot(B.x,B.y,.5,true);{const it=itemReward('boss');if(it)say('Shiloh','Something glints in the wreckage: '+it.name+'.',1);}for(let i=0;i<6;i++)spawnPick('cinder',B.x,B.y,12);spawnPick('heart',B.x,B.y,1);
   Aud.S.boom();hitstop(.22);punch(1);
   const info=BOSSINFO[B.kind==='candle'?'candle':'warden'];
   if(B.kind==='candle'){say('Candlemaker','Burn it and she rebuilds.',1.4);say('Candlemaker','Crown it and she holds the strings.',3.4);say('Candlemaker','Break it, and she has nothing to hold.',5.4);}
