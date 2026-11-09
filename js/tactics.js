@@ -81,9 +81,9 @@ function stepCharge(dt){
 function heavyStrike(){
   const A=G.wren;let ang=A.face;
   if(mouse.used&&mouse.world&&!V.coarse)ang=Math.atan2(mouse.world.y-A.y,mouse.world.x-A.x);
-  A.face=ang;G.strike.ang=ang;G.strike.hvy=.16;G.strike.cd=.8;G.strike.combo=0;G.strike.last=G.time;
+  A.face=ang;G.strike.ang=ang;G.strike.hvy=.1;G.strike.cd=.8;G.strike.combo=0;G.strike.last=G.time;
   A.atk={t:.42,t0:.42,a:ang,combo:2};
-  A.kx=(A.kx||0)+Math.cos(ang)*210;A.ky=(A.ky||0)+Math.sin(ang)*210;
+  A.kx=(A.kx||0)+Math.cos(ang)*60;A.ky=(A.ky||0)+Math.sin(ang)*60;
   Aud.S.swing();Aud.S.slam();
 }
 function resolveHeavy(){

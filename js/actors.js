@@ -259,13 +259,14 @@ function drawFoe(f){
     c.fillStyle='#3a2c26';for(const s of[-1,1]){c.save();c.translate(2,s*14);c.rotate(s*(-.3-raise));ell(c,6+raise*5,0,9,4.6);c.fill();c.fillStyle='#e0b040';circ(c,14+raise*6,0,2);c.fill();c.fillStyle='#3a2c26';c.restore();}
     c.fillStyle='#4a3a34';ell(c,8,0,8,7);c.fill();c.fillStyle='rgba(255,170,60,'+(glow)+')';c.fillRect(11,-3.4,3,2);c.fillRect(11,1.4,3,2);
     c.restore();
-  }
+  } else if(typeof drawFoeNew==='function')drawFoeNew(f,sc);
+  if(typeof drawFoeOver==='function')drawFoeOver(f);
   if(f.state==='recover'||f.state==='stagger'){
     for(let i=0;i<3;i++){const a=t*4+i*2.09;c.fillStyle='#ffe27a';circ(c,f.x+Math.cos(a)*8,f.y-16+Math.sin(a)*3,1.6);c.fill();}
   }
-  if(f.hp<f.max&&f.state!=='dead'&&f.state!=='spawn'){
-    c.fillStyle='rgba(0,0,0,.55)';c.fillRect(f.x-11,f.y-(f.kind==='wisp'?26:f.kind==='husk'?28:20),22,3.4);
-    c.fillStyle='#e05050';c.fillRect(f.x-10.5,f.y-(f.kind==='wisp'?26:f.kind==='husk'?28:20)+.5,21*Math.max(0,f.hp)/f.max,2.4);
+  if(f.hp<f.max&&f.kind!=='cantor'&&f.state!=='dead'&&f.state!=='spawn'){
+    c.fillStyle='rgba(0,0,0,.55)';c.fillRect(f.x-11,f.y-foeBarY(f),22,3.4);
+    c.fillStyle='#e05050';c.fillRect(f.x-10.5,f.y-foeBarY(f)+.5,21*Math.max(0,f.hp)/f.max,2.4);
   }
   c.globalAlpha=1;
 }
@@ -289,6 +290,7 @@ function drawTelegraphs(){
 }
 function drawCombatOver(){
   const c=ctx;
+  if(typeof drawTacticsOver==='function')drawTacticsOver();
   for(const s of G.shock){
     if(s.delay>0)continue;
     const k=1-s.r/s.max;c.strokeStyle='rgba(255,220,150,'+(.75*k)+')';c.lineWidth=s.w*.5;circ(c,s.x,s.y,s.r);c.stroke();

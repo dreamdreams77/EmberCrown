@@ -257,7 +257,7 @@ const UI=(()=>{
         if(navigator.vibrate)try{navigator.vibrate(8);}catch(_){}
         switch(a){
           case'act':if(G.active==='ash'&&!G.flight)novaPress();else touch.act=true;break;
-          case'fire':if(G.active==='wren'&&!G.flight)strikePress();else touch.fire=true;break;
+          case'fire':if(G.active==='wren'&&!G.flight)strikePress();touch.fire=true;break;
           case'shift':if(G.active==='wren'){touch.sneak=!touch.sneak;if(G.time-(G.lastShift||-9)<.32)rollPress();G.lastShift=G.time;}else dashPress();break;
           case'swap':swapChar();break;case'smoke':useSmoke();break;case'bell':useBell();break;case'flute':useFlute();break;
         }

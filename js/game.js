@@ -480,9 +480,10 @@ function stepGuard(g,dt){
   if(g.toastT>0){g.toastT-=dt;g.face=Math.atan2(G.d.feast.table[1]*T-g.y,G.d.feast.table[0]*T-g.x);return;}
   if(g.spin){g.face+=g.spin*.7*dt;return;}
   if(g.lure){
-    if(moveG(g,g.lure.x,g.lure.y,dt,g.spd*1.3)){g.lure.t-=dt;if(g.lure.t<=0){g.lure=null;g.ret=true;}}
+    if(moveG(g,g.lure.x,g.lure.y,dt,g.spd*1.3)){g.lure.t-=dt;if(g.lure.t<=0){g.lure=null;if(!(typeof startSearch==='function'&&startSearch(g)))g.ret=true;}}
     return;
   }
+  if(g.search&&searchStep(g,dt))return;
   if(g.ret){if(moveG(g,g.back.x,g.back.y,dt,g.spd))g.ret=false;return;}
   if(g.pause>0){g.pause-=dt;return;}
   const w=g.wp[g.i];
@@ -739,7 +740,7 @@ function update(dt){
     }
     for(const f of G.foes){
       if(f.state==='dead'||dd.hit.has(f))continue;
-      if(Math.hypot(f.x-A.x,f.y-A.y)<f.r+16){dd.hit.add(f);damageFoe(f,hasRelic('forgeheart')?2:1,{kx:Math.cos(dd.a)*320,ky:Math.sin(dd.a)*320,hs:.06,pn:.5,sh:5,stagger:true,sx:A.x,sy:A.y});}
+      if(Math.hypot(f.x-A.x,f.y-A.y)<f.r+16){dd.hit.add(f);damageFoe(f,hasRelic('forgeheart')?2:1,{kx:Math.cos(dd.a)*320,ky:Math.sin(dd.a)*320,hs:.06,pn:.5,sh:5,stagger:true,sx:A.x,sy:A.y,dash:true});}
     }
     for(const pp of G.pots)if(pp.hp>0&&Math.hypot(pp.x*T+16-A.x,pp.y*T+16-A.y)<22)breakPot(pp);
     for(const it of G.items)if(it.type==='o'&&!it.done&&it.fuse<0&&Math.hypot(it.x-A.x,it.y-A.y)<22)it.fuse=.2;
@@ -749,7 +750,7 @@ function update(dt){
     const sp=270*dt,nx=A.x+Math.cos(rr_.a)*sp,ny=A.y+Math.sin(rr_.a)*sp;
     if(!blocked(nx,A.y,8))A.x=nx;if(!blocked(A.x,ny,8))A.y=ny;
     A.face=rr_.a;if(Math.random()<.6)pt(A.x,A.y+4,(Math.random()-.5)*20,(Math.random()-.5)*20,.4,3,'rgba(150,140,125,.6)',{k:'smoke',gr:5});
-    if(rr_.t<=0)rr_.grace=.12;
+    if(rr_.t<=0)rr_.grace=.12+eqb('roll');
     moving=true;
   } else if(mx0||my0){
     const l=Math.hypot(mx0,my0),mx=mx0/l,my=my0/l;
@@ -902,12 +903,12 @@ function update(dt){
         best=Math.max(best,.45+(1-dist/range)*1.1);
       }
     }
-    if(g.seeing&&!g.was){g.bang=1;if(g.kind==='guard'||g.kind==='brute'||g.kind==='archer')bark(g,'alert');
+    if(g.seeing&&!g.was){g.bang=1;g.search=null;if(typeof callAllies==='function')callAllies(g);if(g.kind==='guard'||g.kind==='brute'||g.kind==='archer')bark(g,'alert');
       if(G.d.alarm&&!G.alarmSt&&!G.runner&&!(G.runCd>0)&&g.kind==='guard'&&!g.boss){const B=beaconItem();if(B&&!B.done&&G.grace<=0)startRunner(g);}G.st.detect++;if(!G.alertSfxT||G.time-G.alertSfxT>1.2){G.alertSfxT=G.time;Aud.S.alert();}}
     if(!g.seeing&&g.was&&!g.spin&&!g.boss&&g.seen){
       // lost sight: go and look
-      if(!g.lure&&!g.ret)g.back={x:g.x,y:g.y};
-      g.lure={x:g.seen.x,y:g.seen.y,t:1.6};g.ret=false;g.quest=1.4;bark(g,'lost');
+      if(!g.lure&&!g.ret&&!g.search)g.back={x:g.x,y:g.y};
+      g.lure={x:g.seen.x,y:g.seen.y,t:1.6};g.ret=false;g.quest=1.4;g.hunt=1;bark(g,'lost');
     }
     g.was=g.seeing;
   }

@@ -321,7 +321,7 @@ function foeFront(f,sx,sy){let d=Math.atan2(sy-f.y,sx-f.x)-f.vf;while(d>Math.PI)
 function damageFoe(f,dmg,o){
   o=o||{};
   if(f.state==='dead'||f.state==='spawn')return false;
-  if(f.ward>0){
+  if(f.ward>0&&wardOk(f)){
     if(o.heavy||o.blast){f.ward=0;if(f.choir){f.choir=false;wardBroke(f);}floatText(f.x,f.y-30,'WARD BROKEN','#9ac4ff',11);}
     else{if(!o.fire||Math.random()<.05){Aud.S.deflect();burst(f.x,f.y,6,'#9ac4ff',90,.3,1.8,{add:true});if(!o.fire)floatText(f.x,f.y-26,'WARDED','#9ac4ff',10);}return false;}
   }
