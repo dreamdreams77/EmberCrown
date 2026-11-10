@@ -3,17 +3,17 @@
    Static figure parts are painted once into offscreen canvases (4x world scale) and stamped with one drawImage,
    so richer art costs fewer canvas calls per frame than the old immediate-mode figures. */
 const SPR={S:(typeof window!=='undefined'&&('ontouchstart' in window))?3:4,m:new Map(),bakes:0,
-  get(key,w,h,fn){
+  get(key,w,h,fn,ox,oy){
     let s=this.m.get(key);
     if(!s){
       if(this.m.size>220)this.m.clear();
       const cv=document.createElement('canvas');cv.width=Math.ceil(w*this.S);cv.height=Math.ceil(h*this.S);
-      const c=cv.getContext('2d');c.scale(this.S,this.S);c.translate(w/2,h/2);c.lineJoin='round';c.lineCap='round';
+      const c=cv.getContext('2d');c.scale(this.S,this.S);c.translate(w/2-(ox||0),h/2-(oy||0));c.lineJoin='round';c.lineCap='round';
       fn(c);s=cv;this.m.set(key,s);this.bakes++;
     }
     return s;
   },
-  draw(c,key,w,h,fn,x,y){c.drawImage(this.get(key,w,h,fn),(x||0)-w/2,(y||0)-h/2,w,h);}
+  draw(c,key,w,h,fn,x,y){c.drawImage(this.get(key,w,h,fn,x,y),(x||0)-w/2,(y||0)-h/2,w,h);}
 };
 const INK='#140a1e';
 /* closed smooth outline through control points (quadratic mid-point spline) */
