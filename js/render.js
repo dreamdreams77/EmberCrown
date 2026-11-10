@@ -507,6 +507,7 @@ function drawGuard(g){
     return;
   }
   if(g.ko&&g.stun>0&&!g.boss){drawKO(g,col,trim);return;}
+  if(!g.boss&&typeof drawGuardArt==='function'){drawGuardArt(g);return;}
   const big=g.boss?1.7:g.kind==='brute'?1.3:1;
   const rad=10*big;
   if(g.kind==='hound'){
