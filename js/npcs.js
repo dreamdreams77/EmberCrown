@@ -326,6 +326,7 @@ function render(){
 function portrait(cv,n){
   const c=cv.getContext('2d'),L=n.look,s=cv.width;
   c.clearRect(0,0,s,s);
+  if(window.Portraits){const nd=G.talk&&n.tree&&n.tree[G.talk.node];window.Portraits.draw(c,'npc:'+n.id,0,0,s,(nd&&nd.mood)||n.mood||'calm',{npc:n});return;}
   const k=s/64;c.save();c.scale(k,k);
   c.fillStyle=L.cloth;rr(c,10,44,44,24,10);c.fill();
   c.fillStyle=L.trim;c.fillRect(30,46,4,18);
@@ -406,6 +407,7 @@ function moveNpc(n,tx,ty,dt,spd){
 /* ---------- drawing ---------- */
 function drawNpcBody(c,n,scale){
   const L=n.look,sw=n.dest||n.follow?Math.sin(G.time*9+n.ph):0;
+  if(window.drawNpcFigure){window.drawNpcFigure(c,window.npcKindOf?window.npcKindOf(n):L.k,0,0,G.time,n.face,{look:L,scale,walk:sw,free:n.free,id:n.id,role:n.role});return;}
   c.save();c.rotate(n.face);c.scale(scale,scale);
   if(L.pack){c.fillStyle='#5a3a24';rr(c,-13,-6,7,12,2);c.fill();c.fillStyle='#8a5a30';c.fillRect(-12,-5,2,10);}
   c.fillStyle='#2a2430';ell(c,sw*2.4,-4,3,2);c.fill();ell(c,-sw*2.4,4,3,2);c.fill();

@@ -283,6 +283,7 @@ function drawHud(){
     const dx=W/2-wd/2,dy=barTop-hh-(V.coarse&&!touchLand?pad:6)-(1-k)*-10;
     c.globalAlpha=Math.min(1,k*1.4);
     panelBox(c,dx,dy,wd,hh,8,'rgba(226,170,70,.5)');
+    if(window.Portraits){const ps=Math.round(Math.max(hh,44*U)),side=dx-ps-6>=4;window.Portraits.draw(c,G.msg.who,side?dx-ps-6:dx,side?dy+hh-ps:dy-ps-4,ps,G.msg.mood||window.Portraits.moodFor(G.msg.who,G.msg.text));}
     const wc=G.msg.who==='Ashling'?'#ff9a4a':G.msg.who==='Perrin'?'#7fd0ff':G.msg.who==='Candlemaker'?'#f0d080':'#c8b4ff';
     c.fillStyle=wc;c.font='bold '+Math.round(fs*.92)+'px '+HEAD;c.fillText(G.msg.who,dx+pad,dy+fs*1.15);
     c.fillStyle='#eadfd0';c.font=fs+'px '+BODY;
