@@ -157,6 +157,8 @@ function awardMastery(g){
   run.mastery.xp=(run.mastery.xp||0)+gain;
   const after=masteryInfo();
   g.xp={gain,parts,before,after,up:after.L>before.L};
+  // Shiloh's techniques that this rank opens (js/abilities.js) show beside the gear drops on the win screen
+  if(after.L>before.L&&window.Abilities&&Abilities.TECHS)for(const t of Abilities.TECHS)if(t.L>before.L&&t.L<=after.L)(g.itemDrops=g.itemDrops||[]).push({name:'Technique: '+t.name,rar:'epic',tech:true});
 }
 
 /* ---------- character sheet: current value vs. base ---------- */
@@ -169,10 +171,13 @@ function sheetRows(){
     wren:[
       ['Hearts',hp,4],['Strike damage',fnum(1+(sil?1:0)+equipBonus('dmg')),1],['Finisher damage',fnum(2+(sil?1:0)+equipBonus('dmg')+equipBonus('finisher')),2],
       ['Blade reach',36+equipBonus('reach'),36],['Roll i-frames',fnum(.3+equipBonus('roll'))+'s','0.3s'],['Roll cooldown',fnum(Math.max(.4,.85-equipBonus('rollCd')))+'s','0.85s'],
+      ['Lockpick tier',['none','I','II','III'][[2,6,10].filter(l=>masteryLevel((run.mastery&&run.mastery.xp)||0)>=l).length],'none'],
+      ['Techniques',(window.Abilities?Abilities.techs().filter(t=>t.on&&!/^pick/.test(t.id)).map(t=>t.name).join(', '):'')||'none','none'],
       ['Sight while sneaking',Math.round(Math.max(.2,(hasT('cloak')?.45:.6)-equipBonus('sneak'))*100)+'%','60%'],['Exposure in light',Math.round((1-Math.min(.6,equipBonus('shade')))*100)+'%','100%']
     ],
     ash:[
       ['Fire range',Math.round(fire),62],['Fire stun',fnum(5+(hasT('searing')?2:0)+equipBonus('stun'))+'s','5s'],
+      ['Abilities',(window.Abilities?Abilities.list().map(Abilities.nameOf).join(', '):'')||'none','none'],
       ['Dash charges',1+(hasT('twin')?1:0)+Math.floor(equipBonus('dash')),1],['Nova cooldown',hasT('nova')?fnum(Math.max(2,6-equipBonus('nova')))+'s':'locked','6s']
     ],
     both:[

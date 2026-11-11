@@ -73,6 +73,16 @@ const fails=[];const ok=(c,m)=>{if(!c){fails.push(m);console.log('FAIL '+m);}els
       });
       console.log(JSON.stringify(r));
       for(const k of ['none','unknown','talent','canBuyBlocked','quest','cycled','web','cd','door','scorchStun','hang','runeHidden','lit','runeSeen','rune','lanternOff','slot','cleared','saved','pitBlocks','glide','noFoot','nova','t0','t6','shadow','silent','pts','teach'])ok(r[k],'desktop: '+k);
+      // Shiloh's techniques: disguise skill adds a livery use, a rank-up names the new technique, the Hero sheet lists them
+      const t2=await p.evaluate(()=>{const o={};
+        newGame();startBrief(1);const base=(()=>{startPlay();G.cine=null;return G.mis&&G.mis.dis?G.mis.dis.uses:-1;})();
+        newGame();run.mastery.xp=masteryXpFor(8);startBrief(1);startPlay();G.cine=null;o.livery=base>0&&G.mis.dis.uses===base+1;
+        G.maskT=0;update(1/60);G.maskT=30;update(1/60);o.mask=G.maskT>40;
+        const g={rank:'A',st:{kills:0,takedowns:0},secretsFound:0,gems:0};run.mastery.xp=masteryXpFor(5)-10;awardMastery(g);
+        o.drop=(g.itemDrops||[]).some(d=>d.tech&&/Shadow-step/.test(d.name));
+        const rows=sheetRows();o.sheet=rows.wren.some(r=>r[0]==='Techniques'&&/Shadow-step/.test(r[1]))&&rows.wren.some(r=>r[0]==='Lockpick tier'&&r[1]==='I');
+        return o;});
+      console.log(JSON.stringify(t2));for(const k of ['livery','mask','drop','sheet'])ok(t2[k],'techniques: '+k);
       // every placed hook lands on a usable tile in its mission
       const sp=await p.evaluate(()=>{const out=[];for(const i of Object.keys(Abilities.SPOTS)){newGame();startBrief(+i);startPlay();G.cine=null;
         const want=Abilities.SPOTS[i].filter(s=>s.k!=='dark').length,got=G.ab.spots.filter(s=>s.k!=='dark').length;out.push([i,want,got]);}return out;});
