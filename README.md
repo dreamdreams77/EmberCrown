@@ -35,6 +35,10 @@ The camera follows the action close-up on every screen size and leans toward thr
 - **Saves.** Progress, talents, cinders, relics and settings persist in `localStorage` (older saves keep working). Cinders and relics are only banked when a mission is completed.
 - **Audio.** Procedural music, ambient beds per area, and combat intensity layers. No asset files.
 
+## Art trial: LPC sprites
+
+Ashfall Keep can be played with Liberated Pixel Cup pixel art for Shiloh, House Marrow's guards, the floor and the wall faces. It is on by default; switch it with **LPC art (Ashfall trial)** in the pause menu to compare with the original drawn art. These assets keep their own licences (CC-BY-SA 3.0 / GPL 3.0 and others): see [CREDITS-LPC.md](CREDITS-LPC.md).
+
 ## Project layout
 
 ```

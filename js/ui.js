@@ -88,6 +88,7 @@ const UI=(()=>{
       case'music':settings.music=!settings.music;Aud.setOpt('music',settings.music);saveSettings();refresh();break;
       case'minimap':settings.minimap=!settings.minimap;saveSettings();refresh();break;
       case'shake':settings.shake=!settings.shake;saveSettings();refresh();break;
+      case'lpc':settings.lpc=!settings.lpc;saveSettings();if(typeof G!=='undefined'&&G)G.dirty=true;refresh();break;
       case'perk1':case'perk2':case'perk3':pickPerk(+a.slice(4));break;
       case'ch1':case'ch2':case'ch3':makeChoice(+a.slice(2));break;
     }
@@ -99,7 +100,7 @@ const UI=(()=>{
   }
   function toggles(){
     const t=(k,l)=>'<button type="button" tabindex="-1" class="tog'+(settings[k]?' on':'')+'" data-a="'+k+'"><span>'+l+'</span><i>'+(settings[k]?'On':'Off')+'</i></button>';
-    return'<div class="togs">'+t('sfx','Sound effects')+t('music','Music')+t('minimap','Minimap')+t('shake','Screen shake')+'</div>';
+    return'<div class="togs">'+t('sfx','Sound effects')+t('music','Music')+t('minimap','Minimap')+t('shake','Screen shake')+t('lpc','LPC art (Ashfall trial)')+'</div>';
   }
   function howHTML(){
     return'<h2>How to play</h2><div class="howgrid">'+
