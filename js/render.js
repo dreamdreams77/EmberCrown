@@ -390,6 +390,7 @@ function bakeStatic(){
       }
     }
   }
+  if(window.TILES)TILES.pools(c);
   bakeForeground();
   G.lightsBaked=true;
 }

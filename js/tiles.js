@@ -61,6 +61,7 @@ const hash=(x,y,s)=>{let n=Math.imul(x*374761393+y*668265263+(s|0)*1442695041,12
 
 /* ---------- zones ---------- */
 function buildZones(){
+  G._roofs=null;
   const gw=G.gw,gh=G.gh,Z=Array.from({length:gh},()=>new Array(gw).fill(''));
   const list=G.d.hub?[]:(ZONES[LEVELS.indexOf(G.d)]||[]);
   for(const [k,x0,y0,x1,y1] of list)for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)if(Z[y]&&x<gw)Z[y][x]=k;
@@ -247,7 +248,7 @@ function floor(c,x,y,p,fs,th){
   const fn=ZFLOOR[z]||null;
   // pattern choice: room variant picks the room's floor, tile hash adds a few odd tiles
   const RV=ROOMV[s.floor]||[0],ft=FEAT[s.floor];
-  const pv=z?(z==='water'?(x%5===2?3:0):z==='court'?(h<.12?1:h<.2?2:0):z==='vault'?0:v%3):(ft!=null&&h<.06?ft:RV[rv%RV.length]);
+  const pv=z?(z==='water'?(x%5===2?3:0):z==='court'?(h<.12?1:h<.2?2:0):z==='vault'?0:z==='arena'?(h<.04?1:v%2?0:2):v%3):(ft!=null&&h<.06?ft:RV[rv%RV.length]);
   const id='f|'+(z||'-')+'|'+s.floor+'|'+pv+'|'+alt+'|'+(h*6|0)+(ruin?'r':'');
   const tile=spr(id,S,S,g=>{const r=mulberry((pv*131+alt*17+(h*6|0)*7+lvl*977)|0);(fn||FLOOR[s.floor]||FLOOR.flag)(g,base,r,pv,sig);
     if(ruin){g.fillStyle='rgba(20,10,6,.25)';g.fillRect(0,0,S,S);crack(g,r,.5);}});
@@ -352,8 +353,48 @@ function wallTop(g,s,p,r,v){
   else if(t==='marble'){g.fillStyle=mix(mul(wt,.8),'#c8d2e8',.2);g.fillRect(0,0,S,S);g.strokeStyle='rgba(255,255,255,.07)';g.beginPath();g.moveTo(r()*S,0);g.quadraticCurveTo(r()*S,16,r()*S,S);g.stroke();}
   g.fillStyle='rgba(0,0,0,.16)';g.fillRect(0,15,S,1);g.fillRect(15,0,1,S);
 }
+/* Ostrander's drowned town seen from the air: each solid block becomes a hipped slate roof with a verdigris ridge */
+function roofs(c,p){
+  const gw=G.gw,gh=G.gh,seen=new Set(),out=new Set();
+  for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){
+    if(G.grid[y][x]!=='#'||seen.has(x+y*256))continue;
+    const q=[[x,y]],cells=[];seen.add(x+y*256);let x0=x,x1=x,y0=y,y1=y;
+    while(q.length){const [a,b]=q.pop();cells.push([a,b]);x0=Math.min(x0,a);x1=Math.max(x1,a);y0=Math.min(y0,b);y1=Math.max(y1,b);
+      for(const [dx,dy] of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=a+dx,ny=b+dy;if(nx>=0&&ny>=0&&nx<gw&&ny<gh&&G.grid[ny][nx]==='#'&&!seen.has(nx+ny*256)){seen.add(nx+ny*256);q.push([nx,ny]);}}}
+    if(cells.length!==(x1-x0+1)*(y1-y0+1))continue; // not a plain block: leave it to the tile renderer
+    for(const [a,b] of cells)out.add(a+b*256);
+    roof(c,x0*T,y0*T,(x1-x0+1)*T,(y1-y0+1)*T,mulberry(x0*31+y0*7));
+  }
+  return out;
+}
+function roof(c,X,Y,W,H,r){
+  const sl='#4a6c72',hi='#6e9294',lo='#2c444c',cu='#7ac8b4';
+  c.fillStyle='rgba(0,10,20,.4)';c.fillRect(X+7,Y+9,W,H); // cast shadow on the water
+  c.fillStyle='#1a2a2e';c.fillRect(X-2,Y-2,W+4,H+4); // eaves
+  const ew=W>=H,hh=Math.min(W,H)/2,rx0=ew?X+hh:X+W/2,rx1=ew?X+W-hh:X+W/2,ry0=ew?Y+H/2:Y+hh,ry1=ew?Y+H/2:Y+H-hh;
+  const faces=[[[X,Y],[X+W,Y],[rx1,ry1],[rx0,ry0],hi,0],[[X+W,Y],[X+W,Y+H],[rx1,ry1],null,sl,1],[[X+W,Y+H],[X,Y+H],[rx0,ry0],[rx1,ry1],lo,2],[[X,Y+H],[X,Y],[rx0,ry0],null,mix(hi,sl,.5),3]];
+  for(const [a,b,cc,d,col,k] of faces){
+    c.save();c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.lineTo(cc[0],cc[1]);if(d)c.lineTo(d[0],d[1]);c.closePath();c.fillStyle=col;c.fill();c.clip();
+    c.strokeStyle='rgba(0,0,0,.28)';c.lineWidth=1;
+    const n=Math.ceil(hh/5)+1;for(let i=1;i<n;i++){const o=i*5;c.beginPath();
+      if(k===0){c.moveTo(X,Y+o);c.lineTo(X+W,Y+o);}else if(k===2){c.moveTo(X,Y+H-o);c.lineTo(X+W,Y+H-o);}else if(k===1){c.moveTo(X+W-o,Y);c.lineTo(X+W-o,Y+H);}else{c.moveTo(X+o,Y);c.lineTo(X+o,Y+H);}c.stroke();}
+    c.fillStyle='rgba(255,255,255,.06)';for(let i=0;i<14;i++)c.fillRect(X+r()*W,Y+r()*H,3,1.4);
+    c.fillStyle='rgba(120,160,150,.2)';for(let i=0;i<4;i++){ell(c,X+r()*W,Y+r()*H,3+r()*4,2+r()*2,r());c.fill();}
+    c.restore();
+  }
+  c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=1;c.beginPath();c.moveTo(X,Y);c.lineTo(rx0,ry0);c.lineTo(X,Y+H);c.moveTo(X+W,Y);c.lineTo(rx1,ry1);c.lineTo(X+W,Y+H);c.stroke();
+  c.strokeStyle=cu;c.lineWidth=3;c.beginPath();c.moveTo(rx0,ry0);c.lineTo(rx1,ry1);c.stroke();c.strokeStyle='rgba(220,255,240,.35)';c.lineWidth=1;c.beginPath();c.moveTo(rx0,ry0-1);c.lineTo(rx1,ry1-1);c.stroke();
+  // chimney and a lit dormer
+  const chx=X+W*(.2+r()*.5),chy=Y+H*(.15+r()*.15);c.fillStyle='rgba(0,0,0,.35)';c.fillRect(chx+3,chy+3,8,8);c.fillStyle='#5a4a40';c.fillRect(chx,chy,8,8);c.fillStyle='#120c0a';c.fillRect(chx+1.5,chy+1.5,5,5);
+  const dx=X+W*(.3+r()*.4),dy=Y+H-9;c.fillStyle='#1a2a2e';c.fillRect(dx-5,dy-4,10,8);c.fillStyle='rgba(255,210,140,.85)';c.fillRect(dx-3,dy-2,6,4);
+  c.strokeStyle='rgba(220,245,255,.25)';c.lineWidth=1.5;c.strokeRect(X-3,Y-3,W+6,H+6);
+}
 function wall(c,x,y,p,flight){
-  if(flight)return false;
+  if(flight){
+    if(key()!=='ostrander')return false;
+    if(!G._roofs){G._roofs=roofs(c,p);}
+    return G._roofs.has(x+y*256);
+  }
   reset();
   const s=st(),px=x*T,py=y*T,front=!isW(x,y+1)&&y+1<G.gh;
   if(front){
@@ -466,12 +507,18 @@ function bakeZones(c){
   for(const R of G.rooms||[]){
     const w=R.x1-R.x0+1,h=R.y1-R.y0+1,cx=(R.x0+R.x1+1)/2*T,cy=(R.y0+R.y1+1)/2*T,z=zone(Math.floor(cx/T),Math.floor(cy/T));
     if(R.n<36||w<6||h<4||R.rug<=.5||z==='arena'||OUT[z]||z==='water'||z==='cellar'||z==='dungeon'||G.d.finale)continue;
-    const rad=Math.min(w,h)*T*.32;
+    const ccx=Math.floor(cx/T),ccy=Math.floor(cy/T);let ok=true;
+    for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++)if(!G.roomOf[ccy+j]||G.roomOf[ccy+j][ccx+i]!==R.id)ok=false;
+    if(!ok)continue;
+    const rad=Math.min(w,h,4)*T*.3;
     c.fillStyle='rgba(0,0,0,.22)';circ(c,cx,cy,rad);c.fill();
     c.strokeStyle=s.ac;c.globalAlpha=.32;c.lineWidth=2;circ(c,cx,cy,rad-2);c.stroke();c.lineWidth=1;circ(c,cx,cy,rad-6);c.stroke();
     for(let i=0;i<16;i++){const a=i/16*6.283;c.beginPath();c.moveTo(cx+Math.cos(a)*(rad-6),cy+Math.sin(a)*(rad-6));c.lineTo(cx+Math.cos(a)*(rad-2),cy+Math.sin(a)*(rad-2));c.stroke();}
     emblem(c,s.em,cx,cy,rad*.55,s.ac,'#000');c.globalAlpha=1;
   }
+  // mood per zone: damp cellars, black dungeons, moonlit lawns
+  const MOOD={cellar:'rgba(8,16,10,.22)',dungeon:'rgba(0,0,0,.26)',vault:'rgba(0,0,0,.12)',water:'rgba(0,20,30,.2)'};
+  for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){const m=MOOD[zone(x,y)];if(m&&!isW(x,y)){c.fillStyle=m;c.fillRect(x*T,y*T,T,T);}}
   arenaBake(c);
   // ambient occlusion: inner corners and around pillars
   for(let y=1;y<gh-1;y++)for(let x=1;x<gw-1;x++){
@@ -482,6 +529,15 @@ function bakeZones(c){
       const g=c.createLinearGradient(0,y*T+T,0,y*T+T-8);g.addColorStop(0,'rgba(0,0,0,.35)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(x*T,y*T+T-8,T,8);}
   }
   story(c);
+}
+/* warm pools of light baked under every torch and grate, so the floor reads lit even where the darkness pass is light */
+function pools(c){
+  if(G.flight)return;
+  const s=st();c.save();c.globalCompositeOperation='lighter';
+  for(const tr of G.torches||[]){if(tr.out)continue;const col=tr.col||s.warm,sp=glowSprite(col),R=tr.small?30:tr.pipe?40:50;
+    c.globalAlpha=tr.small?.12:.16;c.drawImage(sp,tr.x-R,tr.y+(tr.small?0:18)-R*.7,R*2,R*1.4);
+    if(!tr.small&&!tr.pipe){c.globalAlpha=.14;c.drawImage(sp,tr.x-12,tr.y-10,24,26);}}
+  c.restore();
 }
 /* ---------- boss arenas ---------- */
 function arenaInfo(){
@@ -681,6 +737,6 @@ function backdrop(){
   if(typeof drawBeams==='function'){const odb=drawBeams;let warned=false;drawBeams=function(){odb();try{drawDyn();}catch(e){if(!warned){warned=true;console.error('tiles',e);}ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}};}
 })();
 
-return{floor,wall,bakeZones,buildZones,zone,fg,lights,emblem,bannerSprite,arenaInfo,style:st,key,HS,ZONES,stats:()=>({cached:cache.size,made})};
+return{floor,wall,pools,bakeZones,buildZones,zone,fg,lights,emblem,bannerSprite,arenaInfo,style:st,key,HS,ZONES,stats:()=>({cached:cache.size,made})};
 })();
 window.TILES=TILES;
