@@ -11,7 +11,7 @@ function theme(){
   return Object.assign({},LEVELS[1].th,{amb:[26,16,12,.20],grade:'rgba(255,170,90,.08)',part:'dust',tapestry:0,rack:0,shelf:0,tablecloth:false,wine:false,statueGold:false,
     chains:0,web:0,bones:0,banner:0,torch:.10,wood:'#6a4a30',stone:'#8a7a68',bg:'dusk',music:{root:82,mode:'lydian',tempo:.55}});
 }
-const LEVEL={hub:true,name:'The Rookery',house:'The Rookery',sigil:'hallow',map:HUBMAP,guards:[],gadgets:{smoke:0,bell:0,flute:0},opening:'',intro:[],next:1,th:null};
+const LEVEL={hub:true,name:'The Rookery',house:'The Rookery',sigil:'hallow',map:HUBMAP,guards:[],gadgets:{smoke:0,bell:0,flute:0},opening:'',intro:[],next:1,th:null,pal:{f1:'#3a2a20',f2:'#3e2d22',w:'#5a4232',wt:'#74563f'}};
 const S=()=>{NPC.ensureRun();return run.npc;};
 const hs=()=>S().hub;
 const aff=id=>S().aff[id]||0;

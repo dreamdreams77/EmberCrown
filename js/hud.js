@@ -44,7 +44,7 @@ function icon(c,name,x,y,s,col,dim){
 function objectiveLines(){
   const L=[];
   for(const t of['L','H','C','O','P','B','W']){
-    const l=G.d.labels[t];if(!l)continue;
+    const l=(G.d.labels||{})[t];if(!l)continue;
     let its,n,done;
     if(t==='W'){done=!!G.boss.dead;its=[0];n=done?1:0;}
     else{its=G.items.filter(i=>i.type===t);n=its.filter(i=>i.done).length;done=n===its.length;}
