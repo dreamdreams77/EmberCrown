@@ -304,7 +304,7 @@ const UI=(()=>{
   function tick(force){
     if(mode!=='play'||!G)return;
     const wr=G.active==='wren';
-    const st=[wr,G.ash.on,G.flight,G.gad.smoke,G.gad.bell,G.gad.flute,G.dash.ch,G.nova.cd>0,touch.sneak,G.exitOpen,hasT('nova')].join();
+    const st=[wr,G.ash.on,G.flight,!!G.d.hub,G.gad.smoke,G.gad.bell,G.gad.flute,G.dash.ch,G.nova.cd>0,touch.sneak,G.exitOpen,hasT('nova')].join();
     if(!force&&st===T_.last)return;T_.last=st;
     const set=(a,dis,badge,label)=>{
       const b=document.querySelector('#btns [data-act="'+a+'"]');if(!b)return;
@@ -321,7 +321,7 @@ const UI=(()=>{
     set('flute',!wr||G.gad.flute<=0||G.flight,G.gad.flute>50?'♪':G.gad.flute);
     const sh=document.querySelector('#btns [data-act="shift"]');
     if(sh){sh.querySelector('span').textContent=wr?'SNEAK':'DASH';sh.classList.toggle('dis',!wr&&G.dash.ch<=0);sh.classList.toggle('latched',wr&&touch.sneak);}
-    document.querySelectorAll('#btns .gad').forEach(g=>g.style.display=G.flight?'none':'');
+    document.querySelectorAll('#btns .gad').forEach(g=>g.style.display=G.flight||G.d.hub?'none':'');
   }
   /* ---------- mouse on canvas ---------- */
   function bindMouse(){

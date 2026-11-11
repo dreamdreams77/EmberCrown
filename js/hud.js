@@ -256,7 +256,7 @@ function drawHud(){
     chip('Shiloh','#c8b4ff',wr,true,()=>{if(!wr)swapChar();});
     chip('Ashling','#ff9a4a',!wr,G.ash.on&&!G.flight||G.flight,()=>{if(wr&&G.ash.on)swapChar();});
     bx+=gap;
-    if(!G.flight){
+    if(!G.flight&&!G.d.hub){
       slot('Smoke','Q','smoke','#cfd6e6',G.gad.smoke,wr&&G.gad.smoke>0,useSmoke);
       slot('Bell','R','bell','#f0b44c',G.gad.bell,wr&&G.gad.bell>0,useBell);
       slot('Flute','F','flute','#9fd8ff',G.gad.flute>50?'Song':G.gad.flute,wr&&G.gad.flute>0,useFlute);
