@@ -188,14 +188,52 @@ const OUT=process.env.EC_OUT||'.';
     const out={};
     for(let L=0;L<7;L++){
       const G=T_(L);adv(30);
+      if(!G.flight&&L<=3){ // every objective and the exit stay reachable on foot without any optional mechanism (doors may be picked)
+        const sx=tile(G.wren),seen=new Set([sx[0]+sx[1]*256]),q=[sx];
+        const pass=(x,y)=>x>=0&&y>=0&&x<G.gw&&y<G.gh&&(G.doors[x+','+y]||!blocked(x*32+16,y*32+16,8));
+        while(q.length){const [x,y]=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+ny*256;if(!seen.has(k)&&pass(nx,ny)){seen.add(k);q.push([nx,ny]);}}}
+        const need=[...G.items.filter(i=>'OPBLHC'.includes(i.type)),G.exit].map(o=>tile(o));
+        ok('reach'+L,need.every(([x,y])=>seen.has(x+y*256)));
+      }
       for(const it of G.items)if('OPBLHC'.includes(it.type))it.done=true;if(G.boss)G.boss.dead=true;if(G.host){G.host.on=true;}
       const A=G.flight?G.ash:G.wren;G.active=G.flight?'ash':'wren';A.x=G.exit.x;A.y=G.exit.y;if(G.host){G.host.x=A.x;G.host.y=A.y;}
       adv(20);
-      out[L]=(LEVELS[L].mech?'mech ':'')+__ec.mode+(G.cine?':cine':'');
-      ok('done'+L,__ec.mode==='choice'||(G.cine&&G.cine.kind==='exit')||__ec.mode==='win'||!!G.cine);
+      for(let i=0;i<40&&__ec.mode==='play';i++){adv(10);if(G.cine&&typeof skipCine==='function'&&i>20)skipCine();}
+      out[L]=(LEVELS[L].mech?'mech ':'')+__ec.mode;
+      ok('done'+L,__ec.mode==='choice'||__ec.mode==='win');
     }
     return out;});
   console.log('complete',JSON.stringify(comp));
+  // ---------------- phone landscape: Ashling's ACT works his levers, HUD labels fit ----------------
+  const ph=await b.newContext({viewport:{width:740,height:360},hasTouch:true,isMobile:true});const pp=await ph.newPage();
+  pp.on('pageerror',e=>errs.push('phone PAGEERR '+e.message));
+  await pp.goto('http://localhost:8123/index.html');await pp.waitForTimeout(400);
+  const phone=await pp.evaluate(()=>{
+    newGame();startBrief(0);startPlay();G.cine=null;G.grace=99;G.iris=null;
+    const egg=G.items.find(i=>i.type==='O');completeTarget({kind:'item',ref:egg});
+    G.active='ash';G.ash.x=9*32+16;G.ash.y=10*32+16;for(let i=0;i<3;i++)update(1/60);
+    novaPress();for(let i=0;i<60;i++)update(1/60);touch.act=false;for(let i=0;i<3;i++)update(1/60);
+    return{gate:!solidTile(5,8),nova:G.nova.cd};});
+  console.log('phone',JSON.stringify(phone));
+  await p.evaluate(()=>{});
+  const okPhone=phone.gate;
+  await pp.evaluate(()=>{newGame();startBrief(1);startPlay();G.cine=null;G.grace=99;G.iris=null;const M=G.mis;G.wren.x=5*32+16;G.wren.y=7*32+16;M.dis.on=true;M.ch.st='run';M.ch.t=12;camUpdate(0,true);});
+  await pp.waitForTimeout(300);await pp.screenshot({path:OUT+'/misa_phone_gallow.png'});
+  await pp.evaluate(()=>{newGame();startBrief(2);startPlay();G.cine=null;G.grace=99;G.iris=null;camUpdate(0,true);});
+  await pp.waitForTimeout(300);await pp.screenshot({path:OUT+'/misa_phone_spire.png'});
+  // canvas cost: draw calls per frame in the busiest mechanic views versus the same level without its mech table
+  const cost=await pp.evaluate(async()=>{
+    const cnt={n:0},C2=CanvasRenderingContext2D.prototype,names=['fillRect','fill','stroke','drawImage','fillText','arc','ellipse'];
+    const orig={};for(const n of names){orig[n]=C2[n];C2[n]=function(){cnt.n++;return orig[n].apply(this,arguments);};}
+    const measure=async(L,x,y,strip)=>{newGame();startBrief(L);startPlay();G.cine=null;G.grace=99;G.iris=null;if(strip)G.mis=null;
+      const A=G.flight?G.ash:G.wren;A.x=x*32+16;A.y=y*32+16;camUpdate(0,true);await new Promise(r=>setTimeout(r,150));
+      cnt.n=0;const f0=__ec.PERF.n;await new Promise(r=>setTimeout(r,500));return Math.round(cnt.n/Math.max(1,__ec.PERF.n-f0));};
+    const o={};
+    for(const [L,x,y] of [[0,18,18],[1,27,2],[2,12,7],[3,20,18]]){o[L]=[await measure(L,x,y,false),await measure(L,x,y,true)];}
+    for(const n of names)C2[n]=orig[n];return o;});
+  console.log('canvas calls per frame (with mech, without)',JSON.stringify(cost));
+  if(!okPhone)console.log('FAIL phone: Ashling ACT on touch');
+  await ph.close();
   const r=await p.evaluate(()=>res);
   const bad=Object.entries(r).filter(([k,v])=>v!=='ok').map(([k])=>k);
   console.log(bad.length?'FAIL checks: '+bad.join(' '):'all mechanic checks passed');

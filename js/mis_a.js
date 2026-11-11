@@ -136,13 +136,13 @@ findTarget=function(A){
 };
 const oComplete=completeTarget;
 completeTarget=function(t){
-  if(t&&t.kind==='mech'){activate(t);return;}
+  M=G&&G.mis;if(t&&t.kind==='mech'){activate(t);return;}
   const s=G&&G.mis;
   if(s&&s.dis&&s.dis.on&&t&&t.kind==='item'&&seenBy(G.wren))blow('Caught in the act.');
   oComplete(t);
   if(s&&t&&t.kind==='item'&&s.m.events&&s.m.events[t.ref.type])applyFx(s.m.events[t.ref.type],t.ref);
 };
-if(typeof novaPress==='function'){const oNova=novaPress;novaPress=function(){const s=G&&G.mis;if(s&&G.active==='ash'&&!G.flight&&mechTarget(G.ash,'ash')){touch.act=true;s.novaBlock=true;return;}return oNova();};}
+if(typeof novaPress==='function'){const oNova=novaPress;novaPress=function(){const s=M=G&&G.mis;if(s&&G.active==='ash'&&!G.flight&&mechTarget(G.ash,'ash')){touch.act=true;s.novaBlock=true;return;}return oNova();};}
 const oUpdate=update;
 update=function(dt){
   // in these missions the two work apart: the idle partner stays where it was left instead of being yanked along by the tether
@@ -561,10 +561,14 @@ collectLights=function(){
 };
 
 /* ---------------- drawing: floor layer (before characters, under the darkness) ---------------- */
-function vis(x,y,m){const v=viewRect();m=m||40;return x>v.x-m&&x<v.x+v.w+m&&y>v.y-m&&y<v.y+v.h+m;}
+let VR=null;
+function vis(x,y,m){const v=VR||viewRect();m=m||40;return x>v.x-m&&x<v.x+v.w+m&&y>v.y-m&&y<v.y+v.h+m;}
+/* static pieces are drawn once into small offscreen sprites (2x) and stamped */
+const SPR=new Map();
+function spr(key,fn){let cv=SPR.get(key);if(!cv){cv=document.createElement("canvas");cv.width=cv.height=T*2;const g=cv.getContext("2d");g.scale(2,2);fn(g);SPR.set(key,cv);}return cv;}
 const oPots=drawPots;
 drawPots=function(){oPots();const s=G&&G.mis;if(!s)return;ctx.save();try{drawFloor(s);}catch(e){console.error(e);}ctx.restore();};
-function drawFloor(s){
+function drawFloor(s){VR=viewRect();M=s;
   const c=ctx,t=G.time;
   for(const o of s.oil)if(vis((o.x+o.w/2)*T,(o.y+o.h/2)*T,o.w*T))drawOil(c,o,t);
   for(const P of s.pitT.values())drawPit(c,P,s);
@@ -585,7 +589,8 @@ function drawFloor(s){
     for(const f of s.air.gulls)if(f.st==='sit'&&vis(f.x,f.y))drawGullsSit(c,f,t);}
 }
 function ink(c,w){c.strokeStyle=INK;c.lineWidth=w||1.2;c.stroke();}
-function plateTile(c,x,y,trap,lit){
+function plateTile(c,x,y,trap,lit){c.drawImage(spr("pl"+(trap?1:0)+(lit?1:0),g=>plateRaw(g,0,0,trap,lit)),x,y,T,T);}
+function plateRaw(c,x,y,trap,lit){
   c.fillStyle='#3e3a44';c.fillRect(x+3,y+3,T-6,T-6);
   const g=c.createLinearGradient(x,y,x+T,y+T);g.addColorStop(0,'#6a6472');g.addColorStop(1,'#4a4552');
   c.fillStyle=g;c.fillRect(x+4,y+4,T-8,T-9);
@@ -605,7 +610,8 @@ function drawPlate(c,p,t){
   c.restore();
   if(p.kind==='dart'){c.fillStyle=INK;for(let i=0;i<3;i++){circ(c,x+1,y+10+i*6,1.4);c.fill();}}
 }
-function drawRot(c,r,t){
+function drawRot(c,r,t){c.drawImage(spr("rot"+r.st,g=>rotRaw(g,{x:0,y:0,st:r.st})),r.x*T,r.y*T,T,T);}
+function rotRaw(c,r){
   const x=r.x*T,y=r.y*T;
   if(r.st===2){
     const g=c.createRadialGradient(x+16,y+16,2,x+16,y+16,18);g.addColorStop(0,'#000');g.addColorStop(1,'#1a120c');
@@ -628,9 +634,16 @@ function drawPit(c,P,s){
   if(!P.set)P.set=new Set(P.tiles.map(([x,y])=>K(x,y)));
   const has=(x,y)=>P.set.has(K(x,y));
   for(const [x,y] of P.tiles){
-    if(!vis(C(x),C(y)))continue;const X=x*T,Y=y*T;
+    if(!vis(C(x),C(y)))continue;
+    const mk=(has(x,y-1)?1:0)|(has(x-1,y)?2:0)|(has(x+1,y)?4:0)|(has(x,y+1)?8:0),br=P.bridged.some(q=>q[0]===x&&q[1]===y);
+    c.drawImage(spr('pit'+mk+(br?'b':''),g=>pitTile(g,mk,br)),x*T,y*T,T,T);
+  }
+}
+function pitTile(c,mk,br){
+  const x=0,y=0,P={bridged:br?[[0,0]]:[]},has=(a,b)=>!!(mk&(b<0?1:a<0?2:a>0?4:8));
+  {const X=0,Y=0;
     c.fillStyle='#030205';c.fillRect(X,Y,T,T);
-    const m=c.createLinearGradient(X,Y,X,Y+T);m.addColorStop(0,'rgba(90,80,130,.04)');m.addColorStop(1,'rgba(90,80,130,'+(.12+.05*Math.sin(G.time*1.1+x*.7+y))+')');
+    const m=c.createLinearGradient(X,Y,X,Y+T);m.addColorStop(0,'rgba(90,80,130,.04)');m.addColorStop(1,'rgba(90,80,130,.14)');
     c.fillStyle=m;c.fillRect(X,Y,T,T);
     if(!has(x,y-1)){ // the far wall of the chasm, falling away into the dark
       const f=c.createLinearGradient(X,Y,X,Y+14);f.addColorStop(0,'#4a4456');f.addColorStop(1,'rgba(20,16,26,0)');
@@ -733,7 +746,8 @@ function drawNote(c,n,t){
   c.strokeStyle='rgba(30,24,36,.9)';c.lineWidth=1;for(let i=0;i<4;i++){c.beginPath();c.moveTo(x-5,y-6+i*4);c.lineTo(x+5-(i%2)*3,y-6+i*4);c.stroke();}
   if(!n.read){c.strokeStyle='rgba(190,220,255,'+(.3+.25*Math.sin(t*2.5))+')';c.lineWidth=1;rr(c,x-11,y-14,22,26,4);c.stroke();}
 }
-function drawBell(c,b,t,B){
+function drawBell(c,b,t,B){if(b.ring<=0){c.drawImage(spr('bell'+b.n,g=>bellRaw(g,{x:0,y:0,n:b.n,ring:0},0)),b.x*T,b.y*T,T,T);return;}bellRaw(c,b,t);}
+function bellRaw(c,b,t){
   const x=C(b.x),y=C(b.y),sz=5+b.n*1.6,sw=Math.sin(t*20)*b.ring*.35;
   shadowAt(x+1,y+11,13,4,.3);
   c.fillStyle='#4a3424';c.fillRect(x-12,y-14,3,24);c.fillRect(x+9,y-14,3,24);c.fillRect(x-12,y-15,24,3);
@@ -827,15 +841,15 @@ function drawBallista(c,b,t){
     if(dz){c.fillStyle='#ffe0a0';c.font='7px serif';c.fillText('z',cx+4,cy-6-Math.sin(t*3)*2);}}
 }
 function drawGullsSit(c,f,t){
-  for(const b of f.birds){const x=f.x+b.ox,y=f.y+b.oy+Math.sin(t*2+b.ph)*1.2;
-    c.fillStyle='#e8ecf0';c.beginPath();c.ellipse(x,y,4,2.6,0,0,6.283);c.fill();c.strokeStyle=INK;c.lineWidth=.8;c.stroke();
-    c.fillStyle='#8a929a';c.fillRect(x-3,y-1,4,1.4);c.fillStyle='#f0c040';c.fillRect(x+3.4,y-.6,2,1);}
+  const bird=spr('gull',g=>{const x=16,y=16;g.fillStyle='#e8ecf0';g.beginPath();g.ellipse(x,y,4,2.6,0,0,6.283);g.fill();g.strokeStyle=INK;g.lineWidth=.8;g.stroke();
+    g.fillStyle='#8a929a';g.fillRect(x-3,y-1,4,1.4);g.fillStyle='#f0c040';g.fillRect(x+3.4,y-.6,2,1);});
+  for(const b of f.birds)c.drawImage(bird,f.x+b.ox-16,f.y+b.oy+Math.sin(t*2+b.ph)*1.2-16,T,T);
 }
 
 /* ---------------- drawing: overlay (after characters) ---------------- */
 const oRings=drawRings;
 drawRings=function(){oRings();const s=G&&G.mis;if(!s)return;ctx.save();try{drawOver(s);}catch(e){console.error(e);}ctx.restore();};
-function drawOver(s){
+function drawOver(s){VR=viewRect();M=s;
   const c=ctx,t=G.time;
   // the drain grates sit over Ashling while he crawls
   for(const d of s.ducts)for(const [x,y] of d.tiles){if(Math.abs(G.ash.x-C(x))<24&&Math.abs(G.ash.y-C(y))<24&&vis(C(x),C(y)))drawGrate(c,x*T,y*T,true,true);}
