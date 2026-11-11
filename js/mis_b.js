@@ -524,6 +524,7 @@ M[6]={
     if(s.gateOpen&&s.bellCd<=0){const b=ctr(...CR.bell);L.push(tg('bell','Ring the Hallow bell',.6,b.x,b.y,ringBell,36));}
     return L;
   },
+  first(){return !G.mb.gateOpen;},
   lines(){
     const s=G.mb,L=[];
     L.push({text:'Sabotage the candle supply',done:!!s.sab});
@@ -634,7 +635,7 @@ wrap('completeTarget',o=>function(t){if(t&&t.kind==='mb'){t.fn();return;}return 
 wrap('shiftTime',o=>function(){const toRuin=G.state==='ball';o();const m=mod();if(m&&m.shift)m.shift(toRuin);});
 wrap('swapChar',o=>function(){const s=S();if(s&&s.anchor)return;return o();});
 wrap('candleSnuffed',o=>function(B){o(B);const s=S();if(s&&s.sab==='wick'&&B&&B.st==='stagger'){B.t+=1.2;B.stg=Math.max(B.stg||0,B.t);}});
-wrap('objectiveLines',o=>function(){const L=o();const m=mod();if(m&&m.lines&&!(G.d&&G.d.hub))try{for(const l of m.lines())L.push(l);}catch(e){}return L;});
+wrap('objectiveLines',o=>function(){const L=o();const m=mod();if(m&&m.lines&&!(G.d&&G.d.hub))try{const X=m.lines();return m.first&&m.first()?X.concat(L):L.concat(X);}catch(e){}return L;});
 wrap('drawBeams',o=>function(){o();const m=mod();if(m&&m.drawFloor){ctx.save();m.drawFloor(ctx);ctx.restore();}});
 wrap('drawPrompt',o=>function(){const m=mod();if(m&&m.drawTop){ctx.save();m.drawTop(ctx);ctx.restore();}o();});
 

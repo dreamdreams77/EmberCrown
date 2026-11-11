@@ -46,7 +46,7 @@ for(const id in LOREX){const L=typeof LORE!=='undefined'&&LORE[BASE[id]];if(L)fo
 
 const DUNGEONS={
  undercroft:{name:'The Kest Undercroft',sigil:'kest',base:4,opening:'Ore carts and pressure plates. Kest kept its oldest secrets under its weight.',
-  plates:[[9,2],[17,2],[13,6]],carts:[[13,4],[10,5]],
+  plates:[[10,2],[16,2],[13,6]],carts:[[13,4],[10,5]],
   chal:{at:[13,10],label:'Strike the anvil',kind:'waves',limit:75,waves:[['cinder','cinder'],['mite','wisp','cinder'],['husk','cinder']],reward:'undertongs'},
   insp:[[16,6,'Weighing Plates','Three plates, two thieves, one cart. Kest trusted nothing that could not be weighed.']]},
  mirrors:{name:'The Mirror Cellars',sigil:'dunmoor',base:5,opening:'Moonlight through a grate, and mirrors turned to the wall. Point the light.',
