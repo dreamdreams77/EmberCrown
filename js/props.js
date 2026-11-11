@@ -347,7 +347,7 @@ function bakeForeground(){
     if(G.grid[y][x]!=='.')continue;
     const px=x*T,py=y*T;
     const gapNS=isW(x-1,y)&&isW(x+1,y)&&!isW(x,y-1)&&!isW(x,y+1);
-    if(gapNS){ // stone lintel across a north-south doorway
+    if(gapNS&&!window.TILES){ // stone lintel across a north-south doorway
       const g=c.createLinearGradient(0,py,0,py+14);g.addColorStop(0,sh(p.wt,1.05));g.addColorStop(1,sh(p.w,.7));
       c.fillStyle=g;c.fillRect(px-2,py,T+4,9);
       c.fillStyle='rgba(0,0,0,.45)';c.fillRect(px-2,py+9,T+4,2);
@@ -361,6 +361,7 @@ function bakeForeground(){
       c.fillStyle='rgba(0,0,0,.35)';c.fillRect(px,py,T,3);
     }
   }
+  if(window.TILES)TILES.fg(c);
   // rafters in timbered halls
   if(th.rafters&&G.state!=='ruin'){
     for(let y=0;y<gh;y++){
@@ -368,7 +369,7 @@ function bakeForeground(){
       let x0=-1;
       for(let x=0;x<=gw;x++){
         const inV=G.d.vault&&(()=>{const a=G.d.vault.rect;return x>=Math.min(a[0],a[2])-1&&x<=Math.max(a[0],a[2])+1&&y>=Math.min(a[1],a[3])-1&&y<=Math.max(a[1],a[3])+1;})();
-        const ok=x<gw&&G.grid[y][x]==='.'&&!G.doors[x+','+y]&&!inV&&G.grid[y-1]&&G.grid[y+1];
+        const ok=x<gw&&G.grid[y][x]==='.'&&!(window.TILES&&/court|yard|battle|arena/.test(TILES.zone(x,y)))&&!G.doors[x+','+y]&&!inV&&G.grid[y-1]&&G.grid[y+1];
         if(ok&&x0<0)x0=x;
         if(!ok&&x0>=0){
           if(x-x0>=5&&x-x0<=13){
@@ -607,6 +608,7 @@ function autoRugs(c,th,rnd){
   for(const R of G.rooms){
     const w=R.x1-R.x0+1,h=R.y1-R.y0+1;
     if(R.n<16||w<4||h<3||R.rug>.5)continue;
+    if(window.TILES&&/court|yard|battle|water|cellar|dungeon|arena/.test(TILES.zone(Math.round((R.x0+R.x1)/2),Math.round((R.y0+R.y1)/2))))continue;
     const rw=Math.min(w-2,7),rh=Math.min(h-2,3);if(rw<2||rh<1)continue;
     const rx=R.x0+Math.floor((w-rw)/2),ry=R.y0+Math.floor((h-rh)/2);
     let ok=true;
