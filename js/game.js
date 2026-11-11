@@ -112,7 +112,7 @@ function continueGame(){
   const r=s.run;diff=r.diff;perks=r.stairs||(r.perk?{1:Math.max(0,['bribe','blackmail','poison'].indexOf(r.perk))}:{});houses=r.houses;
   stats.gems=r.stats.gems;stats.caught=r.stats.caught;stats.time=r.stats.time;stats.byLvl=r.stats.byLvl.slice();
   run.relics=(r.relics||[]).slice();run.lore=(r.lore||[]).slice();run.ranks=r.ranks||{};run.secrets=r.secrets||{};run.talents=(r.talents||[]).slice();run.cinders=r.cinders||0;run.disc=(r.disc||[]).slice();run.items=(r.items||[]).slice();run.equipped=Object.assign({},r.equipped);run.mastery={xp:(r.mastery&&r.mastery.xp)||0};run.quests=r.quests||{};run.npc=r.npc||{flags:{}};runStage={stage:r.stage,next:r.next};
-  if(r.stage==='court'){lvl=Math.max(0,r.next-1);setMode('court');}else startBrief(r.next);
+  if(r.stage==='court'){lvl=Math.max(0,r.next-1);setMode('court');}else if(r.stage==='hub'&&window.Hub&&Hub.enter(r.next)){}else startBrief(r.next);
   return true;
 }
 function newGame(){
@@ -221,7 +221,8 @@ function shiftTime(){
 
 /* ---------- level loading ---------- */
 function loadLevel(i){
-  const d=LEVELS[i];
+  const hubL=typeof i==='object'?i:null;if(hubL)i=-1; // the Rookery (js/hub.js) reuses the level engine
+  const d=hubL||LEVELS[i];
   const g={d,grid:[],items:[],doors:{},cracks:{},smoke:[],rings:[],active:'wren',alert:0,hold:0,holdT:null,
     time:0,gems:0,msg:null,msgT:0,fireSaid:false,doneSaid:false,sneak:false,gad:{...d.gadgets},exitOpen:false,flight:!!d.flight,vents:[],peds:[],ventSaid:false,gain:1,choice:null,outLines:[],
     host:d.choice?{x:0,y:0,on:false,host:true,face:0,ph:0}:null,
@@ -354,7 +355,7 @@ function continueFromWin(){
   if(lvl+1<LEVELS.length)setMode('court');
   else setMode('end');
 }
-function pickPerk(k){ if(mode!=='court'||!STAIRS[lvl+1]||k<1||k>3)return; perks[lvl+1]=k-1;writeSave('brief',lvl+1);startBrief(lvl+1); }
+function pickPerk(k){ if(mode!=='court'||!STAIRS[lvl+1]||k<1||k>3)return; perks[lvl+1]=k-1;writeSave('brief',lvl+1);if(window.Hub&&Hub.enter(lvl+1))return;startBrief(lvl+1); }
 function pauseGame(on){
   if(on&&mode==='play'){setMode('pause');Aud.fire(false);}
   else if(!on&&mode==='pause'){setMode('play');}
@@ -969,6 +970,7 @@ function update(dt){
   if(G.loreCard){G.loreCard.t-=dt;if(G.loreCard.t<=0)G.loreCard=null;}
   if(G.flash){G.flash.t-=dt;if(G.flash.t<=0)G.flash=null;}
   if(G.shiftT>0)G.shiftT-=dt;
+  if(G.d.hub){if(window.Hub)Hub.tick(dt);return;}
   // exit
   const req=G.items.filter(i=>'OPBLHC'.includes(i.type));
   G.exitOpen=req.every(i=>i.done)&&(!G.boss||G.boss.dead);

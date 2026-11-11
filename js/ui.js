@@ -72,11 +72,12 @@ const UI=(()=>{
       case'new':if(saved&&!confirmNew){confirmNew=true;show('title');return;}confirmNew=false;newGame();break;
       case'continue':continueGame();break;
       case'begin':startPlay();break;
+      case'hub':if(window.Hub)Hub.enter(lvl);break;
       case'retry':startPlay();break;
       case'next':continueFromWin();break;
       case'title':if(mode==='pause'&&!confirmQuit){confirmQuit=true;show('pause');return;}confirmQuit=false;toTitle();break;
       case'resume':pauseGame(false);break;
-      case'restart':pauseGame(false);startPlay();break;
+      case'restart':pauseGame(false);if(G&&G.d.hub){Hub.leave();break;}startPlay();break;
       case'how':openModal(howHTML());break;
       case'codex':openJournal('codex');break;
       case'case':openJournal('case');break;
@@ -176,7 +177,7 @@ const UI=(()=>{
       title(){
         const next=saved&&saved.run?saved.run.next:0;
         const cont=saved&&saved.run;
-        const label=cont?(saved.run.stage==='court'?'The Back Stairs':'Mission '+(next+1)+': '+LEVELS[next].name):'';
+        const label=cont?(saved.run.stage==='court'?'The Back Stairs':saved.run.stage==='hub'?'The Rookery':'Mission '+(next+1)+': '+LEVELS[next].name):'';
         screen('title','<div class="logo"><div class="crown">'+sigil('hallow')+'</div><h1>EMBERCROWN</h1><p class="tag">A spy. A runt dragon. Seven feuding houses. One engineered war.</p></div>'+
         '<div class="menu">'+(cont?btn('Continue<small>'+label+'</small>','continue','primary big')+btn(confirmNew?'Tap again: erase save':'New Game','new','ghost'):btn('Begin','new','primary big'))+
         '<div class="diffrow"><span>Difficulty</span>'+diffChips()+'</div><p class="blurb">'+DIFFS[diff].blurb+'</p>'+
@@ -189,7 +190,7 @@ const UI=(()=>{
         let fin='';if(d.finale){const hc=houseCounts();fin='<div class="stand"><span>Favor sends +'+Math.min(3,hc.f)+' whisper bells &middot; Fear stands down '+Math.min(3,hc.e)+' guards &middot; Ruin: he starts at '+(100-8*hc.r)+' HP</span></div>';}
         const rel=run.relics.length?'<div class="relrow">'+run.relics.map(k=>'<span title="'+RELICS[k].name+'">'+ricon(RELICS[k].icon)+'</span>').join('')+'</div>':'';
         screen('brief','<div class="bleft">'+sigil(d.sigil)+'<div class="mnum">Mission '+(lvl+1)+' of '+LEVELS.length+'</div><h2>'+d.name+'</h2><div class="house">'+d.house+'</div>'+rel+'</div>'+
-        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+(window.NPC?NPC.briefHtml(lvl):'')+btn('Begin mission','begin','primary big')+'<div class="row">'+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+btn('Gear &amp; hero','journal','ghost small')+(lvl>0?btn('Case file','case','ghost small'):'')+'</div><p class="foot">press <kbd>Enter</kbd> &middot; <kbd>J</kbd> journal</p></div>');
+        '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+(window.NPC?NPC.briefHtml(lvl):'')+btn('Begin mission','begin','primary big')+'<div class="row">'+(window.Hub&&Hub.canVisit(lvl)?btn('The Rookery','hub','ghost small'):'')+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+btn('Gear &amp; hero','journal','ghost small')+(lvl>0?btn('Case file','case','ghost small'):'')+'</div><p class="foot">press <kbd>Enter</kbd> &middot; <kbd>J</kbd> journal</p></div>');
       },
       court(){
         const st=STAIRS[lvl+1];if(!st){startBrief(lvl+1);return;}
@@ -229,7 +230,7 @@ const UI=(()=>{
         '<div class="row">'+btn('Retry mission','retry','primary big')+btn('Quit to title','title','ghost')+'</div><p class="foot">press <kbd>Enter</kbd></p>');
       },
       pause(){
-        screen('pause over','<h2>Paused</h2><div class="menu">'+btn('Resume','resume','primary big')+btn('Restart mission','restart','ghost')+
+        screen('pause over','<h2>Paused</h2><div class="menu">'+btn('Resume','resume','primary big')+btn(G&&G.d.hub?'Go to the briefing':'Restart mission','restart','ghost')+
         '<div class="row">'+btn('Journal <kbd>J</kbd>','journal','primary small')+btn('How to play','how','ghost small')+'</div>'+toggles()+
         btn(confirmQuit?'Tap again: quit to title':'Quit to title','title','ghost small')+'</div>');
       },

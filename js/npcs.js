@@ -8,7 +8,7 @@ NPCDATA.forEach((L,i)=>(L.quests||[]).forEach(q=>{q.lvl=i;q.house=L.house;QDEF[q
 const HOUSE_LABEL={marrow:'Marrow',grell:'Grell',ostrander:'Ostrander',sable:'Sable',kest:'Kest',dunmoor:'Dunmoor',hallow:'Hallow'};
 let el=null;
 
-function ensureRun(){ if(!run.quests)run.quests={}; if(!run.npc)run.npc={flags:{}}; if(!run.npc.flags)run.npc.flags={}; }
+function ensureRun(){ if(!run.quests)run.quests={}; if(!run.npc)run.npc={flags:{}}; if(!run.npc.flags)run.npc.flags={}; if(!run.npc.aff)run.npc.aff={}; if(!run.npc.chains)run.npc.chains={}; if(!run.npc.docs)run.npc.docs=[]; if(!run.npc.hub)run.npc.hub={}; }
 /* ---------- standing ---------- */
 function stand(house){
   const h=houses[house];let f,e,r;
@@ -17,18 +17,23 @@ function stand(house){
   const m=Math.max(f,e,r);if(m<=0)return 'none';
   return e===m?'fear':f===m?'favor':'ruin';
 }
-function priceMul(nq){return nq.st==='favor'?.7:nq.st==='fear'?1.25:nq.st==='ruin'?.7:1;}
+function priceMul(nq){let m=nq.st==='favor'?.7:nq.st==='fear'?1.25:nq.st==='ruin'?.7:1;if(nq.hub&&window.Hub&&G.talk)m*=Hub.priceMul(G.talk.npc.id);return m;}
 function avail(){return (G.cinders||0)+(run.cinders||0)-(G.nq?G.nq.debt:0);}
 /* ---------- conditions ---------- */
 function cond(s,nq){
   if(!s)return true;nq=nq||G.nq;
   return s.split('&').every(tok=>{
     tok=tok.trim();let neg=false;if(tok[0]==='!'){neg=true;tok=tok.slice(1);}
-    const i=tok.indexOf(':'),k=tok.slice(0,i),v=tok.slice(i+1);let r=false;
+    const i=tok.indexOf(':'),k=i<0?'':tok.slice(0,i),v=tok.slice(i+1);let r=false;
     if(k==='st')r=nq.st===v;
     else if(k==='flag')r=!!(run.npc.flags[v]||nq.nf[v]);
     else if(k==='tmp')r=!!nq.tmp[v];
     else if(k==='cin')r=avail()>=+v;
+    else if(k==='aff'){const m=v.match(/^(\w+)(>=|<=)(-?\d+)$/);if(m){const a=(run.npc.aff||{})[m[1]]||0;r=m[2]==='>='?a>=+m[3]:a<=+m[3];}}
+    else if(k==='ch'){const m=v.match(/^(\w+)(>=|=)(\w+)$/);if(m){const c=(run.npc.chains||{})[m[1]],sv=m[3];
+      if(m[2]==='>=')r=!!c&&(c.st==='done'||c.st==='active'&&c.s>=+sv);
+      else if(sv==='none')r=!c;else if(sv==='active'||sv==='done'||sv==='failed')r=!!c&&c.st===sv;else r=!!c&&c.st==='active'&&c.s===+sv;}}
+    else if(/^lv[<>=]/.test(tok)){const m=tok.match(/^lv(>=|<=|=)(\d+)$/),L=nq.hub?nq.next:nq.i;if(m)r=m[1]==='>='?L>=+m[2]:m[1]==='<='?L<=+m[2]:L===+m[2];}
     else if(k==='q'){
       const m=v.match(/^(\w+)(>=|=)(\w+)$/);if(m){const qs=nq.q[m[1]],sv=m[3];
         if(m[2]==='='){ if(sv==='none')r=!qs; else if(sv==='active')r=!!qs&&qs.state==='active'; else if(sv==='done'||sv==='failed')r=!!qs&&qs.state===sv; else r=!!qs&&qs.state==='active'&&qs.step===+sv; }
@@ -40,15 +45,16 @@ function cond(s,nq){
 /* ---------- level setup ---------- */
 function init(g,i){
   ensureRun();
-  const D=NPCDATA[i];if(!D){g.nq=null;return;}
-  const nq={i,D,st:stand(D.house),q:{},tmp:{},nf:{},pend:[],debt:0,npcs:[],objs:[],route:null,seq:0,clue:null};
+  const hub=!!(g.d&&g.d.hub),D=hub?HUBDATA:NPCDATA[i];if(!D){g.nq=null;return;}
+  const OBJS=(D.objs||[]).concat(!hub&&window.Hub?Hub.missionObjs(g,i):[]);
+  const nq={i,D,hub,next:hub?g.d.next:i,st:stand(D.house),q:{},tmp:{},nf:{},pend:[],debt:0,npcs:[],objs:[],route:null,seq:0,clue:null};
   g.nq=nq;
   for(const n of D.npcs||[]){
     if(n.show&&!cond(n.show,nq))continue;
     nq.npcs.push(Object.assign({},n,{px:n.x*T+16,py:n.y*T+16,face:Math.PI*.5,ph:Math.random()*6,fade:1,gone:false,fading:false,follow:false,free:false,dest:null,met:false}));
   }
   { // clear decor props from contact tiles (and their neighbours) so nobody stands inside a crate
-    const spots=[...nq.npcs.map(n=>[n.x,n.y]),...(D.objs||[]).map(o=>[o.x,o.y])];
+    const spots=[...nq.npcs.map(n=>[n.x,n.y]),...OBJS.map(o=>[o.x,o.y])];
     g.props=g.props.filter(p=>{
       const hit=spots.some(([sx,sy])=>sx>=p.x-1&&sx<=p.x+p.w&&sy>=p.y-1&&sy<=p.y+p.h);
       if(hit)for(let a=0;a<p.w;a++)for(let b=0;b<p.h;b++)g.pblock.delete(pkey(p.x+a,p.y+b));
@@ -56,7 +62,7 @@ function init(g,i){
     });
     for(const [sx,sy] of spots)g.pblock.delete(pkey(sx,sy));
   }
-  for(const o of D.objs||[])nq.objs.push(Object.assign({},o,{px:o.x*T+16,py:o.y*T+16,done:false,cd:0,p:0,hint:false,ph:Math.random()*6}));
+  for(const o of OBJS)nq.objs.push(Object.assign({},o,{px:o.x*T+16,py:o.y*T+16,done:false,cd:0,p:0,hint:false,ph:Math.random()*6}));
   if(D.route){
     nq.route={x:D.route.x,y:D.route.y,lever:D.route.lever,open:false,hint:nq.st==='favor'};
     g.secretsTotal++;
@@ -72,6 +78,7 @@ function init(g,i){
     if(norm.length>3)g.guards.splice(g.guards.lastIndexOf(norm[norm.length-1]),1);
   }
   const lights=nq.objs.find(o=>o.kind==='light');if(lights&&nq.st==='favor')lights.hint=true;
+  if(!hub&&window.Hub)Hub.missionInit(g,nq,i);
 }
 /* ---------- quests ---------- */
 function qstart(id){
@@ -116,7 +123,8 @@ function giveItem(id,alt){
 function applyFx(fx,npc,why){
   if(!fx)return;const nq=G.nq,notes=G.talk?G.talk.notes:[];
   const A=actor();
-  if(fx.h){nq.pend.push({h:fx.h[0],t:fx.h[1],n:fx.h[2],why:why||(npc?npc.name:'')});notes.push('House '+HOUSE_LABEL[fx.h[0]]+': +'+fx.h[2]+' '+fx.h[1][0].toUpperCase()+fx.h[1].slice(1)+' (when the mission ends)');}
+  if(fx.h&&nq.hub){houses[fx.h[0]][fx.h[1]]+=fx.h[2];notes.push('House '+HOUSE_LABEL[fx.h[0]]+': +'+fx.h[2]+' '+fx.h[1][0].toUpperCase()+fx.h[1].slice(1));}
+  else if(fx.h){nq.pend.push({h:fx.h[0],t:fx.h[1],n:fx.h[2],why:why||(npc?npc.name:'')});notes.push('House '+HOUSE_LABEL[fx.h[0]]+': +'+fx.h[2]+' '+fx.h[1][0].toUpperCase()+fx.h[1].slice(1)+' (when the mission ends)');}
   if(fx.cin){addCinders(fx.cin,A.x,A.y);notes.push('+'+cinderValue(fx.cin)+' cinders');}
   if(fx.gad&&!G.flight)for(const k in fx.gad){G.gad[k]=(G.gad[k]||0)+fx.gad[k];notes.push('+'+fx.gad[k]+' '+({smoke:'smoke powder',bell:'whisper bell',flute:'flute charge'}[k]||k));}
   if(fx.heal){G.hp=fx.heal>=9?G.maxHp:Math.min(G.maxHp,G.hp+fx.heal);floatText(A.x,A.y-20,'+HEART','#ff7a8a',10);notes.push('Health restored');}
@@ -124,7 +132,8 @@ function applyFx(fx,npc,why){
   if(fx.q)qstart(fx.q);
   if(fx.qdone)qdone(fx.qdone);
   if(fx.qfail)qfail(fx.qfail);
-  if(fx.flag){nq.nf[fx.flag]=1;}
+  if(fx.flag){nq.nf[fx.flag]=1;if(nq.hub)run.npc.flags[fx.flag]=1;}
+  if(window.Hub)Hub.fx(fx,notes,npc);
   if(fx.tmp)nq.tmp[fx.tmp]=1;
   if(fx.reveal){
     const o=nq.objs.find(o=>nq.route&&o.id===nq.route.lever)||nq.objs.find(o=>o.kind==='light');
@@ -156,7 +165,7 @@ function target(A,bd){
     if(dd<44&&dd<b){b=dd;best={kind:'npc',ref:n,need:.18,x:n.px,y:n.py,label:'Talk: '+n.name};}
   }
   for(const o of nq.objs){
-    if(!objVisible(o)||o.kind==='burn'||o.cd>0)continue;
+    if(!objVisible(o)||o.kind==='burn'||o.kind==='dummy'||o.cd>0)continue;
     const dd=Math.hypot(o.px-A.x,o.py-A.y);
     if(dd<36&&dd<b){b=dd;best={kind:'qobj',ref:o,need:o.need||.7,x:o.px,y:o.py,label:o.label};}
   }
@@ -224,8 +233,11 @@ function useObj(o){
         floatText(x,y-16,'The plaques forget','#e05050',10);Aud.S.deflect&&Aud.S.deflect();
       }
       return;}
+    case 'hub':if(window.Hub)Hub.use(o);return;
+    case 'dummy':return;
     default: o.done=true; // item pickup
   }
+  if(o.fx)applyFx(o.fx);
   qev('obj:'+o.id);
 }
 /* ---------- dialogue ---------- */
@@ -308,7 +320,7 @@ function render(){
   const T0=G.talk;if(!T0||!el)return;
   const n=T0.npc,nd=n.tree[T0.node]||{t:'...'},list=visChoices(nd);
   if(T0.sel>=list.length)T0.sel=0;
-  el.innerHTML='<div class="nd"><canvas width="128" height="128"></canvas><div><div class="nm">'+n.name+'<i>'+n.role+'</i></div><div class="tx"></div><div class="nt"></div></div><div class="ch"></div></div>';
+  el.innerHTML='<div class="nd"><canvas width="128" height="128"></canvas><div><div class="nm">'+n.name+'<i>'+n.role+(window.Hub?Hub.affTag(n.id):'')+'</i></div><div class="tx"></div><div class="nt"></div></div><div class="ch"></div></div>';
   el.querySelector('.tx').textContent=resolve(nd.t,G.nq);
   el.querySelector('.nt').innerHTML=T0.notes.map(s=>'&bull; '+s.replace(/</g,'&lt;')).join('<br>');
   const ch=el.querySelector('.ch');
@@ -326,6 +338,7 @@ function render(){
 function portrait(cv,n){
   const c=cv.getContext('2d'),L=n.look,s=cv.width;
   c.clearRect(0,0,s,s);
+  if(n.icon&&window.Hub){c.save();c.translate(s/2,s/2);c.scale(s/40,s/40);Hub.glyph(c,{icon:n.icon,px:0,py:2,ph:0,big:1},0);c.restore();return;}
   const k=s/64;c.save();c.scale(k,k);
   c.fillStyle=L.cloth;rr(c,10,44,44,24,10);c.fill();
   c.fillStyle=L.trim;c.fillRect(30,46,4,18);
@@ -340,6 +353,7 @@ function portrait(cv,n){
   if(L.mask){c.fillStyle='rgba(220,230,240,.92)';c.beginPath();c.ellipse(32,29,13,6,0,0,6.3);c.fill();c.fillStyle='#241810';circ(c,27,29,1.5);c.fill();circ(c,37,29,1.5);c.fill();}
   if(L.k==='prisoner'){c.strokeStyle='#8a8a98';c.lineWidth=2;c.beginPath();c.moveTo(14,56);c.lineTo(22,60);c.moveTo(50,56);c.lineTo(42,60);c.stroke();}
   c.restore();
+  try{const P=window.Portraits;if(P&&P.draw&&P.has&&P.has(n.id)){c.clearRect(0,0,s,s);P.draw(c,n.id,0,0,s,'neutral');}}catch(e){}
 }
 function key(k){
   if(!G||!G.talk)return false;
@@ -369,7 +383,7 @@ function update(dt){
       const dx=o.px-a.x,dy=o.py-a.y;
       if(Math.hypot(dx,dy)<G.fireRange&&angDiff(Math.atan2(dy,dx),a.face)<.6&&los(a.x,a.y,o.px,o.py)){
         o.p+=dt;if(Math.random()<dt*14)pt(o.px+(Math.random()-.5)*10,o.py,0,-30,.5,2.4,'#ffb060',{add:true});
-        if(o.p>=1){o.done=true;burst(o.px,o.py,24,'#ffb040',110,.8,3,{add:true});G.rings.push({x:o.px,y:o.py,t:.6,r:70,c:'255,160,60'});Aud.S.confirm();floatText(o.px,o.py-16,'Burned','#ffd27a',10);qev('obj:'+o.id);}
+        if(o.p>=1){o.done=true;burst(o.px,o.py,24,'#ffb040',110,.8,3,{add:true});G.rings.push({x:o.px,y:o.py,t:.6,r:70,c:'255,160,60'});Aud.S.confirm();floatText(o.px,o.py-16,'Burned','#ffd27a',10);if(o.fx)applyFx(o.fx);qev('obj:'+o.id);}
       } else o.p=Math.max(0,o.p-dt*.5);
     }
   } else for(const o of nq.objs)if(o.p>0)o.p=Math.max(0,o.p-dt*.5);
@@ -437,6 +451,7 @@ function ents(list,big){
 }
 function glyph(c,o,t){
   const x=o.px,y=o.py;
+  if(window.Hub&&Hub.glyph(c,o,t))return;
   switch(o.icon){
     case 'key':c.strokeStyle='#e0b040';c.lineWidth=2.4;circ(c,x-3,y,4);c.stroke();c.fillStyle='#e0b040';c.fillRect(x,y-1,9,2.4);c.fillRect(x+6,y,2,5);break;
     case 'book':c.fillStyle='#4a2a1c';rr(c,x-9,y-7,18,14,2);c.fill();c.fillStyle='#eadfd0';c.fillRect(x-6,y-5,12,10);c.fillStyle='rgba(60,40,20,.5)';for(let i=0;i<3;i++)c.fillRect(x-4,y-3+i*3,8,1);break;
@@ -458,6 +473,7 @@ function glyph(c,o,t){
 function drawBack(){
   const nq=G.nq;if(!nq)return;
   const c=ctx,t=G.time;
+  if(nq.hub&&window.Hub)Hub.drawBack(c,t);
   const r=nq.route;
   if(r&&!r.open&&r.hint){ // faint seam in the wall
     const x=r.x*T,y=r.y*T,p=.5+.5*Math.sin(t*2.4);
@@ -467,9 +483,9 @@ function drawBack(){
     if(!objVisible(o))continue;
     const p=.5+.5*Math.sin(t*3+o.ph);
     if(o.kind==='burn'&&!G.ash.on)c.globalAlpha=.55;
-    shadowAt(o.px,o.py+9,9,3,.28);
+    if(!nq.hub)shadowAt(o.px,o.py+9,9,3,.28);
     glyph(c,o,t);c.globalAlpha=1;
-    if(o.hint||o.show||o.cd>0){ // quest / hinted objects get a soft ring
+    if(!nq.hub&&(o.hint||o.show||o.cd>0)){ // quest / hinted objects get a soft ring
       c.strokeStyle=o.cd>0?'rgba(150,150,160,.5)':'rgba(255,210,120,'+(.3+p*.45)+')';c.lineWidth=1.4;circ(c,o.px,o.py,13+p*2);c.stroke();
     }
     if(o.p>0){c.strokeStyle='#ffd27a';c.lineWidth=3;c.beginPath();c.arc(o.px,o.py,16,-1.57,-1.57+6.28*Math.min(1,o.p));c.stroke();}
@@ -509,6 +525,7 @@ function outcome(L){
   }
   for(const f in nq.nf)run.npc.flags[f]=1;
   if(nq.debt>0){run.cinders=Math.max(0,run.cinders-nq.debt);nq.debt=0;}
+  if(window.Hub)Hub.missionEnd(L);
 }
 function entry(id,state,cur){
   const d=QDEF[id],s=cur?cur.q[id]:null;
@@ -520,6 +537,7 @@ const Quests={
     ensureRun();const out=[],seen={},cur=(typeof G!=='undefined'&&G&&G.nq)?G.nq:null;
     for(const id in run.quests)if(QDEF[id]&&!(cur&&cur.q[id])){out.push(entry(id,run.quests[id]));seen[id]=1;}
     if(cur)for(const id in cur.q)out.push(entry(id,cur.q[id].state,cur));
+    if(window.Hub)for(const e of Hub.journal())out.push(e);
     return out;
   },
   active(){return Quests.journal().filter(q=>q.state==='active');},
@@ -532,7 +550,8 @@ function briefHtml(i){
   const eff=st==='none'?'Neutral prices and ordinary servants. What you do here will be remembered.':HOUSEFX[st].join(' &middot; ');
   const fl=Object.keys(run.npc.flags).filter(f=>FLAGLINES[f]&&run.npc.flags[f]).map(f=>FLAGLINES[f]);
   const n=(D.npcs||[]).filter(x=>!x.show||x.show.indexOf('flag:')!==0||run.npc.flags[x.show.slice(5)]).length,q=(D.quests||[]).length;
-  return '<div class="stand"><b>'+head+'</b><br><span>'+eff+'</span>'+(fl.length?'<br><span>'+fl.join(' ')+'</span>':'')+
+  const hubH=window.Hub?Hub.briefHtml(i):'';
+  return hubH+'<div class="stand"><b>'+head+'</b><br><span>'+eff+'</span>'+(fl.length?'<br><span>'+fl.join(' ')+'</span>':'')+
     '<br><span>'+n+' contacts &middot; '+q+' optional task'+(q===1?'':'s')+' &middot; '+({1:'a dinner gong waits to be rung',2:'one lamp crank controls the harbor',3:'a hidden passage lies in the cells',4:'a steam valve can silence the vents',5:'a cloakroom holds silver masks',6:'three memorial plaques wait in order'}[i]||'a hidden chamber lies behind cracked stone')+'</span></div>';
 }
 function markers(){
@@ -543,6 +562,6 @@ function markers(){
   return out;
 }
 window.Quests=Quests;
-return{init,update,target,activate,key,outcome,briefHtml,markers,ents,drawBack,drawFront,stand,cond,qev,qstart,openTalk,choose,closeTalk,QDEF,HOUSEFX};
+return{applyFx,render,ensureRun,init,update,target,activate,key,outcome,briefHtml,markers,ents,drawBack,drawFront,stand,cond,qev,qstart,openTalk,choose,closeTalk,QDEF,HOUSEFX};
 })();
 window.NPC=NPC;
