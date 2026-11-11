@@ -123,7 +123,8 @@ function floorTile(c,x,y,p,fs,rnd,th){
   const px=x*T,py=y*T,alt=(x+y)%2,rm=G.rooms&&G.roomOf&&G.roomOf[y][x]>=0?G.rooms[G.roomOf[y][x]]:null,rv=rm?rm.v:0;
   let base=alt?p.f1:p.f2;if(rm&&rm.tint!==1)base=jitHex(base,rm.tint);
   c.fillStyle=base;c.fillRect(px,py,T,T);
-  if(fs==='stone'||fs==='ruin'||fs==='rubble'){
+  if(window.TILES&&TILES.floor(c,x,y,p,fs,th)){}
+  else if(fs==='stone'||fs==='ruin'||fs==='rubble'){
     if(rv===1){ // one big flagstone with a bevelled inlay
       c.fillStyle=sh(base,.95+rnd()*.15,.6);c.fillRect(px+2,py+2,T-4,T-4);
       c.strokeStyle='rgba(0,0,0,.32)';c.lineWidth=1.4;c.strokeRect(px+1,py+1,T-2,T-2);
@@ -198,6 +199,7 @@ function floorTile(c,x,y,p,fs,rnd,th){
 }
 
 function wallTile(c,x,y,p,th,rnd,flight){
+  if(window.TILES&&TILES.wall(c,x,y,p,flight))return;
   const px=x*T,py=y*T;
   const front=!isW(x,y+1)&&y+1<G.gh;
   if(flight){
@@ -254,6 +256,7 @@ function bakeStatic(){
   c.clearRect(0,0,W,H);
   G.torches=[];G.beams=[];
   computeRooms();
+  if(window.TILES)TILES.buildZones();
   // floors
   for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){
     if(isVoid(x,y))continue;
@@ -304,6 +307,7 @@ function bakeStatic(){
     if(isW(x-1,y)){const g=c.createLinearGradient(px,0,px+9,0);g.addColorStop(0,'rgba(0,0,0,.30)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(px,py,9,T);}
     if(isW(x+1,y)){const g=c.createLinearGradient(px+T,0,px+T-7,0);g.addColorStop(0,'rgba(0,0,0,.2)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(px+T-7,py,7,T);}
   }
+  if(window.TILES&&!G.flight)TILES.bakeZones(c);
   // cast shadow of the building onto the scenery beyond its outer walls
   for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){
     if(!isVoid(x,y))continue;
@@ -343,11 +347,13 @@ function bakeStatic(){
         c.fillStyle='#1a1410';c.fillRect(px+15,py+9,2,6);
         {const ro=ruin&&rnd()<.4;G.torches.push({x:px+16,y:py+12,ph:rnd()*6,col:tc,out:ro,ruinOut:ro});}
       } else if(r<(th.torch||0)+(th.banner||0)&&!nearDoor){
+        if(window.TILES){c.drawImage(TILES.bannerSprite('ban'),px,py,T,T);}else{
         const bc=th.bannerCol||'#8a4a4a';
         c.fillStyle='#2a2018';c.fillRect(px+7,py+10,18,2);
         c.fillStyle=bc;c.beginPath();c.moveTo(px+9,py+11);c.lineTo(px+23,py+11);c.lineTo(px+23,py+T-6);c.lineTo(px+16,py+T-10);c.lineTo(px+9,py+T-6);c.closePath();c.fill();
         c.fillStyle='rgba(0,0,0,.25)';c.fillRect(px+16,py+11,7,T-17);
         c.fillStyle=th.trim;c.globalAlpha=.8;c.beginPath();c.moveTo(px+16,py+15);c.lineTo(px+19,py+19);c.lineTo(px+16,py+23);c.lineTo(px+13,py+19);c.closePath();c.fill();c.globalAlpha=1;
+        }
         if(ruin){c.fillStyle='rgba(0,0,0,.5)';c.fillRect(px+9,py+22,5,8);}
       } else if(r<(th.torch||0)+(th.banner||0)+(th.windows||0)&&!nearDoor&&!ruin){
         c.fillStyle='#0b0a14';c.beginPath();c.moveTo(px+8,py+T-3);c.lineTo(px+8,py+16);c.arc(px+16,py+16,8,Math.PI,0);c.lineTo(px+24,py+T-3);c.closePath();c.fill();
@@ -356,12 +362,14 @@ function bakeStatic(){
         c.strokeStyle='#2a2438';c.lineWidth=1;c.strokeRect(px+8.5,py+13.5,15,14);
         G.beams.push({x:px+16,y:py+T,w:T});
       } else if(th.tapestry&&r<(th.torch||0)+(th.banner||0)+th.tapestry&&!nearDoor){
+        if(window.TILES)c.drawImage(TILES.bannerSprite('tap'),px,py,T,T);else{
         const bc=th.bannerCol||'#8a4a4a';
         c.fillStyle='#2a2018';c.fillRect(px+2,py+10,T-4,2);
         c.fillStyle=bc;c.fillRect(px+4,py+11,T-8,T-12);
         c.fillStyle='rgba(0,0,0,.28)';for(let k=0;k<4;k++)c.fillRect(px+4+k*6,py+11,1.5,T-12);
         c.fillStyle=th.trim;c.globalAlpha=.85;c.beginPath();c.arc(px+16,py+20,5,0,6.283);c.fill();c.fillStyle=bc;c.beginPath();c.arc(px+16,py+20,2.6,0,6.283);c.fill();c.globalAlpha=1;
         c.fillStyle=th.trim;for(let k=0;k<5;k++)c.fillRect(px+5+k*5,py+T-2,2,3);
+        }
       } else if(th.shelf&&r<(th.torch||0)+(th.banner||0)+(th.windows||0)+th.shelf&&!nearDoor){
         c.fillStyle='#2a1a10';c.fillRect(px+3,py+10,T-6,T-11);c.fillStyle='#0e0806';c.fillRect(px+5,py+12,T-10,T-15);
         for(let k=0;k<2;k++){const yy=py+12+k*8;c.fillStyle='#3a2418';c.fillRect(px+5,yy+6,T-10,1.6);
@@ -382,6 +390,7 @@ function bakeStatic(){
       }
     }
   }
+  if(window.TILES)TILES.pools(c);
   bakeForeground();
   G.lightsBaked=true;
 }
@@ -403,10 +412,11 @@ function drawLights(c,list,amb){
 }
 function collectLights(){
   const L=[],t=G.time,A=G.active==='wren'?G.wren:G.ash;
-  const vr=viewRect(),pad=140;
+  const vr=viewRect(),pad=T*2; // matches blitVisible's margin: lights beyond it never reach the screen
   const add=(x,y,r,a,col,gl)=>{
     if(x<vr.x-r-pad||x>vr.x+vr.w+r+pad||y<vr.y-r-pad||y>vr.y+vr.h+r+pad)return;
     L.push({x,y,r,a,col,gl:gl==null?.5:gl});};
+  if(window.TILES)TILES.lights(add);
   for(const tr of G.torches||[]){
     if(tr.out)continue;
     const fl=1+Math.sin(t*9+tr.ph)*.06+Math.sin(t*23+tr.ph*2)*.05;
@@ -458,8 +468,8 @@ function drawDarkness(){
   gc.globalCompositeOperation='source-over';gc.globalAlpha=1;gc.clearRect(0,0,lw,lh);
   gc.globalCompositeOperation='lighter';
   for(const l of list){
-    if(!l.gl)continue;
-    gc.globalAlpha=clamp(l.gl*.5*l.a,0,.7);
+    const ga=l.gl*.5*l.a;if(ga<.06)continue; // too faint to see: skip the draw
+    gc.globalAlpha=Math.min(ga,.7);
     const rr_=l.r*1.15;gc.drawImage(glowSprite(l.col),(l.x-rr_)/k,(l.y-rr_)/k,rr_*2/k,rr_*2/k);
   }
   gc.globalAlpha=1;gc.globalCompositeOperation='source-over';
