@@ -167,7 +167,7 @@ function target(A,bd){
   for(const o of nq.objs){
     if(!objVisible(o)||o.kind==='burn'||o.kind==='dummy'||o.cd>0)continue;
     const dd=Math.hypot(o.px-A.x,o.py-A.y);
-    if(dd<36&&dd<b){b=dd;best={kind:'qobj',ref:o,need:o.need||.7,x:o.px,y:o.py,label:o.label};}
+    if(dd<(o.kind==='hub'?46:36)&&dd<b){b=dd;best={kind:'qobj',ref:o,need:o.need||.7,x:o.px,y:o.py,label:o.label};}
   }
   return best;
 }
@@ -259,7 +259,7 @@ function visChoices(node){
 function price(c){return Math.max(1,Math.round(c.cost*(c.shop?priceMul(G.nq):1)));}
 function openTalk(n){
   if(G.talk||!G.nq)return;
-  G.talk={npc:n,node:pickNode(n),notes:[],sel:0};
+  G.talk={npc:n,node:pickNode(n),notes:[],sel:0,at:performance.now()};
   n.met=true;G.needRel=true;
   touch.act=false;touch.fire=false;mouse.down=false;touch.jx=touch.jy=0;
   for(const k of ['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift',' ','e'])keys[k]=false;
@@ -314,7 +314,7 @@ function buildUI(){
   if(el)el.remove();
   el=document.createElement('div');el.id='npcdlg';el.setAttribute('role','dialog');
   const st=document.getElementById('stage')||document.body;st.appendChild(el);
-  el.addEventListener('pointerdown',e=>e.stopPropagation());
+  el.addEventListener('pointerdown',e=>{e.stopPropagation();if(G&&G.talk)G.talk.armed=true;});
 }
 function render(){
   const T0=G.talk;if(!T0||!el)return;
@@ -330,7 +330,7 @@ function render(){
     b.innerHTML='<b>'+(i+1)+'</b><span></span>'+(c.cost?'<em>'+p+' cinders</em>':'');
     b.querySelector('span').textContent=c.l;
     if(dis)b.disabled=true;if(i===T0.sel)b.className='sel';
-    b.addEventListener('click',e=>{e.stopPropagation();choose(i);});
+    b.addEventListener('click',e=>{e.stopPropagation();if(!T0.armed&&e.detail)return;choose(i);}); // a click needs a press that began inside the dialog (not the held ACT that opened it)
     ch.appendChild(b);
   });
   portrait(el.querySelector('canvas'),n);
@@ -512,6 +512,7 @@ function drawFront(){
   if(G.maskT>0&&!G.wren.hidden){
     const f=Math.min(1,G.maskT/6);c.strokeStyle='rgba(225,235,250,'+(.4+.4*f)+')';c.lineWidth=2;c.beginPath();c.arc(G.wren.x,G.wren.y,21,-1.57,-1.57+6.28*Math.min(1,G.maskT/30));c.stroke();
   }
+  if(nq.hub&&window.Hub)Hub.drawFront(c,t,A);
   if(G.ventOff>0){c.font='bold 9px '+HEAD;c.fillStyle='#cfd6e6';c.fillText('STEAM OFF '+Math.ceil(G.ventOff),A.x,A.y-28);}
   c.textAlign='left';
 }

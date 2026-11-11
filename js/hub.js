@@ -68,7 +68,7 @@ function enter(next){
   try{Aud.setTheme(LEVEL.th.music);Aud.ambient(LEVEL.th.bg);}catch(e){}
   V.ww=G.gw*T;V.wh=G.gh*T;layout();camUpdate(0,true);
   if(typeof initCritters==='function')initCritters();
-  G.fog=null;touch.sneak=false;G.iris={st:performance.now(),dur:900,dir:1};
+  G.fog=[];for(let y=0;y<G.gh;y++)G.fog[y]=new Array(G.gw).fill(true);G.fogRev=1;touch.sneak=false;G.iris={st:performance.now(),dur:900,dir:1};
   UI.tick(true);
   toast('The Rookery','Before '+LEVELS[next].name+'. Walk, talk, then take the door.','#ffd27a');
   const n0=(h.news||[])[0];if(n0)say('Shiloh',n0);
@@ -410,6 +410,30 @@ function bindTap(){
   });
 }
 
+
+/* ---------- HUD and labels ---------- */
+function objectives(){
+  const L=[],h=hs(),next=G.d.next;
+  for(const id in S().chains){const c=chain(id),d=CHAINS[id];if(!d||c.st!=='active')continue;
+    const st=d.steps[c.s]||'';if(/Rookery|^Bring|^Tell|^Return/.test(st))L.push({text:st.replace(' at the Rookery',''),done:false});}
+  if(L.length>2)L.length=2;
+  const d=h.drill||{xp:0};L.push({text:'Drill at the dummies  '+Math.min(45,d.xp)+'/45 XP',done:d.xp>=45});
+  L.push({text:'Take the door to '+LEVELS[next].name,done:false});
+  return L;
+}
+function drawFront(c,t,A){
+  const nq=G.nq;c.font='bold 9px '+HEAD;c.textAlign='center';
+  for(const o of nq.objs){
+    if(o.kind!=='hub'||o.done||o.show&&!NPC.cond(o.show)||G.prompt&&G.prompt.ref===o)continue;
+    const d=Math.hypot(A.x-o.px,A.y-o.py);if(d>2.6*T)continue;
+    const lab=o.use==='door'?'To '+LEVELS[G.d.next].name:o.label,w=c.measureText(lab).width+10,y=o.py-(o.use==='perch'?30:26);
+    c.globalAlpha=Math.min(1,(2.6*T-d)/30);
+    c.fillStyle='rgba(14,10,20,.82)';rr(c,o.px-w/2,y-9,w,12,4);c.fill();c.fillStyle=o.use==='door'?'#ffd27a':'#eadfd0';c.fillText(lab,o.px,y);
+    c.globalAlpha=1;
+  }
+  c.textAlign='left';
+}
+
 /* ---------- art: furniture, stations, standards ---------- */
 const BLOCK={dummy:1,casetable:1,bench:1,board:1,shelf:1};
 const SOLID=[[11,1],[13,1],[15,1],[16,1],[17,1],[1,11],[2,11],[4,13],[22,12],[25,13],[1,3],[25,4],[8,14],[9,14]];
@@ -581,7 +605,7 @@ function glyph(c,o,t){
    {id:'broodband',slot:'gear',rar:'unique',name:'Brood Band',flavor:"The brood-master's ring, sized down for a runt. She will grow into it.",b:{dash:1,hp:1}});
   if(typeof window.giveItem!=='function')window.giveItem=id=>!!grantItem(id);
 })();
-return{enter,leave,canVisit,tick,use,fx,glyph,drawBack,missionObjs,missionInit,missionEnd,briefHtml,journal,peopleHtml,priceMul,affTag,walkTo,carried,
+return{objectives,drawFront,enter,leave,canVisit,tick,use,fx,glyph,drawBack,missionObjs,missionInit,missionEnd,briefHtml,journal,peopleHtml,priceMul,affTag,walkTo,carried,
   get active(){return inHub();},aff,LEVEL};
 })();
 window.Hub=Hub;
