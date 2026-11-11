@@ -412,7 +412,7 @@ function drawLights(c,list,amb){
 }
 function collectLights(){
   const L=[],t=G.time,A=G.active==='wren'?G.wren:G.ash;
-  const vr=viewRect(),pad=140;
+  const vr=viewRect(),pad=T*2; // matches blitVisible's margin: lights beyond it never reach the screen
   const add=(x,y,r,a,col,gl)=>{
     if(x<vr.x-r-pad||x>vr.x+vr.w+r+pad||y<vr.y-r-pad||y>vr.y+vr.h+r+pad)return;
     L.push({x,y,r,a,col,gl:gl==null?.5:gl});};
@@ -468,8 +468,8 @@ function drawDarkness(){
   gc.globalCompositeOperation='source-over';gc.globalAlpha=1;gc.clearRect(0,0,lw,lh);
   gc.globalCompositeOperation='lighter';
   for(const l of list){
-    if(!l.gl)continue;
-    gc.globalAlpha=clamp(l.gl*.5*l.a,0,.7);
+    const ga=l.gl*.5*l.a;if(ga<.06)continue; // too faint to see: skip the draw
+    gc.globalAlpha=Math.min(ga,.7);
     const rr_=l.r*1.15;gc.drawImage(glowSprite(l.col),(l.x-rr_)/k,(l.y-rr_)/k,rr_*2/k,rr_*2/k);
   }
   gc.globalAlpha=1;gc.globalCompositeOperation='source-over';

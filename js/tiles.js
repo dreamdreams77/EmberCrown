@@ -605,7 +605,7 @@ function drawDyn(){
   if(Q.tier<2){
     const vr=viewRect(),x0=Math.max(0,Math.floor(vr.x/T)),x1=Math.min(G.gw-1,Math.ceil((vr.x+vr.w)/T)),y0=Math.max(0,Math.floor(vr.y/T)),y1=Math.min(G.gh-1,Math.ceil((vr.y+vr.h)/T));
     let n=0;
-    for(let y=y0;y<=y1&&n<14;y++)for(let x=x0;x<=x1&&n<14;x++){if(zone(x,y)!=='water')continue;const h=hash(x,y,9),f=(t*.5+h*7)%1;if(f>.5)continue;n++;
+    for(let y=y0;y<=y1&&n<8;y++)for(let x=x0;x<=x1&&n<8;x++){if(zone(x,y)!=='water')continue;const h=hash(x,y,9),f=(t*.5+h*7)%1;if(f>.5)continue;n++;
       c.fillStyle='rgba(200,235,255,'+(Math.sin(f*6.28)*.45).toFixed(3)+')';const gx=x*T+4+h*24,gy=y*T+((h*7)%1<.5?6:26);c.fillRect(gx-2.5,gy,5,.8);}
   }
 }
@@ -638,7 +638,7 @@ function fg(c){
   }
   // overhead: Kest pipes, Dunmoor garlands, Sable bell-ropes, Marrow cages, Hallow candle wheels, courts' boughs
   for(const R of G.rooms||[]){
-    const w=R.x1-R.x0+1,h=R.y1-R.y0+1,z=zone(R.x0,R.y0);if(w<4)continue;
+    const w=R.x1-R.x0+1,h=R.y1-R.y0+1,z=zone(R.x0,R.y0);if(w<4||z==='vault'||zone(R.x1,R.y1)==='vault')continue;
     if(OUT[z]&&z==='court'){for(let i=0;i<3;i++){const ex=(r()<.5?R.x0:R.x1+1)*T,ey=(R.y0+r()*h)*T;bough(c,ex,ey,r);}continue;}
     if(OUT[z])continue;
     if(k==='kest'&&h>=3){const yy=(R.y0+1)*T+8;c.fillStyle='rgba(0,0,0,.25)';c.fillRect(R.x0*T,yy+10,w*T,6);
