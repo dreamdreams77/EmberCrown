@@ -931,5 +931,5 @@ function hud(s){
     c.fillStyle=col;c.fillText(txt,W/2,y+1);y+=fs+12;}
 }
 
-window.MisA={init,step:dt=>{M=G.mis;step(dt);},target:(A,w)=>mechTarget(A,w),activate:t=>{M=G.mis;activate(t);},get M(){return G&&G.mis;}};
+window.MisA={init,step:dt=>{M=G.mis;step(dt);},target:(A,w)=>mechTarget(A,w),activate:t=>{M=G.mis;activate(t);},drop:id=>{M=G.mis;dropChand(id);},get M(){return G&&G.mis;}};
 })();

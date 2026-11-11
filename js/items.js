@@ -86,6 +86,7 @@ function masteryBonus(key,L){
     case'dmg':return .1*Math.floor((L-1)/3);
     case'fire':return 1.5*(L-1);
     case'roll':return .006*(L-1);
+    case'pick':return L>=10?.3:L>=6?.2:L>=2?.1:0; // Shiloh's lockpick tiers
   }
   return 0;
 }
