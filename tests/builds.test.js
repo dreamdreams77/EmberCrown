@@ -39,7 +39,7 @@ const fails=[];const ok=(c,m)=>{if(!c){fails.push(m);console.log('FAIL '+m);}els
         o.fmt=BONUS_FMT.sneak[1](-.1)==='+10%'&&BONUS_FMT.dmg[1](-.5)==='-0.5'&&BONUS_FMT.rollCd[1](-.15)==='+0.15s';
         // uniques never in the shop
         newGame();let seen=new Set();for(let n=0;n<7;n++){runStage={stage:'brief',next:n};for(const it of shopStock())seen.add(it.id);}
-        o.shop=![...seen].some(id=>itemById(id).unique)&&[...seen].length>0;
+        o.shop=![...seen].some(id=>itemById(id).unique||itemById(id).found)&&[...seen].length>0;
         // a mission start applies set bonuses (alchemist: +smoke, +bell)
         for(const id of ['alchsatchel','alchapron','retortcaps'])grantItem(id,true);Object.assign(run.equipped,{charm:'alchsatchel',cloak:'alchapron',gear:'retortcaps'});
         startBrief(0);startPlay();G.cine=null;o.alch=G.gad.smoke>=1+1+2&&G.gad.bell>=1+1;

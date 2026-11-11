@@ -44,17 +44,17 @@ const ITEMS=[
  {id:'scale',slot:'gear',rar:'epic',name:'Forgeheart Scale',flavor:'A plate from the first furnace.',b:{dash:1,nova:1.5}},
  {id:'kiln',slot:'gear',rar:'legendary',name:'Kiln Crown',flavor:'Small head. Large furnace.',b:{fire:20,stun:1.5,nova:2,dash:1}},
 
- /* build sets (see SETS below). unique: kept out of shops and random chests; found behind Ashling's ability hooks */
+ /* build sets (see SETS below). found: kept out of shops and random chests, only found behind Ashling's ability hooks */
  {id:'phantomneedle',slot:'blade',rar:'rare',set:'phantom',name:'Phantom Needle',flavor:'Thin enough to pass through a keyhole. Twice.',b:{finisher:1.5,pick:.1},look:{as:'whisperpoint'}},
- {id:'phantomlocket',slot:'charm',rar:'rare',set:'phantom',unique:true,name:'Phantom Locket',flavor:'The portrait inside is of nobody.',b:{pick:.15,shade:.06},look:{as:'clasp'}},
+ {id:'phantomlocket',slot:'charm',rar:'rare',set:'phantom',found:true,name:'Phantom Locket',flavor:'The portrait inside is of nobody.',b:{pick:.15,shade:.06},look:{as:'clasp'}},
  {id:'duelsabre',slot:'blade',rar:'rare',set:'duellist',name:"Duellist's Sabre",flavor:'Made for the second move, not the first.',b:{dmg:.5,reach:6,parry:.05},look:{as:'quillcutter'}},
- {id:'duelcoat',slot:'cloak',rar:'rare',set:'duellist',unique:true,name:"Fencer's Half-Coat",flavor:'Red, so the blood does not show. Loud, so everyone looks.',b:{roll:.05,rollCd:.15},look:{cloak:{c:'#7a1e2a',trim:'#f0d080',pat:'fringe'}}},
+ {id:'duelcoat',slot:'cloak',rar:'rare',set:'duellist',found:true,name:"Fencer's Half-Coat",flavor:'Red, so the blood does not show. Loud, so everyone looks.',b:{roll:.05,rollCd:.15},look:{cloak:{c:'#7a1e2a',trim:'#f0d080',pat:'fringe'}}},
  {id:'wardenmail',slot:'cloak',rar:'epic',set:'warden',name:"Warden's Mail Cloak",flavor:'Chain under wool. You will hear yourself coming.',b:{hp:1,inv:.2,roll:-.04},look:{cloak:{c:'#55565f',trim:'#d0d2dc',pat:'rivet'}}},
- {id:'drakelance',slot:'blade',rar:'epic',set:'dragon',unique:true,name:'Drake-Knight Lance',flavor:'A short spear from an order that rode dragons. Ashling approves.',b:{dmg:1,reach:8,abcd:.1},look:{as:'hallowfang'}},
- {id:'drakebarding',slot:'gear',rar:'rare',set:'dragon',unique:true,name:'Drake Barding',flavor:'Riveted leather, cut for wings that are still growing.',b:{fire:10,glide:40},look:{as:'collar'}},
- {id:'alchsatchel',slot:'charm',rar:'uncommon',set:'alchemist',unique:true,name:"Alchemist's Satchel",flavor:'Clinks. Smells of sulphur and pear drops.',b:{smoke:1,bell:1},look:{as:'thread'}},
+ {id:'drakelance',slot:'blade',rar:'epic',set:'dragon',found:true,name:'Drake-Knight Lance',flavor:'A short spear from an order that rode dragons. Ashling approves.',b:{dmg:1,reach:8,abcd:.1},look:{as:'hallowfang'}},
+ {id:'drakebarding',slot:'gear',rar:'rare',set:'dragon',found:true,name:'Drake Barding',flavor:'Riveted leather, cut for wings that are still growing.',b:{fire:10,glide:40},look:{as:'collar'}},
+ {id:'alchsatchel',slot:'charm',rar:'uncommon',set:'alchemist',found:true,name:"Alchemist's Satchel",flavor:'Clinks. Smells of sulphur and pear drops.',b:{smoke:1,bell:1},look:{as:'thread'}},
  {id:'alchapron',slot:'cloak',rar:'uncommon',set:'alchemist',name:'Scorched Apron',flavor:'Every burn on it is a lesson.',b:{cinder:.1,smoke:1},look:{cloak:{c:'#4d5a3a',trim:'#d8c060',pat:'ember'}}},
- {id:'retortcaps',slot:'gear',rar:'rare',set:'alchemist',unique:true,name:'Retort Caps',flavor:'Glass talon-tips full of something that glows when she breathes.',b:{stun:1,nova:1,lant:6},look:{as:'talons'}}
+ {id:'retortcaps',slot:'gear',rar:'rare',set:'alchemist',found:true,name:'Retort Caps',flavor:'Glass talon-tips full of something that glows when she breathes.',b:{stun:1,nova:1,lant:6},look:{as:'talons'}}
 ];
 /* equipment sets: bonuses at 2 and 3 pieces worn (Shiloh's blade, cloak, charm and Ashling's gear all count); each set
    has a cost too (negative values), so a build is a choice rather than a sum */
@@ -172,9 +172,9 @@ function grantItem(id,quiet){
 function rollItem(key,minRar){
   const r=mulberry(Math.floor((key+7)*7919)%99991+1),mn=RAR_ORDER.indexOf(minRar||'common');
   const cap=Math.min(4,1+Math.floor((typeof lvl==='number'?lvl:0)*.7)+(mn>0?1:0));
-  let pool=ITEMS.filter(i=>!ownsItem(i.id)&&RAR_ORDER.indexOf(i.rar)>=mn&&RAR_ORDER.indexOf(i.rar)<=cap);
-  if(!pool.length)pool=ITEMS.filter(i=>!ownsItem(i.id)&&RAR_ORDER.indexOf(i.rar)>=mn);
-  if(!pool.length)pool=ITEMS.filter(i=>!ownsItem(i.id));
+  let pool=ITEMS.filter(i=>!i.found&&!ownsItem(i.id)&&RAR_ORDER.indexOf(i.rar)>=mn&&RAR_ORDER.indexOf(i.rar)<=cap);
+  if(!pool.length)pool=ITEMS.filter(i=>!i.found&&!ownsItem(i.id)&&RAR_ORDER.indexOf(i.rar)>=mn);
+  if(!pool.length)pool=ITEMS.filter(i=>!i.found&&!ownsItem(i.id));
   if(!pool.length)return null;
   const tot=pool.reduce((s,i)=>s+RARITY[i.rar].w,0);let x=r()*tot;
   for(const i of pool){x-=RARITY[i.rar].w;if(x<=0)return i;}
@@ -191,7 +191,7 @@ function itemReward(src){
 function shopStock(){
   const n=runStage?runStage.next:0,out=[];
   const r=mulberry(1234+n*57);
-  const pool=ITEMS.filter(i=>!ownsItem(i.id)&&RAR_ORDER.indexOf(i.rar)<=Math.min(3,1+Math.floor(n/2)));
+  const pool=ITEMS.filter(i=>!i.found&&!ownsItem(i.id)&&RAR_ORDER.indexOf(i.rar)<=Math.min(3,1+Math.floor(n/2)));
   // shuffle deterministically, take a different slot per offer
   const a=pool.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   const used={};
