@@ -108,6 +108,39 @@ const OUT=process.env.EC_OUT||'.';
   await p.evaluate(()=>{const G=__ec.G;at(G.wren,15,12);camUpdate(0,true);});await p.waitForTimeout(200);
   await p.screenshot({path:OUT+'/misa_gallow_oil.png'});
 
+  // ---------------- The Drowned Spire ----------------
+  const sp=await p.evaluate(()=>{
+    const G=T_(2),M=G.mis,S=M.air,A=G.ash;ok('S.mech',S.drakes.length===3&&S.ball.length===2&&G.flight);
+    for(const g of G.guards)g.stun=999;
+    // the gale carries Ashling east
+    at(A,4,7);const x0=A.x;adv(60);ok('S.wind',A.x-x0>60);
+    // gulls scream: suspicion and a drake comes to look
+    G.grace=0;G.graceRamp=0;G.alert=0;const f=S.gulls[0];at(A,9,4);A.y-=14;adv(3);ok('S.gulls',f.st==='fly'&&G.alert>0.05);
+    // fog banks hide Ashling from anything further than a tile and a half
+    const fb=S.fog[0];ok('S.fog',!los(fb.x-5*32,fb.y,fb.x,fb.y)&&los(fb.x-1*32,fb.y,fb.x,fb.y));
+    // a drake spots Ashling, chases and spits fire; Ashling burns it out of the sky
+    G.grace=99;G.alert=0;const d=S.drakes[0];d.x=12*32+16;d.y=5*32+16;d.face=0;d.st='patrol';at(A,14,5);G.hp=G.maxHp;G.inv=0;
+    let hurt=false;for(let i=0;i<200&&!hurt;i++){adv(1);if(G.hp<G.maxHp)hurt=true;}
+    ok('S.drakeChase',d.st==='chase');ok('S.drakeSpit',hurt);
+    G.hp=G.maxHp;G.alert=0;at(A,10,5);d.x=A.x+40;d.y=A.y;keys[' ']=true;for(let i=0;i<120;i++){A.face=Math.atan2(d.y-A.y,d.x-A.x);adv(1);}keys[' ']=false;ok('S.drakeDown',d.st==='dead');
+    // a ballista crew tracks Ashling and looses a bolt; fire scatters the crew
+    G.alert=0;G.hp=G.maxHp;G.inv=0;const b=S.ball[0];for(const q of S.drakes)q.st='dead';at(A,8,5);b.a=Math.atan2(A.y-b.y,A.x-b.x);b.cd=0;
+    let teled=false,shot=false;for(let i=0;i<150&&!shot;i++){adv(1);teled=teled||b.tele>0;shot=G.hp<G.maxHp;}
+    ok('S.ballista',teled&&shot);G.hp=G.maxHp;
+    at(A,4,3);A.face=Math.atan2(b.y-A.y,b.x-A.x);keys[' ']=true;adv(60);keys[' ']=false;ok('S.crew',b.stun>0);
+    // the Gale Run: six rings in order
+    G.alert=0;for(const r of M.ch.rings){A.x=r[0]*32+16;A.y=r[1]*32+16;adv(3);}
+    ok('S.galeRun',M.ch.st==='done'&&__ec.run.items.includes('wavecloak'));
+    // the drowned longboat
+    const w=M.caches[0],s0=G.secretsFound;at(A,26,13);adv(3);ok('S.wreckSeen',w.seen);at(A,28,13);adv(2);hold(A,1.3);
+    ok('S.wreck',w.open&&G.secretsFound===s0+1&&__ec.run.items.includes('collar'));
+    return res;});
+  console.log('spire',JSON.stringify(Object.fromEntries(Object.entries(sp).filter(([k])=>k[0]==='S'))));
+  await p.evaluate(()=>{const G=T_(2);V.dbgZoom=1.4;const S=G.mis.air;at(G.ash,7,6);S.drakes[0].x=10*32;S.drakes[0].y=6*32;S.drakes[0].st='chase';S.drakes[0].tele=.3;S.ball[0].tele=.5;S.ball[0].a=1.2;G.time=4;camUpdate(0,true);});
+  await p.waitForTimeout(300);await p.screenshot({path:OUT+'/misa_spire.png'});
+  await p.evaluate(()=>{const G=__ec.G;at(G.ash,22,10);G.mis.ch.st='run';G.mis.ch.t=8;G.mis.ch.ri=3;camUpdate(0,true);});
+  await p.waitForTimeout(300);await p.screenshot({path:OUT+'/misa_spire2.png'});
+
   // ---------------- every mission: loads with its mechanics and can be completed ----------------
   const comp=await p.evaluate(async()=>{
     const out={};

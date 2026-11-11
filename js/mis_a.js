@@ -502,7 +502,7 @@ function stepAir(dt){
     const sees=dist<R&&(dist<T||angDiff(Math.atan2(dy,dx),d.face)<.8)&&los(d.x,d.y,A.x,A.y);
     if(sees){d.see=Math.min(1,d.see+dt*2);d.last={x:A.x,y:A.y};d.lost=3.5;
       if(d.st!=='chase'){d.st='chase';d.say=1.4;Aud.S.alert();}
-      G.alert+=(.35+(1-dist/R)*.75)*dt*G.gain*gm;}
+      G.alert+=(.2+(1-dist/R)*.45)*dt*G.gain*gm;}
     else d.see=Math.max(0,d.see-dt);
     let tx,ty,sp=72;
     if(d.st==='chase'){tx=d.last.x;ty=d.last.y;sp=sees?112:96;if(!sees){d.lost-=dt;if(d.lost<=0)d.st='search';}
@@ -517,14 +517,14 @@ function stepAir(dt){
     let da=want-d.face;while(da>Math.PI)da-=6.283;while(da<-Math.PI)da+=6.283;d.face+=Math.max(-3*dt,Math.min(3*dt,da));
     if(el>4){d.x+=Math.cos(d.face)*sp*dt;d.y+=Math.sin(d.face)*sp*dt;}
     // Ashling's fire and dash
-    if(inFire(d.x,d.y)){d.hp-=dt;d.hurt=.1;if(d.st==='patrol'){d.st='chase';d.last={x:A.x,y:A.y};d.lost=3;}if(d.hp<=0)killDrake(d);}
+    if(inFire(d.x,d.y,8)){d.hp-=dt;d.hurt=.1;if(d.st==='patrol'){d.st='chase';d.last={x:A.x,y:A.y};d.lost=3;}if(d.hp<=0)killDrake(d);}
     if(G.dash.t>0&&dist<26)killDrake(d);
     if(d.say>0)d.say-=dt;
   }
   // ballista crews on the roofs
   for(const b of S.ball){
     if(b.stun>0){b.stun-=dt;b.tele=0;continue;}
-    if(inFire(b.x,b.y)){b.burn+=dt;if(b.burn>.5){b.stun=12;b.burn=0;G.st.stuns++;floatText(b.x,b.y-20,'CREW SCATTERED','#ffd27a');Aud.S.stun();continue;}}else b.burn=Math.max(0,b.burn-dt);
+    if(inFire(b.x,b.y,14)){b.burn+=dt;if(b.burn>.5){b.stun=12;b.burn=0;G.st.stuns++;floatText(b.x,b.y-20,'CREW SCATTERED','#ffd27a');Aud.S.stun();continue;}}else b.burn=Math.max(0,b.burn-dt);
     const dx=A.x-b.x,dy=A.y-b.y,dist=Math.hypot(dx,dy),want=Math.atan2(dy,dx);
     const sees=dist<6.4*T*G.rangeMul&&angDiff(want,b.a)<1.0&&los(b.x,b.y,A.x,A.y);
     b.cd-=dt;
@@ -561,7 +561,7 @@ collectLights=function(){
 /* ---------------- drawing: floor layer (before characters, under the darkness) ---------------- */
 function vis(x,y,m){const v=viewRect();m=m||40;return x>v.x-m&&x<v.x+v.w+m&&y>v.y-m&&y<v.y+v.h+m;}
 const oPots=drawPots;
-drawPots=function(){oPots();const s=G&&G.mis;if(!s)return;try{drawFloor(s);}catch(e){console.error(e);}};
+drawPots=function(){oPots();const s=G&&G.mis;if(!s)return;ctx.save();try{drawFloor(s);}catch(e){console.error(e);}ctx.restore();};
 function drawFloor(s){
   const c=ctx,t=G.time;
   for(const o of s.oil)if(vis((o.x+o.w/2)*T,(o.y+o.h/2)*T,o.w*T))drawOil(c,o,t);
@@ -822,7 +822,7 @@ function drawGullsSit(c,f,t){
 
 /* ---------------- drawing: overlay (after characters) ---------------- */
 const oRings=drawRings;
-drawRings=function(){oRings();const s=G&&G.mis;if(!s)return;try{drawOver(s);}catch(e){console.error(e);}};
+drawRings=function(){oRings();const s=G&&G.mis;if(!s)return;ctx.save();try{drawOver(s);}catch(e){console.error(e);}ctx.restore();};
 function drawOver(s){
   const c=ctx,t=G.time;
   // the drain grates sit over Ashling while he crawls
@@ -891,7 +891,7 @@ function drawDrake(c,d,t){
 }
 
 /* ---------------- HUD: livery state and trial timer ---------------- */
-if(typeof drawHud==='function'){const oHud=drawHud;drawHud=function(){oHud();const s=G&&G.mis;if(!s||mode!=='play')return;try{hud(s);}catch(e){console.error(e);}};}
+if(typeof drawHud==='function'){const oHud=drawHud;drawHud=function(){oHud();const s=G&&G.mis;if(!s||mode!=='play')return;ctx.save();try{hud(s);}catch(e){console.error(e);}ctx.restore();};}
 function hud(s){
   const c=ctx,U=V.U||1,W=V.w,H=V.h;
   c.setTransform(V.dpr,0,0,V.dpr,0,0);

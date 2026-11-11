@@ -214,6 +214,19 @@ const LEVELS=[
  extra:[[11,5,'s']],
  guards:[[[1,14],[23,14]]],
  towers:[[12,2,1.57,1],[20,6,3.14,-1],[6,8,0,1],[15,11,1.57,-1],[3,4,0.5,1]],
+ /* mission mechanics (js/mis_a.js): sea-drake patrols that chase and spit fire, ballista crews on the roofs, a gale band,
+    a down-draught and a westward sea wind, gull flocks that scream when you pass, fog banks to hide in, the Gale Run trial
+    and a drowned longboat */
+ mech:{
+  air:{drakes:[{wp:[[8,5],[16,5],[16,8],[8,8]]},{wp:[[19,0],[27,0],[27,5],[19,5]]},{wp:[[2,10],[9,11],[9,13],[2,13]]}],
+   ballistae:[[6,3,0.8],[20,10,-2.4]],
+   wind:[[0,7,26,2,90,0],[9,0,2,5,0,80],[0,14,29,1,-70,0]],
+   gulls:[[9,4],[23,7],[3,11],[17,13]],
+   fog:[[24,12,1.7],[13,0,1.4],[1,9,1.3]]},
+  challenge:{id:'galerun',name:'The Gale Run',rings:[[2,5],[8,8],[14,7],[20,8],[25,10],[24,13]],time:12,
+   desc:'Six rings, twelve seconds. Ride the gale.',rew:{item:'wavecloak',cin:80}},
+  caches:[{id:'wreck',x:28,y:13,kind:'wreck',by:'ash',label:'Search the wreck',secret:true,hidden:true,title:'A drowned longboat',
+   find:'A longboat, upside down in the fog. Something in it is still shining.',rew:{item:'collar',cin:60},say:['Ashling','A captain\'s strongbox. Ostrander seal. Finders keepers, sea-law, probably.']}]},
  kinds:{}},
 {name:'Thornwick Abbey',house:'House Sable',sigil:'sable',quiet:true,song:true,
  th:{floor:'stone',wall:'brick',amb:[8,8,22,.50],part:'dust',shelf:.12,wood:'#4a3426',stone:'#6a6a82',cloth:'#4a3a70',chains:.06,web:.12,grade:'rgba(90,110,220,.22)',bg:'moon',wood:'#4a3426',stone:'#6a6a82',cloth:'#4a3a70',chains:.06,web:.12,grade:'rgba(90,110,220,.22)',bg:'moon',torch:.1,banner:.08,bannerCol:'#2a2438',bones:0,windows:.14,guard:'#4a3a66',trim:'#b99cff',music:{root:82,mode:'phrygian',tempo:.7}},
