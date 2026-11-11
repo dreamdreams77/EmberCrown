@@ -58,7 +58,7 @@ const Journal=(()=>{
         '<ul>'+itemLines(it).map(l=>'<li>'+l+'</li>').join('')+'</ul>'+(on?'':'<ul class="cmp">'+deltaLines(it,cur)+'</ul>')+'<small>'+jEsc(it.flavor)+'</small></div><i>'+(on?'Equipped':'Equip')+'</i></button>';}).join('')
       :'<p class="small cen">Nothing here yet. Gear drops from vault chests and bosses, and the Quartermaster sells more at the Forge.</p>';
     const have=ITEMS.filter(i=>ownsItem(i.id)).length;
-    return'<div class="slots">'+slots+'</div><h3>'+SLOTS.find(s=>s.id===J.slot).name+' <small>('+SLOTS.find(s=>s.id===J.slot).who+') &middot; '+have+' / '+ITEMS.length+' found</small></h3><div class="ilist">'+list+'</div>';
+    return'<div class="slots">'+slots+'</div><h3>'+SLOTS.find(s=>s.id===J.slot).name+' <small>('+SLOTS.find(s=>s.id===J.slot).who+') &middot; '+have+' / '+ITEMS.length+' found</small></h3><div class="ilist">'+list+'</div>'+(typeof setsHTML==='function'?setsHTML():'');
   }
   /* ----- Forge: talents + quartermaster ----- */
   function forgeHTML(){

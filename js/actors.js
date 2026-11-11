@@ -179,7 +179,7 @@ function drawWren(w,active){
   const c=ctx,t=G.time,sp=Math.hypot(w.vx||0,w.vy||0),mv=sp>14,sneak=G.sneak&&active,f=vfa(w);
   const st=charState(w,active),dt=st.dt,death=st.death,hk=st.hurt;
   const roll=w.rollAnim>0?1-w.rollAnim/.3:-1,atk=w.atk&&w.atk.a!==undefined?w.atk:null;
-  const eq=heroGear(),ck=CLOAK_ART[eq.cloak]?eq.cloak:'_',CL=CLOAK_ART[ck],bid=BLADE_LEN[eq.blade]?eq.blade:'_',charm=eq.charm||'';
+  const eq=heroGear(),lk=id=>(id&&typeof itemById==='function'&&(itemById(id)||{}).look)||{},ck=CLOAK_ART[eq.cloak]?eq.cloak:lk(eq.cloak).cloak?eq.cloak:'_',CL=CLOAK_ART[ck]||lk(eq.cloak).cloak,bid=BLADE_LEN[eq.blade]?eq.blade:BLADE_LEN[lk(eq.blade).as]?lk(eq.blade).as:'_',charm=lk(eq.charm).as||eq.charm||''; // item.look: new gear borrows a cloak palette or an existing blade/charm/gear shape
   const win=mode==='win'&&!death,parry=active&&G.parryT>0&&!death;
   const blink=G.inv>0&&Math.floor(G.time*16)%2===0&&!death;
   c.globalAlpha=blink?.35:1;
@@ -322,7 +322,7 @@ function drawAsh(a,active){
   if(a.celebrate>0)a.celebrate-=.016;
   const blink=G.inv>0&&Math.floor(G.time*16)%2===0&&!death;
   c.globalAlpha=blink?.35:1;
-  const gk=Math.min(12,stats.gems)/12,tier=Math.min(4,Math.floor(gk*4.01)),cf=Math.cos(f),sf=Math.sin(f),gear=heroGear().gear||'';
+  const gk=Math.min(12,stats.gems)/12,tier=Math.min(4,Math.floor(gk*4.01)),cf=Math.cos(f),sf=Math.sin(f),gear=(g0=>(g0&&typeof itemById==='function'&&((itemById(g0)||{}).look||{}).as)||g0||'')(heroGear().gear);
   const sc=(fl?1.4:1)*(nova?1+Math.sin((1-a.novaAnim/.55)*3.14)*.35:1),hover=fl?Math.sin(t*3)*2:(cel_?-Math.abs(Math.sin(t*9))*8:0);
   shadowAt(a.x+(fl?7:0),a.y+(fl?14:5),(fl?13:11)*(cel_?.8:1)*(1+gk*.15),fl?6:5.5,fl?.25:.38);
   // tail: seven-link chain, longer with every few gems, tipped with a flame that grows

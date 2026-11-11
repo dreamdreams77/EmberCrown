@@ -42,32 +42,88 @@ const ITEMS=[
  {id:'collar',slot:'gear',rar:'uncommon',name:'Bellows Collar',flavor:'Every breath gets a boost.',b:{fire:14,stun:.5}},
  {id:'bridle',slot:'gear',rar:'rare',name:'Spark Bridle',flavor:'Two dashes before the first one lands.',b:{dash:1}},
  {id:'scale',slot:'gear',rar:'epic',name:'Forgeheart Scale',flavor:'A plate from the first furnace.',b:{dash:1,nova:1.5}},
- {id:'kiln',slot:'gear',rar:'legendary',name:'Kiln Crown',flavor:'Small head. Large furnace.',b:{fire:20,stun:1.5,nova:2,dash:1}}
+ {id:'kiln',slot:'gear',rar:'legendary',name:'Kiln Crown',flavor:'Small head. Large furnace.',b:{fire:20,stun:1.5,nova:2,dash:1}},
+
+ /* build sets (see SETS below). unique: kept out of shops and random chests; found behind Ashling's ability hooks */
+ {id:'phantomneedle',slot:'blade',rar:'rare',set:'phantom',name:'Phantom Needle',flavor:'Thin enough to pass through a keyhole. Twice.',b:{finisher:1.5,pick:.1},look:{as:'whisperpoint'}},
+ {id:'phantomlocket',slot:'charm',rar:'rare',set:'phantom',unique:true,name:'Phantom Locket',flavor:'The portrait inside is of nobody.',b:{pick:.15,shade:.06},look:{as:'clasp'}},
+ {id:'duelsabre',slot:'blade',rar:'rare',set:'duellist',name:"Duellist's Sabre",flavor:'Made for the second move, not the first.',b:{dmg:.5,reach:6,parry:.05},look:{as:'quillcutter'}},
+ {id:'duelcoat',slot:'cloak',rar:'rare',set:'duellist',unique:true,name:"Fencer's Half-Coat",flavor:'Red, so the blood does not show. Loud, so everyone looks.',b:{roll:.05,rollCd:.15},look:{cloak:{c:'#7a1e2a',trim:'#f0d080',pat:'fringe'}}},
+ {id:'wardenmail',slot:'cloak',rar:'epic',set:'warden',name:"Warden's Mail Cloak",flavor:'Chain under wool. You will hear yourself coming.',b:{hp:1,inv:.2,roll:-.04},look:{cloak:{c:'#55565f',trim:'#d0d2dc',pat:'rivet'}}},
+ {id:'drakelance',slot:'blade',rar:'epic',set:'dragon',unique:true,name:'Drake-Knight Lance',flavor:'A short spear from an order that rode dragons. Ashling approves.',b:{dmg:1,reach:8,abcd:.1},look:{as:'hallowfang'}},
+ {id:'drakebarding',slot:'gear',rar:'rare',set:'dragon',unique:true,name:'Drake Barding',flavor:'Riveted leather, cut for wings that are still growing.',b:{fire:10,glide:40},look:{as:'collar'}},
+ {id:'alchsatchel',slot:'charm',rar:'uncommon',set:'alchemist',unique:true,name:"Alchemist's Satchel",flavor:'Clinks. Smells of sulphur and pear drops.',b:{smoke:1,bell:1},look:{as:'thread'}},
+ {id:'alchapron',slot:'cloak',rar:'uncommon',set:'alchemist',name:'Scorched Apron',flavor:'Every burn on it is a lesson.',b:{cinder:.1,smoke:1},look:{cloak:{c:'#4d5a3a',trim:'#d8c060',pat:'ember'}}},
+ {id:'retortcaps',slot:'gear',rar:'rare',set:'alchemist',unique:true,name:'Retort Caps',flavor:'Glass talon-tips full of something that glows when she breathes.',b:{stun:1,nova:1,lant:6},look:{as:'talons'}}
 ];
-const BONUS_FMT={
- dmg:['Strike damage',v=>'+'+fnum(v)],
- finisher:['Combo finisher',v=>'+'+fnum(v)+' damage'],
- reach:['Blade reach',v=>'+'+fnum(v)],
- roll:['Roll i-frames',v=>'+'+fnum(v)+'s'],
- rollCd:['Roll cooldown',v=>'-'+fnum(v)+'s'],
- sneak:['Sight while sneaking',v=>'-'+Math.round(v*100)+'%'],
- shade:['Exposure in light',v=>'-'+Math.round(v*100)+'%'],
- dash:['Ember Dash charges',v=>'+'+fnum(v)],
- fire:['Fire range',v=>'+'+fnum(v)],
- stun:['Fire stun',v=>'+'+fnum(v)+'s'],
- nova:['Nova cooldown',v=>'-'+fnum(v)+'s'],
- hp:['Hearts',v=>'+'+fnum(v)],
- inv:['Invulnerable after a hit',v=>'+'+fnum(v)+'s'],
- cinder:['Cinders found',v=>'+'+Math.round(v*100)+'%'],
- smoke:['Start with smoke powder',v=>'+'+fnum(v)],
- bell:['Start with whisper bells',v=>'+'+fnum(v)],
+/* equipment sets: bonuses at 2 and 3 pieces worn (Shiloh's blade, cloak, charm and Ashling's gear all count); each set
+   has a cost too (negative values), so a build is a choice rather than a sum */
+const SETS={
+ phantom:{name:'Phantom',col:'#b9a6f0',pieces:['kesthood','phantomneedle','phantomlocket'],role:'Unseen, unheard, light in the hand.',
+   tiers:[[2,{shade:.1,sneak:.04}],[3,{finisher:1,mend:.2,dmg:-.5}]]},
+ duellist:{name:'Duellist',col:'#ff7a6a',pieces:['duelsabre','duelcoat'],role:'Parry, riposte, and everyone watching.',
+   tiers:[[2,{parry:.08,dmg:.5,finisher:.5,sneak:-.08}]]},
+ warden:{name:'Warden',col:'#c8ccd8',pieces:['wardenbreaker','wardenmail','hearthstone'],role:'Takes the hit. Slow to get out of the way.',
+   tiers:[[2,{inv:.3,rollCd:-.15}],[3,{hp:1,dmg:.5,sneak:-.1}]]},
+ dragon:{name:'Dragon-Knight',col:'#ff9a4a',pieces:['drakelance','drakebarding','ashcape'],role:'Shiloh and Ashling as one weapon. Shines like one, too.',
+   tiers:[[2,{abcd:.2,fire:10,shade:-.12}],[3,{dash:1,glide:40,roar:40}]]},
+ alchemist:{name:'Alchemist',col:'#d8c060',pieces:['alchsatchel','alchapron','retortcaps'],role:'More gadgets, more light, less blade.',
+   tiers:[[2,{cinder:.15,bell:1}],[3,{smoke:2,lant:6,stun:1,dmg:-.5,reach:-4}]]}
+};
+function setCount(id){const eq=(typeof run!=='undefined'&&run.equipped)||{},S=SETS[id];if(!S)return 0;let n=0;for(const k in eq)if(eq[k]&&S.pieces.includes(eq[k]))n++;return n;}
+function setBonus(key){let v=0;for(const id in SETS){const n=setCount(id);if(n<2)continue;for(const [need,b] of SETS[id].tiers)if(n>=need&&b[key])v+=b[key];}return v;}
+function setsActive(){return Object.keys(SETS).filter(id=>setCount(id)>=2);}
+const sg=v=>(v<0?'-':'+')+fnum(Math.abs(v)),pc=v=>(v<0?'-':'+')+Math.round(Math.abs(v)*100)+'%';
+const BONUS_FMT={ // a negative value (a set's trade-off) prints with the opposite sign
+ dmg:['Strike damage',v=>sg(v)],
+ finisher:['Combo finisher',v=>sg(v)+' damage'],
+ reach:['Blade reach',v=>sg(v)],
+ roll:['Roll i-frames',v=>sg(v)+'s'],
+ rollCd:['Roll cooldown',v=>sg(-v)+'s'],
+ sneak:['Sight while sneaking',v=>pc(-v)],
+ shade:['Exposure in light',v=>pc(-v)],
+ dash:['Ember Dash charges',v=>sg(v)],
+ fire:['Fire range',v=>sg(v)],
+ stun:['Fire stun',v=>sg(v)+'s'],
+ nova:['Nova cooldown',v=>sg(-v)+'s'],
+ hp:['Hearts',v=>sg(v)],
+ inv:['Invulnerable after a hit',v=>sg(v)+'s'],
+ cinder:['Cinders found',v=>pc(v)],
+ smoke:['Start with smoke powder',v=>sg(v)],
+ bell:['Start with whisper bells',v=>sg(v)],
  vamp:['Heart chance on a kill',v=>Math.round(v*100)+'%'],
  mend:['Heart chance on a takedown',v=>Math.round(v*100)+'%'],
- pick:['Picking and stealing speed',v=>'+'+Math.round(v*100)+'%']
+ pick:['Picking and stealing speed',v=>pc(v)],
+ parry:['Parry window',v=>sg(v)+'s'],
+ abcd:["Ashling's ability cooldowns",v=>pc(-v)],
+ glide:['Glide distance',v=>sg(v)],
+ lant:['Lantern burns',v=>sg(v)+'s'],
+ roar:['Roar reach',v=>sg(v)]
 };
 function fnum(v){return String(Math.round(v*100)/100);}
 function itemById(id){return ITEMS.find(i=>i.id===id);}
-function itemLines(it){return Object.keys(it.b).map(k=>BONUS_FMT[k][0]+' '+BONUS_FMT[k][1](it.b[k]));}
+function itemLines(it){const L=Object.keys(it.b).map(k=>BONUS_FMT[k][0]+' '+BONUS_FMT[k][1](it.b[k]));
+  if(it.set&&SETS[it.set])L.push(SETS[it.set].name+' set ('+setCount(it.set)+'/'+SETS[it.set].pieces.length+' worn)');return L;}
+function bonusLines(b){return Object.keys(b).map(k=>({t:BONUS_FMT[k][0]+' '+BONUS_FMT[k][1](b[k]),good:b[k]>0}));} // every key is better when larger
+/* the Journal gear tab's build panel: sets, then Shiloh's techniques and Ashling's abilities */
+function setsHTML(){
+  const E=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const card=id=>{const S=SETS[id],n=setCount(id);
+    const pcs=S.pieces.map(pid=>{const it=itemById(pid),own=ownsItem(pid),on=Object.values(run.equipped).includes(pid);
+      return'<li style="opacity:'+(own?1:.45)+'">'+(on?'&#9670; ':own?'&#9671; ':'&middot; ')+E(it?it.name:pid)+(own?(on?' <i>(worn)</i>':''):' <i>(not found)</i>')+'</li>';}).join('');
+    const tiers=S.tiers.map(([need,b])=>'<div style="opacity:'+(n>=need?1:.55)+'"><b>'+need+' pieces'+(n>=need?' (active)':'')+':</b> '+
+      bonusLines(b).map(l=>'<span style="color:'+(l.good?'#9fe0a0':'#ff9a8a')+'">'+E(l.t)+'</span>').join(', ')+'</div>').join('');
+    return'<div class="setcard" style="border:1px solid '+(n>=2?S.col:'rgba(200,180,220,.25)')+';border-radius:8px;padding:6px 9px;margin:6px 0;font-size:.9em">'+
+      '<b style="color:'+S.col+'">'+E(S.name)+'</b> <small>'+n+'/'+S.pieces.length+' &middot; '+E(S.role)+'</small><ul style="margin:3px 0 3px 2px;padding:0;list-style:none">'+pcs+'</ul>'+tiers+'</div>';};
+  let h='<h3>Builds <small>(wear 2 or 3 pieces of a set; red is the price)</small></h3><div class="sets">'+Object.keys(SETS).map(card).join('')+'</div>';
+  if(window.Abilities){
+    const T_=Abilities.techs(),A=Abilities.ORDER;
+    h+='<h3>Shiloh\'s techniques <small>(mastery rank)</small></h3><ul class="small" style="list-style:none;padding:0;margin:2px 0">'+T_.map(t=>'<li style="opacity:'+(t.on?1:.5)+'">'+(t.on?'&#9670; ':'rank '+t.L+' &middot; ')+'<b>'+E(t.name)+'</b>: '+E(t.desc)+'</li>').join('')+'</ul>';
+    h+='<h3>Ashling\'s abilities <small>(E to use, G to choose)</small></h3><ul class="small" style="list-style:none;padding:0;margin:2px 0">'+A.map(id=>{const d=Abilities.DEFS[id],on=Abilities.has(id);
+      return'<li style="opacity:'+(on?1:.5)+'"><b style="color:'+d.col+'">'+E(d.name)+'</b>'+(on?'':' <i>('+E(d.src)+')</i>')+': '+E(d.desc)+'</li>';}).join('')+'</ul>';
+  }
+  return h;
+}
 
 /* ---------- mastery ---------- */
 const MASTERY_TITLES=['Cutpurse','Courier','Lamplighter','Shade','Whisperer','Knife in the Dark','Spymaster','Ghost of Hallow'];
@@ -97,6 +153,7 @@ function equipBonus(key){
   const eq=(typeof run!=='undefined'&&run.equipped)||{};
   for(const s in eq){const it=eq[s]&&itemById(eq[s]);if(it&&it.b[key])v+=it.b[key];}
   if(typeof run!=='undefined'&&run.mastery)v+=masteryBonus(key,masteryLevel(run.mastery.xp||0));
+  v+=setBonus(key);
   return v;
 }
 function quickMul(){return(hasT('quick')?.7:1)*(1-Math.min(.5,equipBonus('pick')));}
