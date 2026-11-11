@@ -141,6 +141,48 @@ const OUT=process.env.EC_OUT||'.';
   await p.evaluate(()=>{const G=__ec.G;at(G.ash,22,10);G.mis.ch.st='run';G.mis.ch.t=8;G.mis.ch.ri=3;camUpdate(0,true);});
   await p.waitForTimeout(300);await p.screenshot({path:OUT+'/misa_spire2.png'});
 
+  // ---------------- Thornwick Abbey ----------------
+  const th=await p.evaluate(()=>{
+    const G=T_(3),M=G.mis;ok('T.mech',!!M.bells&&M.pitSet.size===10);
+    for(const g of G.guards)g.stun=999;
+    // the worn slab: invisible from afar, found up close, then a stair into the crypt
+    const sl=M.stairs[0],s0=G.secretsFound;at(G.wren,10,12);adv(2);const far=findTarget(G.wren);ok('T.slabHidden',!far||far.ref!==sl);
+    at(G.wren,13,12);hold(G.wren,1.6);ok('T.slabFound',sl.found&&G.secretsFound===s0+1);
+    hold(G.wren,.8);ok('T.crypt',tile(G.wren)[1]>=16);
+    // the inscription and the bells: a wrong bell resets, the right order raises the gate
+    at(G.wren,13,16);G.wren.y+=6;hold(G.wren,.7);ok('T.note',M.notes[0].read&&!!G.loreCard);
+    const bell=n=>{const b=M.bells.list.find(q=>q.n===n);at(G.wren,b.x,b.y+(b.y<18?1:-1));hold(G.wren,.5);};
+    ok('T.gateShut',solidTile(20,18));bell(1);ok('T.discord',M.bells.p===0&&!M.bells.solved);
+    for(const n of [3,1,4,2])bell(n);ok('T.bells',M.bells.solved&&!solidTile(20,18));
+    // the undercroft: Shiloh cannot cross the chasm
+    ok('T.chasm',blocked(23*32+16,18*32+16,8));
+    // Shiloh hauls the chain; Ashling flies the gap and kicks the winch
+    at(G.wren,21,17);hold(G.wren,1);ok('T.brace',!solidTile(26,18));
+    G.active='ash';at(G.ash,22,18);keys.d=true;adv(55);keys.d=false;ok('T.fly',tile(G.ash)[0]>=26);
+    at(G.ash,27,17);keys.e=true;adv(50);keys.e=false;adv(2);ok('T.bridge',!M.pitSet.has(23+18*256)&&!blocked(23*32+16,18*32+16,8));
+    G.active='wren';at(G.wren,22,18);keys.d=true;adv(80);keys.d=false;adv(30);ok('T.pinned',!solidTile(26,18)&&tile(G.wren)[0]>=25);
+    // up behind the Warden
+    at(G.wren,27,16);hold(G.wren,.8);ok('T.warden',tile(G.wren)[0]===23&&tile(G.wren)[1]<=4);
+    // the court drain is Ashling's alone
+    at(G.wren,12,8);ok('T.drainW',blocked(13*32+16,8*32+16,8));G.active='ash';at(G.ash,12,8);keys.d=true;adv(40);keys.d=false;ok('T.drainA',tile(G.ash)[0]>=14);G.active='wren';
+    // the Silent Ossuary: running on a rotten board fails it; sneaking through wins it
+    at(G.wren,13,22);adv(2);at(G.wren,18,22);adv(2);ok('T.chStart',M.ch.st==='run');G.inv=0;
+    keys.d=true;adv(30);keys.d=false;ok('T.chFall',M.ch.st==='fail');G.hp=G.maxHp;
+    at(G.wren,13,22);adv(3);ok('T.chReset',M.ch.st==='idle'&&!M.pitSet.has(19+22*256));
+    keys.shift=true;for(let x=14;x<=26;x++){at(G.wren,x,23);adv(2);}keys.shift=false;at(G.wren,27,22);adv(2);hold(G.wren,1.3);
+    ok('T.chWin',M.ch.st==='done'&&__ec.run.items.includes('thread'));
+    // the bell-ringer's hoard
+    const st=M.caches.find(q=>q.id==='ink'),s1=G.secretsFound;at(G.wren,14,20);adv(3);ok('T.stoneSeen',st.seen);hold(G.wren,1.4);
+    ok('T.secret',st.open&&G.secretsFound===s1+1&&__ec.run.items.includes('wardenbreaker'));
+    return res;});
+  console.log('thornwick',JSON.stringify(Object.fromEntries(Object.entries(th).filter(([k])=>k[0]==='T'))));
+  await p.evaluate(()=>{const G=T_(3);V.dbgZoom=1.5;at(G.wren,21,17);at(G.ash,24,18);G.active='ash';G.mis.levers[0].on=true;G.mis.gates.cage.open=true;G.time=3;camUpdate(0,true);});
+  await p.waitForTimeout(300);await p.screenshot({path:OUT+'/misa_thorn_chasm.png'});
+  await p.evaluate(()=>{const G=__ec.G;G.active='wren';at(G.wren,18,18);G.mis.bells.list[2].ring=1;camUpdate(0,true);});
+  await p.waitForTimeout(250);await p.screenshot({path:OUT+'/misa_thorn_bells.png'});
+  await p.evaluate(()=>{const G=__ec.G;at(G.wren,18,23);camUpdate(0,true);});
+  await p.waitForTimeout(250);await p.screenshot({path:OUT+'/misa_thorn_ossuary.png'});
+
   // ---------------- every mission: loads with its mechanics and can be completed ----------------
   const comp=await p.evaluate(async()=>{
     const out={};

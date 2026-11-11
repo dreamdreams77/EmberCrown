@@ -173,7 +173,7 @@ function seenBy(t){ // is this character inside any awake guard's cone right now
 }
 function grace(){return G.grace>0?0:G.graceRamp>0?1-G.graceRamp/1.6:1;}
 function setGate(id,open){
-  for(const one of [].concat(id)){const q=M.gates[one];if(!q||q.open===open)continue;q.open=open;
+  for(const one of [].concat(id)){const q=M.gates[one];if(!q||q.open===open||(!open&&q.pinned))continue;q.open=open;
     Aud.S.gate&&Aud.S.gate();shake(3);burst(C(q.x),C(q.y),10,'#9a8f84',60,.7,3,{k:'smoke',gr:5});
     if(!open)for(const c of [G.wren,G.ash,...G.guards])if(c&&tileOf(c)[0]===q.x&&tileOf(c)[1]===q.y)nudge(c);}
   refreshSolid(M);
@@ -186,6 +186,7 @@ function applyFx(f,src){
   if(!f)return;
   if(f.open)setGate(f.open,true);
   if(f.close)setGate(f.close,false);
+  if(f.pin)for(const id of [].concat(f.pin)){const q=M.gates[id];if(q){setGate(id,true);q.pinned=true;}}
   if(f.toggle)for(const id of [].concat(f.toggle))setGate(id,!M.gates[id].open);
   if(f.drop)dropChand(f.drop);
   if(f.bridge)bridge(f.bridge);
@@ -497,6 +498,7 @@ function stepAir(dt){
   for(const d of S.drakes){
     d.ph+=dt*8;
     if(d.st==='dead'){d.fall+=dt;continue;}
+    if(!d.last)d.last={x:d.x,y:d.y};
     if(d.stun>0){d.stun-=dt;continue;}
     const dx=A.x-d.x,dy=A.y-d.y,dist=Math.hypot(dx,dy);
     const sees=dist<R&&(dist<T||angDiff(Math.atan2(dy,dx),d.face)<.8)&&los(d.x,d.y,A.x,A.y);
@@ -623,16 +625,26 @@ function drawRot(c,r,t){
   c.fillStyle='#2a1c12';circ(c,x+4,y+5,1);c.fill();circ(c,x+27,y+27,1);c.fill();
 }
 function drawPit(c,P,s){
+  if(!P.set)P.set=new Set(P.tiles.map(([x,y])=>K(x,y)));
+  const has=(x,y)=>P.set.has(K(x,y));
   for(const [x,y] of P.tiles){
     if(!vis(C(x),C(y)))continue;const X=x*T,Y=y*T;
-    const g=c.createLinearGradient(X,Y,X,Y+T);g.addColorStop(0,'#000');g.addColorStop(1,'#0d0812');
-    c.fillStyle=g;c.fillRect(X,Y,T,T);
-    const up=s.pitSet.has(K(x,y-1))||P.tiles.some(q=>q[0]===x&&q[1]===y-1);
-    if(!up){c.fillStyle='#3a3444';c.fillRect(X,Y,T,4);c.fillStyle='#1a1620';c.fillRect(X,Y+4,T,3);}
-    c.fillStyle='rgba(120,110,160,'+(.05+.04*Math.sin(G.time*1.3+x+y))+')';c.fillRect(X,Y+T*.4,T,T*.6);
+    c.fillStyle='#030205';c.fillRect(X,Y,T,T);
+    const m=c.createLinearGradient(X,Y,X,Y+T);m.addColorStop(0,'rgba(90,80,130,.04)');m.addColorStop(1,'rgba(90,80,130,'+(.12+.05*Math.sin(G.time*1.1+x*.7+y))+')');
+    c.fillStyle=m;c.fillRect(X,Y,T,T);
+    if(!has(x,y-1)){ // the far wall of the chasm, falling away into the dark
+      const f=c.createLinearGradient(X,Y,X,Y+14);f.addColorStop(0,'#4a4456');f.addColorStop(1,'rgba(20,16,26,0)');
+      c.fillStyle=f;c.fillRect(X,Y,T,14);c.strokeStyle='rgba(0,0,0,.45)';c.lineWidth=1;c.beginPath();c.moveTo(X,Y+5);c.lineTo(X+T,Y+5);c.moveTo(X+11,Y);c.lineTo(X+11,Y+5);c.moveTo(X+25,Y+5);c.lineTo(X+25,Y+10);c.stroke();}
+    for(const [dx,lx] of [[-1,X],[1,X+T-4]])if(!has(x+dx,y)){ // stone lips on either side
+      const f=c.createLinearGradient(dx<0?X:X+T,0,dx<0?X+10:X+T-10,0);f.addColorStop(0,'rgba(0,0,0,.7)');f.addColorStop(1,'rgba(0,0,0,0)');
+      c.fillStyle=f;c.fillRect(dx<0?X:X+T-10,Y,10,T);
+      c.fillStyle='#6a6478';c.fillRect(lx,Y,4,T);c.fillStyle='rgba(255,255,255,.14)';c.fillRect(dx<0?lx:lx+3,Y,1,T);
+      c.fillStyle=INK;c.fillRect(dx<0?lx+4:lx-1,Y,1,T);}
+    if(!has(x,y+1)){c.fillStyle='#5a5466';c.fillRect(X,Y+T-3,T,3);c.fillStyle=INK;c.fillRect(X,Y+T-4,T,1);}
     if(P.bridged.some(q=>q[0]===x&&q[1]===y)){
-      for(let i=0;i<5;i++){c.fillStyle=i%2?'#7a5634':'#6a4a2c';c.fillRect(X+i*6.4,Y+6,6,T-12);c.fillStyle='rgba(0,0,0,.4)';c.fillRect(X+i*6.4+5.4,Y+6,.8,T-12);}
-      c.strokeStyle='#c8b088';c.lineWidth=1.2;c.beginPath();c.moveTo(X,Y+8);c.lineTo(X+T,Y+8);c.moveTo(X,Y+T-8);c.lineTo(X+T,Y+T-8);c.stroke();
+      shadowAt(X+16,Y+T-4,18,4,.5);
+      for(let i=0;i<5;i++){c.fillStyle=i%2?'#7a5634':'#6a4a2c';c.fillRect(X+i*6.4,Y+5,6,T-10);c.fillStyle='rgba(0,0,0,.4)';c.fillRect(X+i*6.4+5.4,Y+5,.8,T-10);c.fillStyle='rgba(255,220,170,.08)';c.fillRect(X+i*6.4,Y+5,1,T-10);}
+      c.strokeStyle='#c8b088';c.lineWidth=1.3;c.beginPath();c.moveTo(X,Y+7);c.lineTo(X+T,Y+7.5);c.moveTo(X,Y+T-7);c.lineTo(X+T,Y+T-7.5);c.stroke();
     }
   }
 }
