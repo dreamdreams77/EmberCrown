@@ -67,8 +67,8 @@ function init(g){
   // rooms we use stay clear of furniture: drop any prop on or next to a mechanism, then rebuild the blocking set
   const prot=new Set(),mark=(x,y,r)=>{for(let j=-r;j<=r;j++)for(let i=-r;i<=r;i++)prot.add(K(x+i,y+j));};
   for(const [x0,y0,x1,y1] of m.keep||[])for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)prot.add(K(x,y));
-  const pts=[...(m.gates||[]),...(m.levers||[]),...(m.plates||[]),...(m.drops||[]),...(m.steam||[]),...(m.caches||[]),...(m.notes||[])];
-  for(const q of pts)mark(q.x,q.y,1);
+  for(const q of [...(m.gates||[]),...(m.levers||[]),...(m.caches||[]),...(m.notes||[])])mark(q.x,q.y,1);
+  for(const q of [...(m.plates||[]),...(m.steam||[])])mark(q.x,q.y,0);
   for(const st of m.stairs||[]){mark(st.a[0],st.a[1],1);mark(st.b[0],st.b[1],1);}
   if(m.rot)for(const [x,y] of m.rot.tiles)mark(x,y,1);
   for(const p of m.pits||[])for(const [x,y] of p.tiles)mark(x,y,1);
@@ -145,7 +145,11 @@ completeTarget=function(t){
 if(typeof novaPress==='function'){const oNova=novaPress;novaPress=function(){const s=G&&G.mis;if(s&&G.active==='ash'&&!G.flight&&mechTarget(G.ash,'ash')){touch.act=true;s.novaBlock=true;return;}return oNova();};}
 const oUpdate=update;
 update=function(dt){
+  // in these missions the two work apart: the idle partner stays where it was left instead of being yanked along by the tether
+  const s0=G&&G.mis,P=s0&&G.ash&&G.ash.on&&!G.flight?(G.active==='wren'?G.ash:G.wren):null,px=P&&P.x,py=P&&P.y;
   oUpdate(dt);
+  if(P&&G.mis===s0&&Math.hypot(P.x-px,P.y-py)>5*T&&!s0.moved){P.x=px;P.y=py;G.rings=G.rings.filter(r=>!(r.c==='180,120,255'&&r.t>.38));}
+  if(s0)s0.moved=false;
   const s=G&&G.mis;
   if(!s||mode!=='play'||G.cine||G.talk)return;
   M=s;try{step(dt);}catch(e){console.error(e);}
@@ -155,9 +159,9 @@ update=function(dt){
 function near(a,x,y,r){return Math.hypot(a.x-x,a.y-y)<r;}
 function onTile(a,x,y,pad){return Math.abs(a.x-C(x))<(pad||12)&&Math.abs(a.y-C(y))<(pad||12);}
 function tileOf(a){return[Math.floor(a.x/T),Math.floor(a.y/T)];}
-function inFire(x,y){
+function inFire(x,y,pad){
   if(!G.fireOn)return false;const a=G.ash,dx=x-a.x,dy=y-a.y,r=G.fireRange||80;
-  return Math.hypot(dx,dy)<r&&angDiff(Math.atan2(dy,dx),a.face)<.62&&oLos(a.x,a.y,x,y);
+  return Math.hypot(dx,dy)<r+(pad||0)&&angDiff(Math.atan2(dy,dx),a.face)<.62&&oLos(a.x,a.y,x,y);
 }
 function seenBy(t){ // is this character inside any awake guard's cone right now (ignoring the livery)
   for(const g of G.guards){
@@ -315,7 +319,7 @@ function step(dt){
   // levers that must be held
   for(const l of s.levers){
     if(!l.hold||!l.on)continue;
-    if(Math.hypot(W.x-C(l.x),W.y-C(l.y))>.85*T){l.rel+=dt;if(l.rel>.35){l.on=false;l.rel=0;
+    if(Math.hypot(W.x-C(l.x),W.y-C(l.y))>1.3*T){l.rel+=dt;if(l.rel>.35){l.on=false;l.rel=0;
       const f=l.fx||{};if(f.open)setGate(f.open,false);if(f.close)setGate(f.close,true);
       refreshSolid(s);ejectAsh();toast('Released',l.relText||'Shiloh let go. It drops shut.','#c9b8a0');}}
     else l.rel=0;
@@ -323,7 +327,7 @@ function step(dt){
   // pressure plates (Shiloh's weight)
   for(const p of s.plates){
     p.cd=Math.max(0,p.cd-dt);
-    if(!p.rev&&inFire(C(p.x),C(p.y))){p.rev=true;burst(C(p.x),C(p.y),8,'#ff6040',30,.6,2,{add:true});if(!s.said.rev){s.said.rev=1;say('Ashling','That plate glows. The scorched ones are wired to something.');}}
+    if(!p.rev&&inFire(C(p.x),C(p.y),12)){p.rev=true;burst(C(p.x),C(p.y),8,'#ff6040',30,.6,2,{add:true});if(!s.said.rev){s.said.rev=1;say('Ashling','That plate glows. The scorched ones are wired to something.');}}
     const on=!W.hidden&&onTile(W,p.x,p.y,11);
     if(on&&!p.on&&p.cd<=0&&!(p.kind==='rattle'&&G.sneak&&G.active==='wren'))tripPlate(p);
     p.on=on;
@@ -350,7 +354,7 @@ function step(dt){
   // lamp oil
   for(const o of s.oil){
     const cx=(o.x+o.w/2)*T,cy=(o.y+o.h/2)*T;
-    if(o.st==='wet'){let lit=false;for(let y=o.y;y<o.y+o.h&&!lit;y++)for(let x=o.x;x<o.x+o.w;x++)if(inFire(C(x),C(y))){lit=true;break;}
+    if(o.st==='wet'){let lit=false;for(let y=o.y;y<o.y+o.h&&!lit;y++)for(let x=o.x;x<o.x+o.w;x++)if(inFire(C(x),C(y),16)){lit=true;break;}
       if(lit){o.st='burn';o.t=7;Aud.S.explode&&Aud.S.ember();shake(4);lureNear(cx,cy,5*T,true);G.rings.push({x:cx,y:cy,t:.6,r:90,c:'255,150,60'});
         if(!s.said.oil){s.said.oil=1;say('Ashling','Lamp oil! It burns. Nobody walk through that. Except them.');}}}
     else if(o.st==='burn'){o.t-=dt;
