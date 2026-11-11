@@ -268,3 +268,209 @@ const NPCDATA=[
   {id:'memorial',title:"The Hallow Memorial",desc:"Old Nan says three plaques remember the last Hallow, if touched in order.",steps:["Touch the plaques in order: west, east, north"],on:['obj:plaques'],
    rew:{cin:60,heal:9,gad:{smoke:2,bell:2},item:'hallow_wick'}}]}
 ];
+
+/* ================= THE ROOKERY (home base) =================
+   Extra condition tokens (hub and missions): aff:npc>=N aff:npc<=N  ch:chain=N|none|active|done|failed  ch:chain>=N
+   lv>=N lv<=N lv=N (the mission you set out for next)
+   Extra fx: aff:[npc,n] chstart chadv chdone chfail ch:[chain,step] doc stash:{smoke,bell} hub:<action> abil xp wager */
+const HUBMAP=[
+"###########################",
+"#.........#.......#.......#",
+"#.........#.......#.......#",
+"#.........#.......#.......#",
+"#.........#.......#.......#",
+"#.........#.......#.......#",
+"####..#####...#...###..####",
+"#.........................#",
+"#.........................#",
+"#.........................#",
+"####..#####.......###..####",
+"#.........#.......#.......#",
+"#.........#.......#.......#",
+"#.........#...S...#.......#",
+"#.........#.......#.......#",
+"#.........#...X...#.......#",
+"###########################"];
+const HUBPEOPLE={maud:'Maud Tallow',brann:'Serjeant Brann',needle:'Needle',odalys:'Odalys Fenn',hesper:'Old Hesper',corvin:'Corvin Vane'};
+const HUBROLE={maud:'Quartermaster',brann:'Trainer',needle:'Informant',odalys:'Archivist',hesper:'Dragon-keeper',corvin:'Rival'};
+const AFFNAME=a=>a>=4?'Sworn friend':a>=2?'Trusted':a>=1?'Warm':a<=-2?'Lost':a<=-1?'Cold':'Wary';
+/* documents for the library wall */
+const HUBDOCS={
+ wick_satchel:["Wick's Satchel","Seven receipts, one hand. Wick carried for Grell, for Ostrander and for someone who signs only with a ring of plain wax. The last receipt reads: 'Deliver to the abbey cells. Do not wait for a reply.'"],
+ hostage:["A Letter Under the Door","'To the woman at the Rookery forge. We hold Tobin Tallow in the Ironvale cells. He hammers for Kest now. Send the spy away from the houses and he keeps his hands.' No seal. A ring of plain wax."],
+ tobin:["Tobin's Reply","'Maud. They write what I owe in a ledger at Dunmoor: bread, chains, the air I breathe. While that book exists I am theirs wherever I run. Burn it. T.'"],
+ seal_notes:["On the Blank Ring","Odalys Fenn's notes: the plain wax ring is not the absence of a seal. It is a seal. Pressed with a die cut from bell-bronze, cooled in ash. Whoever owns the die can speak for any house."],
+ hesper_song:["Keeper's Rhyme","'Moss for the cold, bronze for the heat, a runt grows slow but a runt grows sweet.' Hesper sings it badly, to a dragon who pretends not to listen."],
+ wager_book:["Corvin's Wager Book","Two columns. 'Shiloh: caught' and 'Shiloh: clean'. The clean column is longer than he lets on."]};
+/* multi-mission chains. steps[n] is the objective while the chain is at step n. by[n]=mission index: if that mission ends with the chain still at step n it fails. */
+const CHAINS={
+ courier:{title:'The Missing Courier',house:'grell',giver:'needle',desc:"Needle's courier Wick walked into Gallowmere and never walked out.",
+  steps:["Look for Wick's satchel in Gallowmere Hall","Bring the satchel back to Needle at the Rookery","Spring Wick's cell in Thornwick Abbey","Tell Needle that Wick is free"],
+  by:{0:1,2:3},fail:{0:"The trail in Gallowmere went cold. Wick is gone.",2:"Thornwick emptied its cells. Wick was not seen again."},failFx:{0:{aff:['needle',-1]},2:{aff:['needle',-2]}},
+  reward:"Courier's Red Band, cinders, and Needle marks every hidden passage."},
+ seal:{title:'The Forged Seal',house:'sable',giver:'odalys',desc:"Odalys wants to copy the blank ring that starts wars.",
+  steps:["Press wax onto a sealed writ in Thornwick Abbey","Bring the impression to Odalys","Temper a die blank at Ironvale with Ashling's fire","Return the die to Odalys"],
+  by:{0:3,2:4},fail:{0:"No impression, no copy. The writs were burned at dawn.",2:"The blank cracked cold. Odalys cannot cut a die from it."},failFx:{0:{aff:['odalys',-1]},2:{aff:['odalys',-1]}},
+  reward:"A forged order sends one guard away in every house, or a fat purse if you sell it."},
+ hostage:{title:'The Hostage Letter',house:'kest',giver:'maud',desc:"Kest holds Maud's brother Tobin to make you stop.",
+  steps:["Slip a file into Tobin's cell at Ironvale","Bring Tobin's reply home to Maud","Burn the ransom ledger at Dunmoor with Ashling's fire","Tell Maud it is done"],
+  by:{0:4,2:5},fail:{0:"Tobin was moved before you reached him. Maud has stopped singing at the forge.",2:"The ledger survives. Tobin is out of the cell but never out of debt."},failFx:{0:{aff:['maud',-2],flag:'maud_grief'},2:{aff:['maud',-1]}},
+  reward:"Maud's Own blade and kin prices at the forge."},
+ rookery:{title:'A Proper Roost',house:'hallow',giver:'hesper',desc:"Old Hesper says a dragon who sleeps on sacking stays a runt.",
+  steps:["Gather ember-moss in Gallowmere or Thornwick","Bring the moss to Hesper","Pry a shard of bell-bronze at Ironvale or Dunmoor","Bring the bronze to Hesper"],
+  by:{},fail:{},failFx:{},
+  reward:"Ashling gains a second dash charge, then a heart, and the Brood Band."}};
+/* objects the chains add to missions; placed on a reachable floor tile, `far` = how deep into the map (0..1) */
+const CHAINOBJ={
+ 1:[{id:'c_satchel',kind:'item',icon:'satchel',label:"Take Wick's satchel",need:.8,show:'ch:courier=0',fx:{chadv:'courier',doc:'wick_satchel'},far:.62},
+    {id:'c_moss',kind:'item',icon:'moss',label:'Gather ember-moss',need:.8,show:'ch:rookery=0',fx:{chadv:'rookery'},far:.38}],
+ 3:[{id:'c_wick',kind:'item',icon:'celldoor',label:"Spring Wick's cell",need:1.4,show:'ch:courier=2',fx:{chadv:'courier',flag:'wick_free'},far:.7},
+    {id:'c_wax',kind:'item',icon:'wax',label:'Press wax on the writ',need:1,show:'ch:seal=0',fx:{chadv:'seal'},far:.45},
+    {id:'c_moss',kind:'item',icon:'moss',label:'Gather ember-moss',need:.8,show:'ch:rookery=0',fx:{chadv:'rookery'},far:.25}],
+ 4:[{id:'c_file',kind:'item',icon:'celldoor',label:"Slip a file to Tobin",need:1.2,show:'ch:hostage=0',fx:{chadv:'hostage',doc:'tobin'},far:.66},
+    {id:'c_die',kind:'burn',icon:'die',label:'Die blank (burn)',show:'ch:seal=2',fx:{chadv:'seal'},far:.5},
+    {id:'c_bronze',kind:'item',icon:'bronze',label:'Pry the bronze shard',need:1,show:'ch:rookery=2',fx:{chadv:'rookery'},far:.3}],
+ 5:[{id:'c_ledger',kind:'burn',icon:'book',label:'Ransom ledger (burn)',show:'ch:hostage=2',fx:{chadv:'hostage'},far:.6},
+    {id:'c_bronze',kind:'item',icon:'bronze',label:'Pry the bronze shard',need:1,show:'ch:rookery=2',fx:{chadv:'rookery'},far:.35}]};
+/* notice board contracts: judged when the next mission is won */
+const BOUNTIES=[
+ {id:'ghost',title:'Ghost Work',desc:'Win the next mission without being spotted once.',pay:90,test:g=>g.st.detect===0},
+ {id:'magpie',title:'Magpie Work',desc:'Find at least two secrets in the next mission.',pay:70,test:g=>g.secretsFound>=2},
+ {id:'clean',title:'Clean Hands',desc:'Win the next mission with rank A or better.',pay:80,test:g=>g.rank==='S'||g.rank==='A'},
+ {id:'swift',title:'Swift Work',desc:'Win the next mission in under four minutes.',pay:70,test:g=>g.time<240}];
+const HUBDATA={house:null,
+ npcs:[
+ {id:'maud',name:'Maud Tallow',role:'Quartermaster',x:3,y:12,look:{k:'merchant',skin:'#d8a880',cloth:'#7a4a2a',trim:'#e0b060',hat:'cap',apron:true},
+  entry:[{if:'aff:maud<=-2',n:'cold'},{if:'ch:hostage=3',n:'done'},{if:'ch:hostage=1',n:'reply'},{if:'flag:hostage_seen&ch:hostage=none&!flag:maud_told',n:'letter'},{n:'s'}],
+  tree:{
+   s:{t:{d:"Bench is hot, stock is honest. What do you need, Shiloh?",favor:"The houses speak well of you, so the carters give me credit. Prices are down. Enjoy it.",fear:"Carters cross the street when they hear your name. Stock costs me more now, so it costs you more.",ruin:"Half the city is selling its silver for bread. I buy cheap. I am not proud of it."},c:[
+    {l:"Show me the gear.",fx:{hub:'shop'}},
+    {l:"Smoke powder for the next job.",cost:35,shop:1,to:'sold',fx:{stash:{smoke:1}}},
+    {l:"A whisper bell for the next job.",cost:30,shop:1,to:'sold',fx:{stash:{bell:1}}},
+    {l:"Anything put aside for me?",if:'aff:maud>=2&!flag:maud_gift',to:'gift',fx:{flag:'maud_gift',item:'clasp',alt:{cin:60}}},
+    {l:"How is the forge?",to:'chat',once:'maudchat',fx:{aff:['maud',1]}},
+    {l:"Leave",end:1}]},
+   sold:{t:"Packed by the door. It goes out with you.",c:[{l:"More.",to:'s'},{l:"Leave",end:1}]},
+   gift:{t:"I kept this back from the last crate. Do not tell Corvin, he will say I have favourites. I do."},
+   chat:{t:{d:"Drawing well. Ashling keeps trying to help. I let her light it once a day, it makes her feel tall.",ruin:"Busy. Ruined houses sell good iron cheap. I would rather they did not have to."}},
+   letter:{t:"You found a letter under my door? Give it here. ... Tobin. They have my brother at Ironvale. Because of us. Because of this place.",c:[
+    {l:"I will get word to him. I promise.",to:'vow',fx:{chstart:'hostage',flag:'maud_told',aff:['maud',1]}},
+    {l:"I cannot promise. But I will look.",to:'vow2',fx:{chstart:'hostage',flag:'maud_told'}}]},
+   vow:{t:"Then take this file. Flat enough to pass under a cell door. He will know my mark on it."},
+   vow2:{t:"Honest, at least. Take this file. Pass it under his door if you see it."},
+   reply:{t:"He wrote back? Read it to me. ... A ledger at Dunmoor. Paper. They hold a man with paper. Burn it, Shiloh. Let the little one do it.",fx:{chadv:'hostage'}},
+   done:{t:"It is ash? Then Tobin owes nobody. Here. I forged this for myself, years ago, for the day I would go and fetch him. You went instead.",fx:{chdone:'hostage',item:'maudsown',alt:{cin:150},flag:'maud_kin',aff:['maud',2]}},
+   cold:{t:"Coin on the bench, goods off it. That is all we are now.",c:[{l:"Show me the gear.",fx:{hub:'shop'}},{l:"Pay toward a marker for Tobin. (Make amends)",cost:60,to:'mend',fx:{aff:['maud',1]}},{l:"Leave",end:1}]},
+   mend:{t:"Sorry is cheap. Sixty cinders toward a marker for him is not. ... It is a start."}}},
+ {id:'brann',name:'Serjeant Brann',role:'Trainer',x:8,y:4,look:{k:'guard',skin:'#b88868',cloth:'#4a5568',trim:'#c0c8d8',hat:'none'},
+  entry:[{if:'aff:brann<=-2',n:'cold'},{if:'aff:brann>=4&!flag:brann_gift',n:'gift'},{if:'aff:brann>=2&!flag:brann_riposte',n:'teach'},{n:'s'}],
+  tree:{
+   s:{t:{d:"Dummies do not hit back. Everything else will. Three clean combos and I will call it a drill.",fear:"They fear you out there. Fear makes a guard swing early. Use it. Three clean combos.",favor:"Friends in the houses will not parry for you. Three clean combos."},c:[
+    {l:"What do I get for drilling?",to:'what'},
+    {l:"Leave",end:1}]},
+   what:{t:"Mastery. Every blow on the straw is worth a little, up to a point each visit. Ashling can scorch them too. Finish a full drill and I will remember it."},
+   teach:{t:"You have drilled enough to stop thinking about your feet. Good. Now learn the turn of the wrist that makes a parry into a kill.",fx:{flag:'brann_riposte',abil:'riposte',xp:60}},
+   gift:{t:"Twenty years I carried this. It kept my hide whole at Dunmoor Bridge. You will need it more than my wall does.",fx:{flag:'brann_gift',item:'hearthstone',alt:{cin:120}}},
+   cold:{t:"You have been getting caught. I do not train corpses. Win a mission with rank B or better and we will talk.",c:[{l:"Leave",end:1}]}}},
+ {id:'odalys',name:'Odalys Fenn',role:'Archivist',x:16,y:2,look:{k:'scribe',skin:'#c8a080',cloth:'#3a4a6a',trim:'#d8d0b8',hat:'hood'},
+  entry:[{if:'ch:seal=3',n:'die'},{if:'ch:seal=1',n:'wax'},{if:'aff:odalys<=-2',n:'cold'},{if:'lv>=2&lv<=3&ch:seal=none',n:'offer'},{n:'s'}],
+  tree:{
+   s:{t:{d:"Everything you bring back goes on the wall. Letters, scrolls, lies. Especially lies. They are the best record of what people wanted.",fear:"The houses are frightened, and frightened people burn their papers. Bring me what you can before it is all smoke."},c:[
+    {l:"What should I be reading?",to:'hint'},
+    {l:"Tell me about the plain wax ring.",to:'ring',once:'ring',fx:{doc:'seal_notes',aff:['odalys',1]}},
+    {l:"Leave",end:1}]},
+   hint:{t:"The wall behind me. Every scroll you find in the houses is copied there, and every clue from your case file. Read them together. Patterns hide in the gaps."},
+   ring:{t:"It is not an absence. It is a seal, cut by someone who wants no name on the war. I have written what I know. It is on the wall."},
+   offer:{t:"I can copy the blank ring. I need two things. First an impression: press this wax to any sealed writ in Thornwick Abbey. Will you?",c:[
+    {l:"Give me the wax.",to:'yes',fx:{chstart:'seal'}},{l:"Forgery is how this war started.",to:'no',fx:{tmp:'seal_no'}}]},
+   yes:{t:"Soft wax, hard seal, count to five. Do not let the monks hear you breathe."},
+   no:{t:"Yes. That is rather the point. Come back if you change your mind before Thornwick."},
+   wax:{t:"A clean impression. Now the die. I need a blank of bell-bronze tempered in dragonfire, not forge fire. There are blanks on the racks at Ironvale. Have Ashling breathe on one.",fx:{chadv:'seal',aff:['odalys',1]}},
+   die:{t:"It is done. One die, and with it any house's order can be written. What do we do with a thing like this?",c:[
+    {l:"Keep it here. Use it sparingly.",to:'keep',fx:{chdone:'seal',flag:'forged_seal',aff:['odalys',2],abil:'forged_order'}},
+    {l:"Corvin can sell copies. We need the coin.",to:'sell',fx:{chdone:'seal',flag:'seal_sold',cin:220,aff:['odalys',-3],h:['dunmoor','fear',1]}}]},
+   keep:{t:"Then before each job I will write one small order. A guard reassigned. Nothing anyone will question until it is too late."},
+   sell:{t:"Then we are couriers of the same war we are trying to stop. Take your coin. I will be at the wall. Do not talk to me for a while."},
+   cold:{t:"The wall is there. Read it yourself.",c:[{l:"Buy three copies back. (Make amends)",cost:80,to:'mend',fx:{aff:['odalys',1]}},{l:"Leave",end:1}]},
+   mend:{t:"Eighty cinders buys three of the copies back. It is not forgiveness. It is arithmetic."}}},
+ {id:'hesper',name:'Old Hesper',role:'Dragon-keeper',x:20,y:4,look:{k:'servant',skin:'#c89878',cloth:'#5a6a3a',trim:'#e0c060',hat:'hood'},
+  entry:[{if:'aff:hesper<=-2',n:'cold'},{if:'ch:rookery=3',n:'bronze'},{if:'ch:rookery=1',n:'moss'},{if:'ch:rookery=none',n:'offer'},{n:'s'}],
+  tree:{
+   s:{t:{d:"She ate, she slept, she set fire to one small thing. A good day, for a dragon.",ruin:"She smells the smoke on you when you come home from a ruined house. She will not say so. Neither will I."},c:[
+    {l:"How is she growing?",to:'grow'},
+    {l:"Sing her the rhyme.",to:'rhyme',once:'rhyme',fx:{doc:'hesper_song',aff:['hesper',1]}},
+    {l:"Leave",end:1}]},
+   grow:{t:"Gems feed the fire. The roost feeds the bones. Use the perch: she chooses what to become there. I only sweep up after."},
+   rhyme:{t:"Moss for the cold, bronze for the heat. There. She pretended not to listen. Her tail kept time."},
+   offer:{t:"Sacking. You have a dragon sleeping on sacking. I kept the royal brood, girl, before there was no royal anything. Bring me ember-moss from a great house's cellar and I will show you a roost.",c:[
+    {l:"I will look for it.",to:'ok',fx:{chstart:'rookery',aff:['hesper',1]}},{l:"She is fine as she is.",fx:{tmp:'roost_no'}}]},
+   ok:{t:"Grey-green, warm to the hand, grows where a chimney leaks. Gallowmere has it. So does the abbey."},
+   moss:{t:"That is the stuff. Feel that? Holds heat like a held breath. Now.",c:[
+    {l:"Line the roost with it.",to:'lined',fx:{chadv:'rookery',flag:'roost1',abil:'ember_roost',aff:['hesper',1]}},
+    {l:"Corvin offered forty cinders for it.",to:'sold',fx:{cin:40,aff:['hesper',-2],ch:['rookery',0]}}]},
+   lined:{t:"There. Look at her. A warm roost and she will wake with a second wind in her. Next: bell-bronze, to hold the heat through winter. The forges have it. So do the Dunmoor chandeliers."},
+   sold:{t:"You sold a dragon's bed for forty cinders. Go and find more. And think about what you are, while you look."},
+   bronze:{t:"Bell-bronze. I have not held any since the old mews burned. Help me set it under the moss. ... Done. She will grow a stouter heart on that. And this was the brood-master's. It is hers now.",fx:{chdone:'rookery',flag:'roost2',item:'broodband',alt:{cin:120},aff:['hesper',2]}},
+   cold:{t:"I will see to the dragon. You see to yourself.",c:[{l:"Muck out the roost with her. (Make amends)",to:'mend',once:'hmend',fx:{aff:['hesper',1]}},{l:"Leave",end:1}]},
+   mend:{t:"Hm. You hold a shovel better than I expected."}}},
+ {id:'needle',name:'Needle',role:'Informant',x:24,y:12,look:{k:'servant',skin:'#e0c0a0',cloth:'#3a2a3a',trim:'#b04a6a',hat:'hood'},
+  entry:[{if:'aff:needle<=-2',n:'cold'},{if:'ch:courier=3',n:'free'},{if:'ch:courier=1',n:'satchel'},{if:'ch:courier=none&lv<=1',n:'offer'},{n:'s'}],
+  tree:{
+   s:{t:{d:"I sell what people whisper. You look like someone who wants to buy.",favor:"Your friends in the houses gossip to me for nothing now. I pass the saving on. Mostly.",fear:"Nobody talks about you. They are too frightened. That makes my work dear."},c:[
+    {l:"Mark the hidden way in the next house.",if:'!flag:needle_maps',cost:25,shop:1,to:'tip',once:'tip',fx:{stash:{tip:1}}},
+    {l:"What do they say about me?",to:'say'},
+    {l:"Who is Corvin, really?",if:'aff:needle>=2',to:'corvin',once:'ncorv'},
+    {l:"Leave",end:1}]},
+   tip:{t:"Paid. I have marked the hidden way on your map for the next job. Look for the seam in the wall."},
+   say:{t:{d:"That you are careful. From a spy, that is the only compliment.",favor:"That you keep your word. Dangerous reputation. People will start expecting it.",fear:"That doors open when you look at them. I would be careful what you become.",ruin:"That houses fall down behind you. Some of them deserved it."}},
+   corvin:{t:"Quill trained him the year before she trained you. He was the one she kept. Ask yourself why she let you go."},
+   offer:{t:"My courier Wick went into Gallowmere Hall with a full satchel and did not come out. Find the satchel and I will know who took him.",c:[
+    {l:"I will look for it.",to:'ok',fx:{chstart:'courier',aff:['needle',1]}},{l:"I am not a finder of lost boys.",fx:{tmp:'courier_no'}}]},
+   ok:{t:"Red strap, brass buckle. He would have hidden it somewhere deep in the hall when he knew he was followed."},
+   satchel:{t:"That is his. Give it here and I will read where he was sent.",c:[
+    {l:"It is yours.",to:'cells',fx:{chadv:'courier',aff:['needle',1]}},
+    {l:"Corvin offered eighty cinders for it.",to:'sold',fx:{chfail:'courier',cin:80,aff:['needle',-3],flag:'satchel_sold'}}]},
+   cells:{t:"The abbey cells. Thornwick. They are keeping him quiet until the war starts. Spring his door if you pass it."},
+   sold:{t:"Then Wick is worth eighty cinders to you. I will remember the price. So will every runner in this city."},
+   free:{t:"He is by the fire, eating my bread. You brought back one of mine. Nobody does that. Take his band, he wants you to have it. And from now on I mark every hidden way for you, free.",fx:{chdone:'courier',item:'courierband',alt:{cin:120},cin:120,flag:'needle_maps',aff:['needle',2]}},
+   cold:{t:"I have nothing to sell you.",c:[{l:"Pay Wick's blood-price. (Make amends)",cost:100,to:'mend',fx:{aff:['needle',2]}},{l:"Leave",end:1}]},
+   mend:{t:"A hundred cinders to his mother. It does not bring him back. It means I will take your coin again."}}},
+ {id:'corvin',name:'Corvin Vane',role:'Rival',x:20,y:14,show:'!flag:corvin_gone',look:{k:'servant',skin:'#d0b090',cloth:'#2a3a4a',trim:'#70c0d0',hat:'none'},
+  entry:[{if:'aff:corvin>=3&!flag:corvin_ally',n:'ally'},{if:'flag:corvin_ally',n:'friend'},{n:'s'}],
+  tree:{
+   s:{t:{d:"Shiloh. Still alive. I had money on that, as it happens. Care to make it interesting?",fear:"They are afraid of you now. I remember when that was my job.",favor:"Friends in every house. How sweet. Friends are just marks who have not been asked yet."},c:[
+    {l:"A wager: rank A or better next time.",if:'!flag:wager_on',cost:40,to:'bet',fx:{wager:1}},
+    {l:"Why do you stay here?",to:'why',once:'cwhy',fx:{aff:['corvin',1],doc:'wager_book'}},
+    {l:"Stay out of my way.",to:'rude',once:'crude',fx:{aff:['corvin',-1]}},
+    {l:"Leave",end:1}]},
+   bet:{t:"Forty says you trip an alarm. Double back if you come home clean. Do try. I hate winning easy."},
+   why:{t:"Because Quill is out there, and this is the only roof she has not bought. Do not read into it."},
+   rude:{t:"There she is. I was worried you had gone soft."},
+   ally:{t:"I have lost enough wagers to you that I find I do not mind. Here. A key to the couriers' caches. There is one near every house. Use them.",fx:{flag:'corvin_ally',aff:['corvin',1],abil:'courier_cache'}},
+   friend:{t:"The cache will be stocked. Smoke and a bell. Try not to need them.",c:[
+    {l:"A wager: rank A or better.",if:'!flag:wager_on',cost:40,to:'bet',fx:{wager:1}},{l:"Leave",end:1}]}}},
+ {id:'wick',name:'Wick',role:'Courier',x:23,y:14,show:'ch:courier>=3',look:{k:'servant',skin:'#e8c8a0',cloth:'#6a3030',trim:'#d04040',hat:'cap',small:true,pack:true},
+  entry:[{if:'tmp:wick_bell',n:'again'},{n:'s'}],
+  tree:{s:{t:"I run for you now, if you will have me. I left a bell in your kit. I know which doors squeak in every house in the city.",fx:{stash:{bell:1},tmp:'wick_bell'},c:[{l:"Welcome home, Wick.",end:1}]},
+        again:{t:"Kit is packed. Go quiet."}}},
+ {id:'hale',name:'Hale',role:'Freed sailor',x:3,y:8,show:'flag:hale_free',look:{k:'servant',skin:'#d8b890',cloth:'#4a6a88',trim:'#2a3a50',hat:'none'},
+  tree:{s:{t:"You cut my chain, I sweep your floor. Fair trade. The Spire's sailors drink to you, quietly."}}},
+ {id:'tam',name:'Tam',role:'Pot-boy',x:6,y:8,show:'flag:tam_safe',look:{k:'servant',skin:'#e8c8a0',cloth:'#7a6a40',trim:'#d8c8a0',hat:'cap',small:true},
+  tree:{s:{t:"Maud lets me work the bellows! Ashling lets me scratch behind the horn. Nobody here sells anybody."}}},
+ {id:'refugee',name:'Dispossessed Clerk',role:'Refugee',x:20,y:8,show:'st:ruin',look:{k:'servant',skin:'#c8b098',cloth:'#5a5a5a',trim:'#8a8a8a',hat:'none'},
+  tree:{s:{t:"My house fell. They say you were seen there the night before. I am not accusing. I have nowhere else to sleep.",c:[{l:"Give him a little.",cost:20,to:'ty',once:'alms',fx:{aff:['hesper',1]}},{l:"Leave",end:1}]},ty:{t:"Hesper said you were not what they say. Thank you."}}},
+ {id:'envoy',name:'Nervous Envoy',role:'Sent with tribute',x:17,y:8,show:'st:fear',look:{k:'merchant',skin:'#e0c8b0',cloth:'#5a2a4a',trim:'#e0c060',hat:'cap'},
+  tree:{s:{t:"My lord sends this purse and asks, respectfully, that his house not be next.",c:[{l:"Take the purse.",once:'trib',to:'took',fx:{cin:45}},{l:"Keep it. Tell him to behave.",once:'trib',to:'left',fx:{aff:['hesper',1]}},{l:"Leave",end:1}]},took:{t:"Of course. Of course. I will tell him you were gracious."},left:{t:"I... yes. I will tell him exactly that."}}},
+ {id:'steward',name:'Grateful Steward',role:'Sent with thanks',x:10,y:8,show:'st:favor',look:{k:'servant',skin:'#d8b890',cloth:'#3a5a3a',trim:'#e0c060',hat:'cap'},
+  tree:{s:{t:"My mistress sends bread, lamp oil and her regards. The houses that owe you will not see your people go hungry.",c:[{l:"Thank her for me.",once:'thx',to:'ty',fx:{stash:{smoke:1}}},{l:"Leave",end:1}]},ty:{t:"And a pinch of smoke powder from her own cellar. For the road."}}}
+ ],
+ objs:[
+  {id:'h_door',kind:'hub',use:'door',icon:'door',label:'Set out',x:14,y:15,need:.5},
+  {id:'h_board',kind:'hub',use:'board',icon:'board',label:'Read the notice board',x:24,y:7,need:.3},
+  {id:'h_lib',kind:'hub',use:'library',icon:'shelf',label:'Read the library wall',x:12,y:1,need:.3},
+  {id:'h_case',kind:'hub',use:'case',icon:'casetable',label:'Study the case file',x:14,y:3,need:.3},
+  {id:'h_bench',kind:'hub',use:'bench',icon:'bench',label:'Equipment bench',x:7,y:12,need:.3},
+  {id:'h_perch',kind:'hub',use:'perch',icon:'perch',label:"Ashling's perch",x:23,y:2,need:.3},
+  {id:'h_letter',kind:'hub',use:'letter',icon:'letter',label:'A letter under the door',x:2,y:14,need:.4,show:'lv>=3&lv<=4&!flag:hostage_seen'},
+  {id:'h_d1',kind:'dummy',icon:'dummy',label:'',x:3,y:2},{id:'h_d2',kind:'dummy',icon:'dummy',label:'',x:6,y:2},{id:'h_d3',kind:'dummy',icon:'dummy',label:'',x:4,y:4}
+ ]};
