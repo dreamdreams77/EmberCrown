@@ -774,11 +774,11 @@ function update(dt){
       if(!G.flight&&Math.random()<.6)pt(A.x,A.y+5,(Math.random()-.5)*10,(Math.random()-.5)*10,.5,2.5,'rgba(120,110,100,.5)',{k:'smoke',gr:3});}
   }
   // tether: the other one is pulled along if too far
-  if(G.ash.on&&!G.flight){
+  if(G.ash.on&&!G.flight&&!(G.mis&&G.mis.dis&&G.mis.dis.on)){
     const O=G.active==='wren'?G.ash:G.wren;
     if(Math.hypot(O.x-A.x,O.y-A.y)>7.5*T){
       G.rings.push({x:O.x,y:O.y,t:.4,r:30,c:'180,120,255'});
-      O.x=A.x;O.y=A.y;
+      O.x=A.x;O.y=A.y;for(const [ox,oy] of [[-18,6],[18,6],[0,16],[0,-16]])if(!blocked(A.x+ox,A.y+oy,8)){O.x=A.x+ox;O.y=A.y+oy;break;}
       G.rings.push({x:O.x,y:O.y,t:.4,r:30,c:'180,120,255'});
     }
   }

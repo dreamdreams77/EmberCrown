@@ -59,7 +59,7 @@ function enter(next){
   G.props=[];G.pblock=new Set();G.pots=[];G.inspects=[];G.insp=[];G.chests=[];G.torches=(G.torches||[]).slice(0,10);
   for(const o of G.nq.objs)if(BLOCK[o.icon])G.pblock.add(pkey(o.x,o.y));
   for(const b of SOLID)G.pblock.add(pkey(b[0],b[1]));
-  G.ash.on=true;G.ash.x=23*T+16;G.ash.y=2*T+20;G.ash.face=2.2;
+  G.ash.on=true;G.ash.x=G.wren.x+22;G.ash.y=G.wren.y+8;if(blocked(G.ash.x,G.ash.y,8)){G.ash.x=G.wren.x-22;}G.ash.face=2.2;
   G.wren.face=-Math.PI/2;
   decor=null;auto=null;lastAtk=null;
   const h=hs();if(!h.drill||h.drill.lv!==next)h.drill={lv:next,xp:0,fin:0,done:0};
