@@ -88,7 +88,7 @@ function build(id,arrive){
   const parent=stack[0].G,S_=DUNGEONS[id],st=D();
   const g=loadLevel(levelDef(id));
   g.props=[];g.pblock=new Set();g.pots=[];g.chests=[];g.inspects=[];
-  g.exit={x:-9999,y:-9999};g.grace=1e9;g.ash.on=true;g.gad=parent.gad;g.hp=parent.hp;g.maxHp=parent.maxHp;g.cinders=0;
+  g.exit={x:-9999,y:-9999};g.doneSaid=true;g.grace=1e9;g.ash.on=true;g.gad=parent.gad;g.hp=parent.hp;g.maxHp=parent.maxHp;g.cinders=0;
   const dg={id,t:0,carts:(S_.carts||[]).map(c=>({x:c[0],y:c[1],fx:c[0],fy:c[1],a:1,push:0})),plates:(S_.plates||[]).map(p=>({x:p[0],y:p[1],on:false})),
     mirrors:(S_.mirrors||[]).map(m=>({x:m[0],y:m[1],s:m[2]})),braz:(S_.braz||S_.braz2||[]).map(b=>({x:b[0],y:b[1],dx:b[2]||0,dy:b[3]||0,lit:false,p:0})),
     bells:(S_.bells||[]).map(b=>({x:b[0],y:b[1],n:b[2],ring:0})),seq:[],ch:null,beam:null,beam2:[],loot:0};
