@@ -475,7 +475,7 @@ function glyph(c,o,t){
 function drawBack(){
   const nq=G.nq;if(!nq)return;
   const c=ctx,t=G.time;
-  if(nq.hub&&window.Hub)Hub.drawBack(c,t);
+  if(nq.hub&&window.Hub)Hub.drawBack(c,t);else if(window.Hub&&G.barred)Hub.drawMission(c,t);
   const r=nq.route;
   if(r&&!r.open&&r.hint){ // faint seam in the wall
     const x=r.x*T,y=r.y*T,p=.5+.5*Math.sin(t*2.4);

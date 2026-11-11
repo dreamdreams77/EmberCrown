@@ -168,7 +168,24 @@ function carried(i){ // what the Rookery sends with you into mission i: [{t:text
   if(aff('brann')>=3)out.push({k:'brann',t:"Brann's drills: +1 heart"});
   return out;
 }
+function reach(g,skip){ // floor tiles reachable from the start; locked doors count as passable unless barred or skipped
+  const sx=Math.floor(g.wren.x/T),sy=Math.floor(g.wren.y/T),seen=new Set([sx+sy*256]),q=[[sx,sy]];
+  while(q.length){const [x,y]=q.pop();
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+ny*256;
+      if(nx<0||ny<0||nx>=g.gw||ny>=g.gh||seen.has(k)||g.grid[ny][nx]!=='.')continue;
+      const dr=g.doors[nx+','+ny];if(dr&&(dr===skip||dr.barred||dr.gate))continue;
+      seen.add(k);q.push([nx,ny]);}}
+  return seen;
+}
+function barDoor(g){ // a frightened house bars one locked door, never one the job needs
+  const need=[...g.items.filter(it=>'OPBLHC'.includes(it.type)),g.exit].map(it=>Math.floor(it.x/T)+Math.floor(it.y/T)*256);
+  const base=reach(g);if(!need.every(k=>base.has(k)))return null;
+  const ds=Object.values(g.doors).filter(d=>!d.open&&!d.sealed&&!d.gate).sort((a,b)=>a.x-b.x||a.y-b.y);
+  for(const d of ds){const r=reach(g,d);if(need.every(k=>r.has(k))){d.barred=true;return d;}}
+  return null;
+}
 function missionInit(g,nq,i){
+  if(nq.st==='fear'&&!g.flight)g.barred=barDoor(g);
   const C=carried(i);g.hubFx=C;
   for(const c of C){
     if(c.k==='stash'){g.gad.smoke+=c.smoke;g.gad.bell+=c.bell;}
@@ -235,7 +252,11 @@ function peopleHtml(){
     let pips='';for(let k=-3;k<=5;k++)pips+='<i style="display:inline-block;width:9px;height:9px;margin-right:2px;border-radius:50%;border:1px solid '+(k<0?'#a05048':'#b89a50')+';background:'+((k<0&&a<=k)?'#e07060':(k>0&&a>=k)?'#f0b44c':k===0?'#6a5a78':'transparent')+'"></i>';
     const perk=gone?'Gone. Your description is in every guardroom.':PERK[id](a);
     return'<div class="quest"><span class="qdot"></span><div><b>'+HUBPEOPLE[id]+' <small style="font-weight:400;opacity:.7">'+HUBROLE[id]+'</small></b><span>'+pips+' '+AFFNAME(a)+'. '+perk+'</span></div><i>'+(a>0?'+':'')+a+'</i></div>';};
-  return'<h3>The Rookery <small>who stands with you</small></h3>'+Object.keys(HUBPEOPLE).map(row).join('');
+  const st=NPC.stand(null),word={none:'The city does not know the Rookery yet. Win houses over, frighten them or break them, and it will show here.',
+    favor:'Houses that owe you send stewards with gifts; carters give Maud credit, so prices fall.',
+    fear:'Envoys bring tribute and Maud pays more for stock. Corvin has hired a blade to watch the door.',
+    ruin:'The dispossessed sleep in the hall. Ruined houses sell iron cheap; the city whispers your name with dread.'}[st];
+  return'<h3>The Rookery <small>who stands with you</small></h3><p class="small">'+word+'</p>'+Object.keys(HUBPEOPLE).map(row).join('');
 }
 const PERK={
  maud:a=>flag('maud_kin')?'Kin prices at the forge (-25%).':a>=3?'Prices -20% and extra smoke powder each mission.':a<=-2?'Sells at +20%. No favours.':flag('maud_grief')?'Grieving: prices +25%.':'Sells gear and supplies.',
@@ -523,6 +544,18 @@ function bake(){
   { const n=run.relics.length;for(let i=0;i<n&&i<7;i++){const x=11*T+8+i*9,y=11*T+8;c.fillStyle='rgba(0,0,0,.3)';ell(c,x,y+5,4,1.6);c.fill();c.fillStyle=['#e8c060','#9fd8ff','#e07060','#c08cff','#ff9a4a','#e0e8f0','#ffd27a'][i];c.beginPath();c.moveTo(x,y-5);c.lineTo(x+3.5,y);c.lineTo(x,y+5);c.lineTo(x-3.5,y);c.closePath();c.fill();ol(c,1);} }
   return cvs;
 }
+function drawMission(c,t){ // a barred door in a frightened house
+  const d=G.barred;if(!d||d.open)return;
+  const x=d.x*T,y=d.y*T;
+  c.save();c.translate(x+16,y+16);
+  for(const a of [-.62,.62]){c.save();c.rotate(a);c.fillStyle='rgba(0,0,0,.35)';c.fillRect(-17,-2,34,6);
+    c.fillStyle='#6a4a30';c.fillRect(-17,-3.5,34,6);c.strokeStyle=INK;c.lineWidth=1.2;c.strokeRect(-17,-3.5,34,6);
+    c.fillStyle='rgba(255,230,180,.25)';c.fillRect(-16,-3,32,1.5);c.fillStyle='#2a2a30';circ(c,-13,-.5,1.3);c.fill();circ(c,13,-.5,1.3);c.fill();c.restore();}
+  c.restore();
+  const A=G.active==='wren'?G.wren:G.ash;
+  if(Math.hypot(A.x-x-16,A.y-y-16)<2.2*T){c.font='bold 9px '+HEAD;c.textAlign='center';const s='Barred from inside',w=c.measureText(s).width+10;
+    c.fillStyle='rgba(14,10,20,.82)';rr(c,x+16-w/2,y-14,w,12,4);c.fill();c.fillStyle='#e07060';c.fillText(s,x+16,y-5);c.textAlign='left';}
+}
 function drawBack(c,t){
   if(resume&&mode==='pause'&&!UI.modalOpen){resume=false;pauseGame(false);}
   if(!decor)decor=bake();
@@ -605,7 +638,7 @@ function glyph(c,o,t){
    {id:'broodband',slot:'gear',rar:'unique',name:'Brood Band',flavor:"The brood-master's ring, sized down for a runt. She will grow into it.",b:{dash:1,hp:1}});
   if(typeof window.giveItem!=='function')window.giveItem=id=>!!grantItem(id);
 })();
-return{objectives,drawFront,enter,leave,canVisit,tick,use,fx,glyph,drawBack,missionObjs,missionInit,missionEnd,briefHtml,journal,peopleHtml,priceMul,affTag,walkTo,carried,
+return{objectives,drawFront,drawMission,barDoor,enter,leave,canVisit,tick,use,fx,glyph,drawBack,missionObjs,missionInit,missionEnd,briefHtml,journal,peopleHtml,priceMul,affTag,walkTo,carried,
   get active(){return inHub();},aff,LEVEL};
 })();
 window.Hub=Hub;

@@ -461,6 +461,8 @@ const HUBDATA={house:null,
   tree:{s:{t:"My house fell. They say you were seen there the night before. I am not accusing. I have nowhere else to sleep.",c:[{l:"Give him a little.",cost:20,to:'ty',once:'alms',fx:{aff:['hesper',1]}},{l:"Leave",end:1}]},ty:{t:"Hesper said you were not what they say. Thank you."}}},
  {id:'envoy',name:'Nervous Envoy',role:'Sent with tribute',x:17,y:8,show:'st:fear',look:{k:'merchant',skin:'#e0c8b0',cloth:'#5a2a4a',trim:'#e0c060',hat:'cap'},
   tree:{s:{t:"My lord sends this purse and asks, respectfully, that his house not be next.",c:[{l:"Take the purse.",once:'trib',to:'took',fx:{cin:45}},{l:"Keep it. Tell him to behave.",once:'trib',to:'left',fx:{aff:['hesper',1]}},{l:"Leave",end:1}]},took:{t:"Of course. Of course. I will tell him you were gracious."},left:{t:"I... yes. I will tell him exactly that."}}},
+ {id:'blade',name:'Hired Blade',role:'Watching the door',x:12,y:14,show:'st:fear&!flag:corvin_gone',look:{k:'guard',skin:'#c8a080',cloth:'#3a3a44',trim:'#8a8f9a',hat:'none'},
+  tree:{s:{t:"Corvin pays me to watch the door. Half the houses would like you dead, the other half would like to watch. Nobody gets past me.",c:[{l:"Keep a sharp eye.",end:1}]}}},
  {id:'steward',name:'Grateful Steward',role:'Sent with thanks',x:10,y:8,show:'st:favor',look:{k:'servant',skin:'#d8b890',cloth:'#3a5a3a',trim:'#e0c060',hat:'cap'},
   tree:{s:{t:"My mistress sends bread, lamp oil and her regards. The houses that owe you will not see your people go hungry.",c:[{l:"Thank her for me.",once:'thx',to:'ty',fx:{stash:{smoke:1}}},{l:"Leave",end:1}]},ty:{t:"And a pinch of smoke powder from her own cellar. For the road."}}}
  ],

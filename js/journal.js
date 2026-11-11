@@ -95,9 +95,11 @@ const Journal=(()=>{
   function housesHTML(){
     const mood=k=>{const h=houses[k];return h.ruin>0?'in ruins':h.fear>0?'afraid of you':h.favor>0?'owes you':'does not know your name';};
     const hs=Object.keys(HOUSE_NAMES).map(k=>{const h=houses[k];
-      return'<div class="hcard">'+sigil(k)+'<div><b>House '+HOUSE_NAMES[k]+'</b><span>'+mood(k)+'</span></div><div class="pips"><i class="f" title="Favor">'+h.favor+'</i><i class="e" title="Fear">'+h.fear+'</i><i class="r" title="Ruin">'+h.ruin+'</i></div></div>';}).join('');
+      const st=window.NPC&&NPC.stand?NPC.stand(k):'none',fx=st!=='none'&&typeof HOUSEFX!=='undefined'?'<br><small style="opacity:.75">'+HOUSEFX[st].join(' &middot; ')+'</small>':'';
+      return'<div class="hcard">'+sigil(k)+'<div><b>House '+HOUSE_NAMES[k]+'</b><span>'+mood(k)+fx+'</span></div><div class="pips"><i class="f" title="Favor">'+h.favor+'</i><i class="e" title="Fear">'+h.fear+'</i><i class="r" title="Ruin">'+h.ruin+'</i></div></div>';}).join('');
     const st=[];for(let i=1;i<STAIRS.length;i++){const a=stairsAction(i);if(a)st.push('<div class="cx lore"><div><b>'+LEVELS[i].name+'</b><span>You '+a.short+'.</span></div></div>');}
-    return'<div class="codex"><h3>Where the houses stand <small>Favor &middot; Fear &middot; Ruin</small></h3>'+hs+(st.length?'<h3 class="sp">On the back stairs</h3>'+st.join(''):'')+'</div>';
+    let rk='';try{rk=window.Hub&&Hub.peopleHtml?Hub.peopleHtml():'';}catch(e){rk='';}
+    return'<div class="codex"><h3>Where the houses stand <small>Favor &middot; Fear &middot; Ruin</small></h3>'+hs+(st.length?'<h3 class="sp">On the back stairs</h3>'+st.join(''):'')+(rk?'<div class="sp"></div>'+rk:'')+'</div>';
   }
   function codexHTML(){
     const rl=RELIC_KEYS.map(k=>{const have=meta.relics.includes(k)||run.relics.includes(k),r=RELICS[k];

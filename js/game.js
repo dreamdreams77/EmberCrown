@@ -622,7 +622,7 @@ function stepTorches(dt){
 function findTarget(A){
   let tgt=null,bd=1e9;
   for(const k in G.doors){
-    const d=G.doors[k];if(d.open||d.sealed||d.gate)continue;
+    const d=G.doors[k];if(d.open||d.sealed||d.gate||d.barred)continue;
     const dd=Math.hypot(d.x*T+16-A.x,d.y*T+16-A.y);
     if(dd<44&&dd<bd){bd=dd;tgt={kind:'door',ref:d,need:.9*quickMul()*(G.bsx.pick||1),x:d.x*T+16,y:d.y*T+16,label:'Pick lock'};}
   }
