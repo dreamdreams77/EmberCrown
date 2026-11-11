@@ -184,6 +184,7 @@ function burnSpot(s){
 function step(dt){
   const S=G.ab;if(!S)return;
   for(const k in S.cd)if(S.cd[k]>0)S.cd[k]-=dt;
+  if(G.pdAt&&G.pdAt!==S.pd){S.pd=G.pdAt;try{Aud.S.parry();}catch(e){}} // a ringing layer on top of the parry's deflect
   if(S.shadeT>0)S.shadeT-=dt;if(S.stepCd>0)S.stepCd-=dt;if(S.flare>0)S.flare-=dt;
   if(S.lant>0){S.lant-=dt;if(S.lant<=0){S.lant=0;S.cd.lantern=DEFS.lantern.cd*cdMul();}}
   // disguise skill: stretch a freshly put-on mask
