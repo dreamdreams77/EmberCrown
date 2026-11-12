@@ -186,12 +186,15 @@ function floorTile(c,x,y,p,fs,rnd,th){
   }
   // decals
   if(th.bones&&rnd()<th.bones){
+    if(typeof LPCP!=='undefined'&&LPCP.on()){ // pixel mode: a bone or a skull from the prop sheet (same number of random draws as the drawn bones)
+      const a=rnd(),b=rnd(),k=rnd(),sk=rnd()<.35;LPCP.at(c,sk?'skull':'bone',px+(sk?a*6:a*4-6),py+(sk?b*6:b*10-4),k>.5);
+    }else{
     c.strokeStyle='rgba(225,220,200,.6)';c.lineWidth=1.6;c.lineCap='round';
     const bx=px+8+rnd()*16,by=py+8+rnd()*16,a=rnd()*3;
     c.beginPath();c.moveTo(bx,by);c.lineTo(bx+Math.cos(a)*8,by+Math.sin(a)*8);c.stroke();
     c.beginPath();c.moveTo(bx+2,by+3);c.lineTo(bx+2+Math.cos(a+1.2)*6,by+3+Math.sin(a+1.2)*6);c.stroke();
     if(rnd()<.35){c.fillStyle='rgba(225,220,200,.7)';ell(c,bx-3,by-3,3,2.6);c.fill();c.fillStyle='rgba(0,0,0,.6)';c.fillRect(bx-4.5,by-4,1.2,1.2);c.fillRect(bx-2.5,by-4,1.2,1.2);}
-    c.lineCap='butt';
+    c.lineCap='butt';}
   }
   if(th.coins&&rnd()<th.coins){c.fillStyle='#e0b040';circ(c,px+6+rnd()*20,py+6+rnd()*20,1.8);c.fill();c.fillStyle='rgba(255,255,255,.5)';c.fillRect(px+8+rnd()*10,py+8+rnd()*10,1,1);}
   if(G.state==='ruin'&&rnd()<.07){c.fillStyle='rgba(40,70,90,.5)';ell(c,px+16,py+16,8+rnd()*6,5+rnd()*4,rnd()*3);c.fill();c.fillStyle='rgba(180,210,230,.18)';ell(c,px+14,py+14,4,2,0);c.fill();}
@@ -343,8 +346,9 @@ function bakeStatic(){
       const nearDoor=G.doors[x+','+(y+1)];
       if(r<(th.torch||0)&&Math.abs(x-lastTorch)>2&&!ruin||(ruin&&r<(th.torch||0)*.5)){
         lastTorch=x;
+        if(!(typeof LPCP!=='undefined'&&LPCP.on())){ // pixel mode draws the whole torch as an animated sprite in drawFlames
         c.fillStyle='#2a2018';c.fillRect(px+14,py+13,4,10);c.fillStyle='#4a3a28';c.fillRect(px+12,py+21,8,3);
-        c.fillStyle='#1a1410';c.fillRect(px+15,py+9,2,6);
+        c.fillStyle='#1a1410';c.fillRect(px+15,py+9,2,6);}
         {const ro=ruin&&rnd()<.4;G.torches.push({x:px+16,y:py+12,ph:rnd()*6,col:tc,out:ro,ruinOut:ro});}
       } else if(r<(th.torch||0)+(th.banner||0)&&!nearDoor){
         if(window.TILES){c.drawImage(TILES.bannerSprite('ban'),px,py,T,T);}else{
@@ -456,6 +460,7 @@ function drawDarkness(){
   amb=amb.slice();
   if(G.d.finale)amb[3]=clamp(amb[3]+(5-Math.min(5,G.candlesLit||0))*.055,0,.8);
   amb[3]=clamp(amb[3]+(G.shiftT>0?.1*G.shiftT:0),0,.85);
+  if(typeof PX!=='undefined'&&PX.active)amb[3]=Math.min(.74,amb[3]+.2); // deeper shadow in pixel mode so lit figures stand out
   const W=G.gw*T,H=G.gh*T,k=LT.k;
   const lw=Math.ceil(W/k),lh=Math.ceil(H/k);
   if(LT.cv.width!==lw||LT.cv.height!==lh){LT.cv.width=lw;LT.cv.height=lh;}
@@ -670,17 +675,21 @@ function drawCones(){
     const pts=visPoly(g,range,g.half||.62);
     const seeing=g.seeing,alert=g.lure||g.ret;
     const col=seeing?'255,84,62':alert?'255,196,96':'255,238,176';
-    const a0=seeing?.36:alert?.26:.2,a1=seeing?.12:.075;
+    const px=typeof PX!=='undefined'&&PX.active;
+    const a0=px?(seeing?.3:alert?.2:.11):(seeing?.36:alert?.26:.2),a1=px?(seeing?.14:.06):(seeing?.12:.075);
     const gr=c.createRadialGradient(g.x,g.y,6,g.x,g.y,range);
     gr.addColorStop(0,'rgba('+col+','+a0+')');gr.addColorStop(.55,'rgba('+col+','+(a0*.5)+')');gr.addColorStop(1,'rgba('+col+','+a1+')');
     c.fillStyle=gr;c.beginPath();pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.closePath();c.fill();
     // bright core down the middle of the beam
     const mid=1+(CONE_N>>1),lo=mid-3,hi=mid+3;
     const gc=c.createRadialGradient(g.x,g.y,4,g.x,g.y,range*.9);
-    gc.addColorStop(0,'rgba('+col+','+(seeing?.22:.14)+')');gc.addColorStop(1,'rgba('+col+',0)');
+    gc.addColorStop(0,'rgba('+col+','+(px?(seeing?.16:.05):(seeing?.22:.14))+')');gc.addColorStop(1,'rgba('+col+',0)');
     c.fillStyle=gc;c.beginPath();c.moveTo(g.x,g.y);for(let i=lo;i<=hi;i++)c.lineTo(pts[i][0],pts[i][1]);c.closePath();c.fill();
     // faint rim, stronger once you are seen
-    c.strokeStyle='rgba('+col+','+(seeing?.5:.12)+')';c.lineWidth=seeing?1.4:1;c.stroke();
+    if(px){ // outline the whole cone, not just the core
+      c.beginPath();pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.closePath();
+      c.strokeStyle='rgba('+col+','+(seeing?.8:alert?.55:.4)+')';c.lineWidth=1;c.stroke();
+    }else{c.strokeStyle='rgba('+col+','+(seeing?.5:.12)+')';c.lineWidth=seeing?1.4:1;c.stroke();}
     if(g.kind==='hound'){ // scent radius
       c.strokeStyle='rgba(255,150,80,.2)';c.setLineDash([3,4]);circ(c,g.x,g.y,2.5*T*G.rangeMul);c.stroke();c.setLineDash([]);
     }

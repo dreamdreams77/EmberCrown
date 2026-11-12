@@ -120,32 +120,35 @@ function drawHud(){
     if(jb.width)V.safeL=Math.max(0,jb.right-cr.left+8);
   }
   const aL=touchLand?(V.safeL||150):0,aR=touchLand?(V.safeR||240):0,aw=Math.max(220,W-aL-aR),acx=touchLand?aL+(W-aL-aR)/2:W/2;
-  const objs=objectiveLines();
-  const title=G.d.name;
+  // phone portrait keeps the playfield clear: hearts on the left, minimap on the right, and one line for the next objective
+  const objsAll=objectiveLines();
+  const objs=narrow?[objsAll.find(o=>!o.done)||objsAll[objsAll.length-1]].filter(Boolean):objsAll;
+  const title=narrow?'':G.d.name;
   c.font='bold '+Math.round(fs*1.05)+'px '+HEAD;let ow=c.measureText(title).width;
   c.font=fs+'px '+BODY;
   for(const o of objs)ow=Math.max(ow,c.measureText(o.text).width+20);
-  const foot='Embers '+stats.gems+(G.secretsTotal?'   Secrets '+G.secretsFound+'/'+G.secretsTotal:'');
+  const foot=narrow?'':'Embers '+stats.gems+(G.secretsTotal?'   Secrets '+G.secretsFound+'/'+G.secretsTotal:'');
   ow=Math.max(ow,c.measureText(foot).width+4);
-  ow=Math.min(ow,narrow?W-pad*4:W*.58);
-  const lh=Math.round(fs*1.5),oh=Math.round(lh*(objs.length+2)+10);
-  const ox=pad,oy=narrow?pad+pbS+8:pad;
+  ow=Math.min(ow,narrow?W-pad*5-clamp(W*.26,72,110):W*.58);
+  const tl=narrow?0:1,hhN=Math.round(26*U);
+  const lh=Math.round(fs*1.5),oh=narrow?Math.round(lh+8):Math.round(lh*(objs.length+2)+10);
+  const ox=pad,oy=narrow?pad+pbS+8+hhN+5:pad;
   panelBox(c,ox,oy,ow+pad*2,oh,8);
   c.fillStyle='#f0b44c';c.font='bold '+Math.round(fs*1.05)+'px '+HEAD;c.fillText(title,ox+pad,oy+lh*.95);
   c.font=fs+'px '+BODY;
   objs.forEach((o,i)=>{
-    const yy=oy+lh*(i+2)-lh*.18;
+    const yy=oy+lh*(i+1+tl)-lh*.18+(narrow?2:0);
     c.strokeStyle=o.done?'#7be08a':'#9a8aa0';c.lineWidth=1.4;
     c.beginPath();c.arc(ox+pad+5,yy-fs*.32,fs*.36,0,6.28);c.stroke();
     if(o.done){c.strokeStyle='#7be08a';c.lineWidth=2;c.beginPath();c.moveTo(ox+pad+2.5,yy-fs*.3);c.lineTo(ox+pad+4.6,yy-fs*.1);c.lineTo(ox+pad+8.4,yy-fs*.6);c.stroke();}
-    c.fillStyle=o.done?'#7be08a':'#eadfd0';c.fillText(o.text,ox+pad+fs*1.05,yy);
+    c.fillStyle=o.done?'#7be08a':'#eadfd0';c.fillText(o.text,ox+pad+fs*1.05,yy,ow-fs*1.05+pad);
   });
   c.fillStyle='#b8a0c8';c.font=Math.round(fs*.92)+'px '+BODY;
   c.fillText(foot,ox+pad,oy+oh-pad*.75);
   // hearts and cinders
-  const hs=Math.round(15*U),hh=Math.round(26*U),hy=oy+oh+5;
+  const hs=Math.round(15*U),hh=hhN,hy=narrow?pad+pbS+8:oy+oh+5;
   const hw=Math.max(G.maxHp*(hs+3)+pad*2+Math.round(70*U),ow+pad*2);
-  panelBox(c,ox,hy,Math.min(hw,ow+pad*2),hh,8,G.hurtFlash>0?'rgba(255,90,90,.8)':undefined);
+  panelBox(c,ox,hy,narrow?G.maxHp*(hs+3)+pad*2+Math.round(46*U):Math.min(hw,ow+pad*2),hh,8,G.hurtFlash>0?'rgba(255,90,90,.8)':undefined);
   for(let i=0;i<G.maxHp;i++){
     const hx=ox+pad+i*(hs+3)+hs/2,full=i<G.hp,sh_=G.hpShake>0?Math.sin(G.hpShake*60)*2:0;
     c.save();c.translate(hx,hy+hh/2+sh_);const sc=hs/16*(full&&G.hp<=1&&Math.sin(G.time*8)>0?1.12:1);c.scale(sc,sc);
@@ -156,7 +159,7 @@ function drawHud(){
   }
   c.fillStyle='#ffb040';const cx0=ox+pad+G.maxHp*(hs+3)+6;c.beginPath();c.moveTo(cx0,hy+hh/2-5);c.lineTo(cx0+4,hy+hh/2);c.lineTo(cx0,hy+hh/2+5);c.lineTo(cx0-4,hy+hh/2);c.fill();
   c.fillStyle='#ffd27a';c.font='bold '+Math.round(fs*.95)+'px '+HEAD;c.textAlign='left';c.fillText(String(run.cinders+G.cinders),cx0+8,hy+hh/2+fs*.34);
-  const topBottom=hy+hh;
+  const topBottom=narrow?oy+oh:hy+hh;
   // --- suspicion meter ---
   const icoW=Math.round(26*U),mh=Math.round(26*U),my=pad+Math.round((pbS-mh)/2);
   const mw=narrow?W-pad*2-pbS-8-icoW-6:Math.min(Math.round(150*U),Math.max(96,W*.30));
@@ -179,7 +182,7 @@ function drawHud(){
   if(settings.minimap){
     const maxW=Math.round(narrow?clamp(W*.26,72,110):clamp(W*.17,84,150)),asp=G.gw/G.gh;
     let mmw=maxW,mmh=mmw/asp;if(mmh>H*.2){mmh=H*.2;mmw=mmh*asp;}
-    const mmx=W-pad-mmw-4,mmy=narrow?topBottom+10:pad+pbS+14;
+    const mmx=W-pad-mmw-4,mmy=narrow?pad+pbS+12:pad+pbS+14;
     drawMinimap(mmx,mmy,mmw,mmh);rightBottom=mmy+mmh+8;
     HIT.push({x:mmx-4,y:mmy-4,w:mmw+8,h:mmh+8,fn:()=>{V.wideT=V.wideT>0?0:4.5;}});
   }
