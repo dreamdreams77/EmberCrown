@@ -100,7 +100,7 @@ const UI=(()=>{
   }
   function toggles(){
     const t=(k,l)=>'<button type="button" tabindex="-1" class="tog'+(settings[k]?' on':'')+'" data-a="'+k+'"><span>'+l+'</span><i>'+(settings[k]?'On':'Off')+'</i></button>';
-    return'<div class="togs">'+t('sfx','Sound effects')+t('music','Music')+t('minimap','Minimap')+t('shake','Screen shake')+t('lpc','LPC art (Ashfall trial)')+'</div>';
+    return'<div class="togs">'+t('sfx','Sound effects')+t('music','Music')+t('minimap','Minimap')+t('shake','Screen shake')+t('lpc','Pixel art')+'</div>';
   }
   function howHTML(){
     return'<h2>How to play</h2><div class="howgrid">'+

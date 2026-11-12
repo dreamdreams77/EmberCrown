@@ -1,8 +1,10 @@
-/* EMBERCROWN - LPC art trial.
-   Ashfall Keep only: Shiloh and House Marrow's guards are drawn from Liberated Pixel Cup sprite sheets
-   (assets/lpc/*.png, credits in CREDITS-LPC.md) instead of the code-drawn figures.
-   Toggle: settings.lpc ("LPC art" in the pause menu). Everything falls back to the original art when off,
-   when an image has not loaded, or outside the trial mission. */
+/* EMBERCROWN - pixel art (LPC sprites).
+   Shiloh, guards and NPCs are drawn from Liberated Pixel Cup sprite sheets (assets/lpc/, credits in
+   CREDITS-LPC.md) instead of the code-drawn figures, on every mission and in the hub.
+   Shiloh and House Marrow's guards use ready-made sheets; other houses' guards, archers, brutes and NPCs are
+   assembled from tinted layers at run time (js/lpcgen.js). Ashfall Keep also uses LPC floor and wall tiles.
+   Toggle: settings.lpc ("Pixel art" in the pause menu). Everything falls back to the original art when off
+   or when an image has not loaded. */
 'use strict';
 const LPC=(function(){
   const IMG={},ok={};
@@ -11,7 +13,11 @@ const LPC=(function(){
   const ROW={walk:0,slash:4,thrust:8,hurt:12},NF={walk:9,slash:6,thrust:8,hurt:6};
   const SC=.8,FOOT=58; // draw scale, and the y of the feet inside a 64px frame
   function trialLevel(){return typeof G!=='undefined'&&G&&G.d&&!G.d.hub&&!G.dng&&G.d===LEVELS[0];}
-  function on(){return settings.lpc!==false&&trialLevel();}
+  function on(){return settings.lpc!==false&&typeof G!=='undefined'&&!!G&&!!G.d;}
+  function tiles(){return on()&&trialLevel();}
+  // sheets assembled at run time (js/lpcgen.js) are 5 rows: walk up/left/down/right, then hurt
+  const GEN={};
+  function add(name,cv){IMG[name]=cv;ok[name]=true;GEN[name]=true;}
   // facing angle to LPC row: 0 up, 1 left, 2 down, 3 right
   function dir(f){const x=Math.cos(f),y=Math.sin(f);return Math.abs(x)>Math.abs(y)?(x>0?3:1):(y>0?2:0);}
   function walkFrame(ph){return 1+((Math.floor(ph/(Math.PI*2)*8)%8)+8)%8;}
@@ -24,7 +30,7 @@ const LPC=(function(){
     return s;
   }
   function blit(name,anim,frame,d,x,y,alpha,line,flash){
-    const c=ctx,row=ROW[anim]+(anim==='hurt'?0:d),fr=Math.max(0,Math.min(NF[anim]-1,frame|0));
+    const c=ctx,row=GEN[name]?(anim==='hurt'?4:d):ROW[anim]+(anim==='hurt'?0:d),fr=Math.max(0,Math.min(NF[anim]-1,frame|0));
     const sm=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
     if(alpha!=null)c.globalAlpha=alpha;
     const X=x-32*SC,Y=y+8-FOOT*SC,m=c.getTransform();
@@ -54,15 +60,16 @@ const LPC=(function(){
     const fr=mv?walkFrame(w.ph||0):0;
     blit('shiloh','walk',fr,d,w.x,w.y,blink?.35:(G.sneak&&active?.82:1),active?(G.sneak?'#8f7fd0':'#f3e6c4'):null);
   }
-  function drawMarrow(g){
+  function drawMarrow(g,name){
+    name=name||'guard_marrow';
     const hit=G.time-(g.hitT===undefined?-9:g.hitT)<.09;
-    if(g.ko&&g.stun>0){shadowAt(g.x,g.y+6,14,5,.4);blit('guard_marrow','hurt',hit?2:5,0,g.x,g.y+4,1,null,hit);return;}
+    if(g.ko&&g.stun>0){shadowAt(g.x,g.y+6,14,5,.4);blit(name,'hurt',hit?2:5,0,g.x,g.y+4,1,null,hit);return;}
     const moving=g._lx!=null&&Math.hypot(g.x-g._lx,g.y-g._ly)>.05;g._lx=g.x;g._ly=g.y;
     const d=dir(vfa(g));
     shadowAt(g.x,g.y+7,12,5,.38);
-    if(g.stun>0){blit('guard_marrow','hurt',1,d,g.x,g.y,1,null,hit);return;}
+    if(g.stun>0){blit(name,'hurt',1,d,g.x,g.y,1,null,hit);return;}
     const hu=g.hopT===undefined?1:(G.time-g.hopT)/.26,hop=hu>=0&&hu<1?Math.sin(hu*Math.PI)*6:0; // startle hop when he first sees you
-    blit('guard_marrow','walk',moving?walkFrame(g.ph||0):0,d,g.x,g.y-hop,1,g.seeing?'#ff5440':(g.lure||g.ret)?'#ffc060':null);
+    blit(name,'walk',moving?walkFrame(g.ph||0):0,d,g.x,g.y-hop,1,g.seeing?'#ff5440':(g.lure||g.ret)?'#ffc060':null);
   }
   // Ashfall Keep floor and wall faces from LPC castle tiles (atlas: floor, floor mirrored, brick wall face)
   function isWall(x,y){const r=G.grid[y];return!r||r[x]==='#'||r[x]===' '||r[x]===undefined;}
@@ -81,18 +88,26 @@ const LPC=(function(){
     c.drawImage(IMG.ashfall_tiles,64,0,32,32,x*T,y*T,T,T);c.imageSmoothingEnabled=sm;
     c.fillStyle='rgba(0,0,0,.28)';c.fillRect(x*T,y*T+T-3,T,3); // contact shadow at the base
   }
-  return{on,ready:n=>!!ok[n],drawShiloh,drawMarrow,dir,floor,wallFace};
+  return{on,tiles,trialLevel,add,blit,walkFrame,ready:n=>!!ok[n],drawShiloh,drawMarrow,dir,floor,wallFace};
 })();
 // Swap in the LPC figures without touching the original draw functions.
 {
   const _drawWren=drawWren;
   drawWren=function(w,active){if(LPC.on()&&LPC.ready('shiloh'))return LPC.drawShiloh(w,active);return _drawWren(w,active);};
   const _drawGuard=drawGuard;
-  drawGuard=function(g){if(LPC.on()&&LPC.ready('guard_marrow')&&!g.boss&&!g.spin&&(g.kind==='guard'||!g.kind))return LPC.drawMarrow(g);return _drawGuard(g);};
+  drawGuard=function(g){
+    if(LPC.on()&&!g.boss&&!g.spin){
+      const kind=g.kind||'guard';
+      if(kind==='guard'&&LPC.trialLevel()){if(LPC.ready('guard_marrow'))return LPC.drawMarrow(g);}
+      else if(typeof LPCG!=='undefined'&&(kind==='guard'||kind==='archer'||kind==='brute')){
+        const k=LPCG.guard(kind,(G.d.th&&G.d.th.guard)||'#8d8a98');if(k)return LPC.drawMarrow(g,k);}
+    }
+    return _drawGuard(g);
+  };
 }
-// Tiles: only while baking Ashfall Keep with the trial on; otherwise the house art is untouched.
+// Tiles: only while baking Ashfall Keep with pixel art on; other houses keep their own tile art.
 if(typeof TILES!=='undefined'){
   const _floor=TILES.floor,_wall=TILES.wall;
-  TILES.floor=function(c,x,y,p,fs,th){if(LPC.on()&&!G.flight&&LPC.floor(c,x,y))return true;return _floor.apply(this,arguments);};
-  TILES.wall=function(c,x,y,p,flight){const r=_wall.apply(this,arguments);if(LPC.on()&&!flight)LPC.wallFace(c,x,y);return r;};
+  TILES.floor=function(c,x,y,p,fs,th){if(LPC.tiles()&&!G.flight&&LPC.floor(c,x,y))return true;return _floor.apply(this,arguments);};
+  TILES.wall=function(c,x,y,p,flight){const r=_wall.apply(this,arguments);if(LPC.tiles()&&!flight)LPC.wallFace(c,x,y);return r;};
 }

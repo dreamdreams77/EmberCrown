@@ -17,7 +17,7 @@ const OUT=process.env.EC_OUT||'.';
   });
   // ---------------- Ashfall Keep ----------------
   const a=await p.evaluate(()=>{
-    const G=T_(0),M=G.mis;ok('A.mech',!!M&&M.stairs.length===3&&G.guards.some(g=>g.mname==='Jailer'));
+    const G=T_(0),M=G.mis;ok('A.mech',!!M&&M.stairs.length===4&&M.stairs.some(s=>s.id==='culvert')&&G.guards.some(g=>g.mname==='Jailer'));
     // coal chute takes Shiloh into the cellar
     at(G.wren,4,1);hold(G.wren,.8);ok('A.chute',tile(G.wren)[1]===17);
     // a rattle plate trips when walked over, not when sneaked over
@@ -189,7 +189,8 @@ const OUT=process.env.EC_OUT||'.';
     for(let L=0;L<7;L++){
       const G=T_(L);adv(30);
       if(!G.flight&&L<=3){ // every objective and the exit stay reachable on foot without any optional mechanism (doors may be picked)
-        const sx=tile(G.wren),seen=new Set([sx[0]+sx[1]*256]),q=[sx];
+        // the walk starts where the mission's entry ladder comes up, if it has one (Ashfall's culvert opening)
+        const en=((G.d.mech&&G.d.mech.stairs)||[]).find(s=>s.entry),sx=en?en.b.slice():tile(G.wren),seen=new Set([sx[0]+sx[1]*256]),q=[sx];
         const pass=(x,y)=>x>=0&&y>=0&&x<G.gw&&y<G.gh&&(G.doors[x+','+y]||!blocked(x*32+16,y*32+16,8));
         while(q.length){const [x,y]=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+ny*256;if(!seen.has(k)&&pass(nx,ny)){seen.add(k);q.push([nx,ny]);}}}
         const need=[...G.items.filter(i=>'OPBLHC'.includes(i.type)),G.exit].map(o=>tile(o));

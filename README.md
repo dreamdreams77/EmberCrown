@@ -35,15 +35,22 @@ The camera follows the action close-up on every screen size and leans toward thr
 - **Saves.** Progress, talents, cinders, relics and settings persist in `localStorage` (older saves keep working). Cinders and relics are only banked when a mission is completed.
 - **Audio.** Procedural music, ambient beds per area, and combat intensity layers. No asset files.
 
-## Art trial: LPC sprites
+## Pixel art
 
-With the trial on, Ashfall Keep is drawn through a **pixel pass** (`js/pixel.js`): the world renders into a small buffer at one pixel per world unit, the native size of the sprites, and is scaled up with hard edges, so sprites, tiles, props, light and vision cones share one pixel grid. Shiloh and alerted guards get a one-pixel outline, shadows are deeper, and cones are a quiet fill with a clear edge.
+Every mission, the hub and the dungeons are drawn through a **pixel pass** (`js/pixel.js`): the world renders into a small buffer at one pixel per world unit, the native size of the sprites, and is scaled up with hard edges, so sprites, tiles, props, light and vision cones share one pixel grid. World text (prompts, barks, floating words) is drawn afterwards at full resolution.
 
-In the same mode, crates, barrels, tables, pots, urns, candle stands, wall torches, bones, webs and chains come from a pixel prop sheet (`js/lpcprops.js`, `assets/lpc/props.png`, rebuilt with `tools/build_lpc_props.py`).
+- **Characters** are Liberated Pixel Cup sprites. Shiloh and House Marrow's guards use ready-made sheets (`js/lpc.js`). Other houses' guards, archers and brutes, and every NPC, are assembled at run time from tinted layers (`js/lpcgen.js`, `assets/lpc/parts/`, rebuilt with `tools/build_lpc_parts.py`): soldiers wear their house colour, NPCs the colours in their `look`.
+- **Props**: crates, barrels, tables, pots, urns, candle stands, wall torches, bones, webs and chains come from a pixel prop sheet (`js/lpcprops.js`, `assets/lpc/props.png`, rebuilt with `tools/build_lpc_props.py`).
+- **Tiles**: Ashfall Keep uses LPC floor and wall tiles; the other houses keep their own tile art, drawn on the pixel grid.
+- **Still code-drawn** (on the pixel grid): Ashling, hounds, watch towers, both bosses, vault creatures, and props with no sprite yet.
 
-**Feel.** On every mission: a guard who spots you jumps while the frame holds for a beat and the screen blinks red; running, rolling and striking kick up dust (sneaking does not); Marrow guards flash white when hit.
+Switch it with **Pixel art** in the pause menu to compare with the original drawn art. These assets keep their own licences (CC-BY-SA 3.0 / GPL 3.0 and others): see [CREDITS-LPC.md](CREDITS-LPC.md).
 
-Ashfall Keep can be played with Liberated Pixel Cup pixel art for Shiloh, House Marrow's guards, the floor and the wall faces. It is on by default; switch it with **LPC art (Ashfall trial)** in the pause menu to compare with the original drawn art. These assets keep their own licences (CC-BY-SA 3.0 / GPL 3.0 and others): see [CREDITS-LPC.md](CREDITS-LPC.md).
+**Feel.** A guard who spots you jumps while the frame holds for a beat and the screen blinks red; running, rolling and striking kick up dust (sneaking does not); guards flash white when hit.
+
+## The opening
+
+Ashfall Keep starts in the culvert under the keep, three small rooms that teach one thing each before the keep opens up: grates that rattle unless you sneak, a guard with his back turned (takedown), and a guard watching a door (throw a bell). A ladder then climbs into the keep. The culvert is a soft zone (`mech.soft`): suspicion builds at half speed there, and being caught sends Shiloh back to the start of it instead of ending the mission. The rooms and hints are data in `LEVELS[0]` (`mech.lessons`, `mech.plates`, `mech.guards`, the `culvert` stairs marked `entry`).
 
 ## Project layout
 
