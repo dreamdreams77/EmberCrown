@@ -15,11 +15,27 @@ const LPC=(function(){
   // facing angle to LPC row: 0 up, 1 left, 2 down, 3 right
   function dir(f){const x=Math.cos(f),y=Math.sin(f);return Math.abs(x)>Math.abs(y)?(x>0?3:1):(y>0?2:0);}
   function walkFrame(ph){return 1+((Math.floor(ph/(Math.PI*2)*8)%8)+8)%8;}
-  function blit(name,anim,frame,d,x,y,alpha){
+  // one-colour copy of a frame, used to draw a 1px outline around a figure
+  const SIL=new Map();
+  function sil(name,fx,fy,col){
+    const k=name+fx+','+fy+col;let s=SIL.get(k);
+    if(!s){if(SIL.size>400)SIL.clear();s=document.createElement('canvas');s.width=s.height=64;const g=s.getContext('2d');
+      g.drawImage(IMG[name],fx,fy,64,64,0,0,64,64);g.globalCompositeOperation='source-in';g.fillStyle=col;g.fillRect(0,0,64,64);SIL.set(k,s);}
+    return s;
+  }
+  function blit(name,anim,frame,d,x,y,alpha,line){
     const c=ctx,row=ROW[anim]+(anim==='hurt'?0:d),fr=Math.max(0,Math.min(NF[anim]-1,frame|0));
     const sm=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
     if(alpha!=null)c.globalAlpha=alpha;
-    c.drawImage(IMG[name],fr*64,row*64,64,64,Math.round(x-32*SC),Math.round(y+8-FOOT*SC),64*SC,64*SC);
+    const X=x-32*SC,Y=y+8-FOOT*SC,m=c.getTransform();
+    if(!m.b&&!m.c){ // land on whole canvas pixels so no sprite column is dropped or doubled
+      c.save();c.setTransform(1,0,0,1,0,0);
+      const dx=Math.round(m.a*X+m.e),dy=Math.round(m.d*Y+m.f),dw=Math.round(64*SC*m.a),dh=Math.round(64*SC*m.d);
+      if(line){const o=Math.max(1,Math.round(dw/64)),sl=sil(name,fr*64,row*64,line);
+        c.drawImage(sl,dx-o,dy,dw,dh);c.drawImage(sl,dx+o,dy,dw,dh);c.drawImage(sl,dx,dy-o,dw,dh);c.drawImage(sl,dx,dy+o,dw,dh);}
+      c.drawImage(IMG[name],fr*64,row*64,64,64,dx,dy,dw,dh);
+      c.restore();
+    }else c.drawImage(IMG[name],fr*64,row*64,64,64,Math.round(X),Math.round(Y),64*SC,64*SC);
     c.globalAlpha=1;c.imageSmoothingEnabled=sm;
   }
   function drawShiloh(w,active){
@@ -30,12 +46,12 @@ const LPC=(function(){
     shadowAt(w.x,w.y+7,11,4.5,.38);
     if(st.death>0){blit('shiloh','hurt',st.death*5.99,d,w.x,w.y);return;}
     if(atk){const u=1-atk.t/atk.t0;
-      if(atk.combo===2)blit('shiloh','thrust',1+u*6.99,d,w.x,w.y,blink?.4:1);
-      else blit('shiloh','slash',u*5.99,d,w.x,w.y,blink?.4:1);return;}
+      if(atk.combo===2)blit('shiloh','thrust',1+u*6.99,d,w.x,w.y,blink?.4:1,'#f3e6c4');
+      else blit('shiloh','slash',u*5.99,d,w.x,w.y,blink?.4:1,'#f3e6c4');return;}
     if(w.rollAnim>0){const u=1-w.rollAnim/.3;blit('shiloh','walk',1+u*7.99,d,w.x,w.y+Math.sin(u*Math.PI)*-4,.75);return;}
     if(st.hurt>.5){blit('shiloh','hurt',1,d,w.x,w.y,blink?.4:1);return;}
     const fr=mv?walkFrame(w.ph||0):0;
-    blit('shiloh','walk',fr,d,w.x,w.y,blink?.35:(G.sneak&&active?.82:1));
+    blit('shiloh','walk',fr,d,w.x,w.y,blink?.35:(G.sneak&&active?.82:1),active?(G.sneak?'#8f7fd0':'#f3e6c4'):null);
   }
   function drawMarrow(g){
     if(g.ko&&g.stun>0){shadowAt(g.x,g.y+6,14,5,.4);blit('guard_marrow','hurt',5,0,g.x,g.y+4);return;}
@@ -43,7 +59,7 @@ const LPC=(function(){
     const d=dir(vfa(g));
     shadowAt(g.x,g.y+7,12,5,.38);
     if(g.stun>0){blit('guard_marrow','hurt',1,d,g.x,g.y);return;}
-    blit('guard_marrow','walk',moving?walkFrame(g.ph||0):0,d,g.x,g.y);
+    blit('guard_marrow','walk',moving?walkFrame(g.ph||0):0,d,g.x,g.y,1,g.seeing?'#ff5440':(g.lure||g.ret)?'#ffc060':null);
   }
   // Ashfall Keep floor and wall faces from LPC castle tiles (atlas: floor, floor mirrored, brick wall face)
   function isWall(x,y){const r=G.grid[y];return!r||r[x]==='#'||r[x]===' '||r[x]===undefined;}

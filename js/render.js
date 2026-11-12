@@ -456,6 +456,7 @@ function drawDarkness(){
   amb=amb.slice();
   if(G.d.finale)amb[3]=clamp(amb[3]+(5-Math.min(5,G.candlesLit||0))*.055,0,.8);
   amb[3]=clamp(amb[3]+(G.shiftT>0?.1*G.shiftT:0),0,.85);
+  if(typeof PX!=='undefined'&&PX.active)amb[3]=Math.min(.74,amb[3]+.2); // deeper shadow in pixel mode so lit figures stand out
   const W=G.gw*T,H=G.gh*T,k=LT.k;
   const lw=Math.ceil(W/k),lh=Math.ceil(H/k);
   if(LT.cv.width!==lw||LT.cv.height!==lh){LT.cv.width=lw;LT.cv.height=lh;}
@@ -670,17 +671,21 @@ function drawCones(){
     const pts=visPoly(g,range,g.half||.62);
     const seeing=g.seeing,alert=g.lure||g.ret;
     const col=seeing?'255,84,62':alert?'255,196,96':'255,238,176';
-    const a0=seeing?.36:alert?.26:.2,a1=seeing?.12:.075;
+    const px=typeof PX!=='undefined'&&PX.active;
+    const a0=px?(seeing?.3:alert?.2:.11):(seeing?.36:alert?.26:.2),a1=px?(seeing?.14:.06):(seeing?.12:.075);
     const gr=c.createRadialGradient(g.x,g.y,6,g.x,g.y,range);
     gr.addColorStop(0,'rgba('+col+','+a0+')');gr.addColorStop(.55,'rgba('+col+','+(a0*.5)+')');gr.addColorStop(1,'rgba('+col+','+a1+')');
     c.fillStyle=gr;c.beginPath();pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.closePath();c.fill();
     // bright core down the middle of the beam
     const mid=1+(CONE_N>>1),lo=mid-3,hi=mid+3;
     const gc=c.createRadialGradient(g.x,g.y,4,g.x,g.y,range*.9);
-    gc.addColorStop(0,'rgba('+col+','+(seeing?.22:.14)+')');gc.addColorStop(1,'rgba('+col+',0)');
+    gc.addColorStop(0,'rgba('+col+','+(px?(seeing?.16:.05):(seeing?.22:.14))+')');gc.addColorStop(1,'rgba('+col+',0)');
     c.fillStyle=gc;c.beginPath();c.moveTo(g.x,g.y);for(let i=lo;i<=hi;i++)c.lineTo(pts[i][0],pts[i][1]);c.closePath();c.fill();
     // faint rim, stronger once you are seen
-    c.strokeStyle='rgba('+col+','+(seeing?.5:.12)+')';c.lineWidth=seeing?1.4:1;c.stroke();
+    if(px){ // outline the whole cone, not just the core
+      c.beginPath();pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.closePath();
+      c.strokeStyle='rgba('+col+','+(seeing?.8:alert?.55:.4)+')';c.lineWidth=1;c.stroke();
+    }else{c.strokeStyle='rgba('+col+','+(seeing?.5:.12)+')';c.lineWidth=seeing?1.4:1;c.stroke();}
     if(g.kind==='hound'){ // scent radius
       c.strokeStyle='rgba(255,150,80,.2)';c.setLineDash([3,4]);circ(c,g.x,g.y,2.5*T*G.rangeMul);c.stroke();c.setLineDash([]);
     }

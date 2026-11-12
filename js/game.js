@@ -1,6 +1,6 @@
 'use strict';
 /* EMBERCROWN - game logic. Rendering lives in render.js, menus/touch in ui.js. */
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const cv=document.getElementById('c');let ctx=cv.getContext('2d'); // let: the pixel pass (js/pixel.js) points ctx at its low-res buffer while the world is drawn
 
 let mode='title',lvl=0,perks={},G=null,diff=1;
 const attempts={};
