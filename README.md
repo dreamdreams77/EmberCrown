@@ -39,6 +39,10 @@ The camera follows the action close-up on every screen size and leans toward thr
 
 With the trial on, Ashfall Keep is drawn through a **pixel pass** (`js/pixel.js`): the world renders into a small buffer at one pixel per world unit, the native size of the sprites, and is scaled up with hard edges, so sprites, tiles, props, light and vision cones share one pixel grid. Shiloh and alerted guards get a one-pixel outline, shadows are deeper, and cones are a quiet fill with a clear edge.
 
+In the same mode, crates, barrels, tables, pots, urns, candle stands, wall torches, bones, webs and chains come from a pixel prop sheet (`js/lpcprops.js`, `assets/lpc/props.png`, rebuilt with `tools/build_lpc_props.py`).
+
+**Feel.** On every mission: a guard who spots you jumps while the frame holds for a beat and the screen blinks red; running, rolling and striking kick up dust (sneaking does not); Marrow guards flash white when hit.
+
 Ashfall Keep can be played with Liberated Pixel Cup pixel art for Shiloh, House Marrow's guards, the floor and the wall faces. It is on by default; switch it with **LPC art (Ashfall trial)** in the pause menu to compare with the original drawn art. These assets keep their own licences (CC-BY-SA 3.0 / GPL 3.0 and others): see [CREDITS-LPC.md](CREDITS-LPC.md).
 
 ## Project layout

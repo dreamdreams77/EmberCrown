@@ -186,12 +186,15 @@ function floorTile(c,x,y,p,fs,rnd,th){
   }
   // decals
   if(th.bones&&rnd()<th.bones){
+    if(typeof LPCP!=='undefined'&&LPCP.on()){ // pixel mode: a bone or a skull from the prop sheet (same number of random draws as the drawn bones)
+      const a=rnd(),b=rnd(),k=rnd(),sk=rnd()<.35;LPCP.at(c,sk?'skull':'bone',px+(sk?a*6:a*4-6),py+(sk?b*6:b*10-4),k>.5);
+    }else{
     c.strokeStyle='rgba(225,220,200,.6)';c.lineWidth=1.6;c.lineCap='round';
     const bx=px+8+rnd()*16,by=py+8+rnd()*16,a=rnd()*3;
     c.beginPath();c.moveTo(bx,by);c.lineTo(bx+Math.cos(a)*8,by+Math.sin(a)*8);c.stroke();
     c.beginPath();c.moveTo(bx+2,by+3);c.lineTo(bx+2+Math.cos(a+1.2)*6,by+3+Math.sin(a+1.2)*6);c.stroke();
     if(rnd()<.35){c.fillStyle='rgba(225,220,200,.7)';ell(c,bx-3,by-3,3,2.6);c.fill();c.fillStyle='rgba(0,0,0,.6)';c.fillRect(bx-4.5,by-4,1.2,1.2);c.fillRect(bx-2.5,by-4,1.2,1.2);}
-    c.lineCap='butt';
+    c.lineCap='butt';}
   }
   if(th.coins&&rnd()<th.coins){c.fillStyle='#e0b040';circ(c,px+6+rnd()*20,py+6+rnd()*20,1.8);c.fill();c.fillStyle='rgba(255,255,255,.5)';c.fillRect(px+8+rnd()*10,py+8+rnd()*10,1,1);}
   if(G.state==='ruin'&&rnd()<.07){c.fillStyle='rgba(40,70,90,.5)';ell(c,px+16,py+16,8+rnd()*6,5+rnd()*4,rnd()*3);c.fill();c.fillStyle='rgba(180,210,230,.18)';ell(c,px+14,py+14,4,2,0);c.fill();}
@@ -343,8 +346,9 @@ function bakeStatic(){
       const nearDoor=G.doors[x+','+(y+1)];
       if(r<(th.torch||0)&&Math.abs(x-lastTorch)>2&&!ruin||(ruin&&r<(th.torch||0)*.5)){
         lastTorch=x;
+        if(!(typeof LPCP!=='undefined'&&LPCP.on())){ // pixel mode draws the whole torch as an animated sprite in drawFlames
         c.fillStyle='#2a2018';c.fillRect(px+14,py+13,4,10);c.fillStyle='#4a3a28';c.fillRect(px+12,py+21,8,3);
-        c.fillStyle='#1a1410';c.fillRect(px+15,py+9,2,6);
+        c.fillStyle='#1a1410';c.fillRect(px+15,py+9,2,6);}
         {const ro=ruin&&rnd()<.4;G.torches.push({x:px+16,y:py+12,ph:rnd()*6,col:tc,out:ro,ruinOut:ro});}
       } else if(r<(th.torch||0)+(th.banner||0)&&!nearDoor){
         if(window.TILES){c.drawImage(TILES.bannerSprite('ban'),px,py,T,T);}else{

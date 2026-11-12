@@ -24,3 +24,16 @@ The files in `assets/lpc/` are derived from Liberated Pixel Cup (LPC) artwork. T
 - `hat/helmet/kettle/adult/` - Johannes Sjölund (wulax),JaidynReiman,Napsio (Vitruvian Studio) - OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites https://opengameart.org/content/lpc-expanded-hats-facial-helmets
 - `weapon/sword/dagger/` - bluecarrot16,Johannes Sjölund (wulax),Matthew Krohn (makrohn) - OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites https://opengameart.org/content/lpc-extended-weapon-animations
 - `weapon/polearm/spear/` - Pierre Vigier (pvigier),Johannes Sjölund (wulax),Inboxninja - CC-BY-SA 3.0 - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites https://opengameart.org/content/lpc-spear-and-shovel-reworked
+
+## Props (`assets/lpc/props.png`)
+
+Cropped, unaltered, from the LPC Revised collection by Eliza Wyatt and contributors, https://github.com/ElizaWy/LPC, licensed OGA-BY 3.0. `tools/build_lpc_props.py` lists the exact source rectangles. Credits as given in that collection's per-folder `Credits.txt`:
+
+- Barrel (`Objects/Furniture/Barrel.png`) - Lanea Zimmerman (Sharm), Eliza Wyatt (DeathsDarling) - OGA-BY 3.0 - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+- Crates (`Objects/Furniture/Crate.png`) - Eliza Wyatt (DeathsDarling) - OGA-BY 3.0
+- Table (`Objects/Furniture/Table, Rough Wood.png`) - Lanea Zimmerman (Sharm), adjusted and recoloured by Eliza Wyatt (DeathsDarling) - OGA-BY 3.0 - https://opengameart.org/content/lpc-dungeon-elements
+- Pot and urn (`Objects/Furniture/Vase-Studies.png`) - Eliza Wyatt (DeathsDarling) - OGA-BY 3.0
+- Candle stands (`Objects/Furniture/Lighting, Floor.png`, top row) - Lanea Zimmerman (Sharm), Eliza Wyatt (DeathsDarling) - OGA-BY 3.0 - https://opengameart.org/content/lpc-modified-base-tiles https://opengameart.org/content/lpc-interior-castle-tiles
+- Wall torches (`Objects/Wall Items/Lighting, Wall.png`, second row) - Eliza Wyatt (DeathsDarling) - OGA-BY 3.0
+- Skull and bones (`Objects/Small Items/Skeletons A.png`) - Lanea Zimmerman (Sharm), recoloured by Eliza Wyatt - OGA-BY 3.0 - https://opengameart.org/content/lpc-dungeon-elements
+- Cobweb and chains (`Objects/Small Items/Dungeon Elements.png`) - Lanea Zimmerman (Sharm), recoloured by Eliza Wyatt - OGA-BY 3.0 - https://opengameart.org/content/lpc-dungeon-elements

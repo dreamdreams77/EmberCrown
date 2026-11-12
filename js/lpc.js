@@ -23,7 +23,7 @@ const LPC=(function(){
       g.drawImage(IMG[name],fx,fy,64,64,0,0,64,64);g.globalCompositeOperation='source-in';g.fillStyle=col;g.fillRect(0,0,64,64);SIL.set(k,s);}
     return s;
   }
-  function blit(name,anim,frame,d,x,y,alpha,line){
+  function blit(name,anim,frame,d,x,y,alpha,line,flash){
     const c=ctx,row=ROW[anim]+(anim==='hurt'?0:d),fr=Math.max(0,Math.min(NF[anim]-1,frame|0));
     const sm=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
     if(alpha!=null)c.globalAlpha=alpha;
@@ -34,6 +34,7 @@ const LPC=(function(){
       if(line){const o=Math.max(1,Math.round(dw/64)),sl=sil(name,fr*64,row*64,line);
         c.drawImage(sl,dx-o,dy,dw,dh);c.drawImage(sl,dx+o,dy,dw,dh);c.drawImage(sl,dx,dy-o,dw,dh);c.drawImage(sl,dx,dy+o,dw,dh);}
       c.drawImage(IMG[name],fr*64,row*64,64,64,dx,dy,dw,dh);
+      if(flash){c.globalAlpha=.85;c.drawImage(sil(name,fr*64,row*64,'#ffffff'),dx,dy,dw,dh);} // white hit flash
       c.restore();
     }else c.drawImage(IMG[name],fr*64,row*64,64,64,Math.round(X),Math.round(Y),64*SC,64*SC);
     c.globalAlpha=1;c.imageSmoothingEnabled=sm;
@@ -54,12 +55,14 @@ const LPC=(function(){
     blit('shiloh','walk',fr,d,w.x,w.y,blink?.35:(G.sneak&&active?.82:1),active?(G.sneak?'#8f7fd0':'#f3e6c4'):null);
   }
   function drawMarrow(g){
-    if(g.ko&&g.stun>0){shadowAt(g.x,g.y+6,14,5,.4);blit('guard_marrow','hurt',5,0,g.x,g.y+4);return;}
+    const hit=G.time-(g.hitT===undefined?-9:g.hitT)<.09;
+    if(g.ko&&g.stun>0){shadowAt(g.x,g.y+6,14,5,.4);blit('guard_marrow','hurt',hit?2:5,0,g.x,g.y+4,1,null,hit);return;}
     const moving=g._lx!=null&&Math.hypot(g.x-g._lx,g.y-g._ly)>.05;g._lx=g.x;g._ly=g.y;
     const d=dir(vfa(g));
     shadowAt(g.x,g.y+7,12,5,.38);
-    if(g.stun>0){blit('guard_marrow','hurt',1,d,g.x,g.y);return;}
-    blit('guard_marrow','walk',moving?walkFrame(g.ph||0):0,d,g.x,g.y,1,g.seeing?'#ff5440':(g.lure||g.ret)?'#ffc060':null);
+    if(g.stun>0){blit('guard_marrow','hurt',1,d,g.x,g.y,1,null,hit);return;}
+    const hu=g.hopT===undefined?1:(G.time-g.hopT)/.26,hop=hu>=0&&hu<1?Math.sin(hu*Math.PI)*6:0; // startle hop when he first sees you
+    blit('guard_marrow','walk',moving?walkFrame(g.ph||0):0,d,g.x,g.y-hop,1,g.seeing?'#ff5440':(g.lure||g.ret)?'#ffc060':null);
   }
   // Ashfall Keep floor and wall faces from LPC castle tiles (atlas: floor, floor mirrored, brick wall face)
   function isWall(x,y){const r=G.grid[y];return!r||r[x]==='#'||r[x]===' '||r[x]===undefined;}

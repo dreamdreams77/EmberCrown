@@ -195,6 +195,16 @@ function updateFX(dt){
   if(G){if(G.shake>0)G.shake=Math.max(0,G.shake-dt*22);if(G.hurtFlash>0)G.hurtFlash=Math.max(0,G.hurtFlash-dt);}
 }
 function shake(a){if(G&&settings.shake)G.shake=Math.max(G.shake||0,a);}
+/* The moment a guard first sees you: he jumps, the frame holds for a beat and the screen blinks red.
+   Rate-limited so a room full of guards reads as one jolt, not a strobe. */
+function spotted(g){
+  g.hopT=G.time;
+  if(G.spotT!==undefined&&G.time-G.spotT<1.5)return;
+  G.spotT=G.time;
+  if(typeof hitstop==='function')hitstop(.07);
+  shake(3);if(!G.flash)G.flash={t:.16,c:'255,96,72'};
+  burst(g.x,g.y-30,6,'#ff6a50',70,.3,2,{add:true});
+}
 
 /* ---------- time shift ---------- */
 function shiftTime(){
@@ -771,7 +781,8 @@ function update(dt){
     A.ph+=sp*dt*.2;
     A.sd=(A.sd||0)+sp*dt;
     if(A.sd>(G.active==='wren'?(G.sneak?30:22):24)){A.sd=0;Aud.S.step(G.sneak);
-      if(!G.flight&&Math.random()<.6)pt(A.x,A.y+5,(Math.random()-.5)*10,(Math.random()-.5)*10,.5,2.5,'rgba(120,110,100,.5)',{k:'smoke',gr:3});}
+      // running kicks dust back off each step; sneaking leaves none
+      if(!G.flight&&!(G.active==='wren'&&G.sneak))for(let i=0;i<2;i++)pt(A.x-mx*4,A.y+7,-mx*16+(Math.random()-.5)*14,-my*16-4+(Math.random()-.5)*8,.4,2.6,'rgba(150,140,130,.5)',{k:'smoke',gr:5});}
   }
   // tether: the other one is pulled along if too far
   if(G.ash.on&&!G.flight&&!(G.mis&&G.mis.dis&&G.mis.dis.on)){
@@ -912,7 +923,7 @@ function update(dt){
         best=Math.max(best,.45+(1-dist/range)*1.1);
       }
     }
-    if(g.seeing&&!g.was){g.bang=1;g.search=null;if(typeof callAllies==='function')callAllies(g);if(g.kind==='guard'||g.kind==='brute'||g.kind==='archer')bark(g,'alert');
+    if(g.seeing&&!g.was){spotted(g);g.bang=1;g.search=null;if(typeof callAllies==='function')callAllies(g);if(g.kind==='guard'||g.kind==='brute'||g.kind==='archer')bark(g,'alert');
       if(G.d.alarm&&!G.alarmSt&&!G.runner&&!(G.runCd>0)&&g.kind==='guard'&&!g.boss){const B=beaconItem();if(B&&!B.done&&G.grace<=0)startRunner(g);}G.st.detect++;if(!G.alertSfxT||G.time-G.alertSfxT>1.2){G.alertSfxT=G.time;Aud.S.alert();}}
     if(!g.seeing&&g.was&&!g.spin&&!g.boss&&g.seen){
       // lost sight: go and look

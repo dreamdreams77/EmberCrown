@@ -390,6 +390,7 @@ function strikePress(){
   G.strike.cd=cb===2?.5:.34;G.strike.pend=.05;G.strike.ang=ang;G.strike.cb=cb;
   A.kx=(A.kx||0)+Math.cos(ang)*(cb===2?170:100);A.ky=(A.ky||0)+Math.sin(ang)*(cb===2?170:100);
   Aud.S.swing();
+  for(let i=0;i<3;i++)pt(A.x-Math.cos(ang)*6,A.y+7,-Math.cos(ang)*30+(Math.random()-.5)*24,-Math.sin(ang)*30+(Math.random()-.5)*14,.3,2.4,'rgba(160,150,140,.5)',{k:'smoke',gr:5}); // planted-foot dust
   if(typeof strikeExtras==='function')strikeExtras(cb);
 }
 function resolveStrike(){
@@ -402,7 +403,7 @@ function resolveStrike(){
     const behind=angDiff(Math.atan2(A.y-g.y,A.x-g.x),g.face)>1.5,unaware=!g.seeing&&g.stun<=0;
     hit++;
     if(unaware&&behind&&!g.lure){ // silent takedown
-      g.stun=Math.max(g.stun,hasT('silent')?16:9);g.ko=true;G.st.takedowns=(G.st.takedowns||0)+1;G.st.stuns++;
+      g.hitT=G.time;g.stun=Math.max(g.stun,hasT('silent')?16:9);g.ko=true;G.st.takedowns=(G.st.takedowns||0)+1;G.st.stuns++;
       floatText(g.x,g.y-24,'TAKEDOWN','#9fd8ff',12);hitstop(.1);punch(.6);shake(5);
       burst(g.x,g.y,18,'#bfe4ff',130,.4,2,{add:true});Aud.S.hit();
       if(!hasT('silent'))lureNear(g.x,g.y,2*T,true);
@@ -411,7 +412,7 @@ function resolveStrike(){
       Aud.S.deflect();burst(g.x+Math.cos(g.face)*10,g.y+Math.sin(g.face)*10,8,'#cfd6e6',120,.3,1.6,{add:true});floatText(g.x,g.y-22,'BLOCKED','#cfd6e6',10);
       A.kx-=Math.cos(ang)*140;A.ky-=Math.sin(ang)*140;
     } else {
-      g.stun=Math.max(g.stun,1.8+(cb===2?1.2:0));g.ko=false;G.st.stuns++;
+      g.hitT=G.time;g.stun=Math.max(g.stun,1.8+(cb===2?1.2:0));g.ko=false;G.st.stuns++;
       const kx=Math.cos(ang)*16,ky=Math.sin(ang)*16;if(!blocked(g.x+kx,g.y+ky,8)){g.x+=kx;g.y+=ky;}
       G.alert=Math.min(.95,G.alert+.1);lureNear(g.x,g.y,4*T,true);
       floatText(g.x,g.y-22,'STUNNED','#ffd27a');hitstop(.06);punch(.4);shake(4);Aud.S.hit();burst(g.x,g.y,10,'#ffd27a',120,.3,2,{add:true});
@@ -437,6 +438,7 @@ function rollPress(){
   let a=A.face;const mx=(keys['d']||keys['arrowright']?1:0)-(keys['a']||keys['arrowleft']?1:0),my=(keys['s']||keys['arrowdown']?1:0)-(keys['w']||keys['arrowup']?1:0);
   if(mx||my)a=Math.atan2(my,mx);else if(touch.jx||touch.jy)a=Math.atan2(touch.jy,touch.jx);
   G.roll={t:.3+equipBonus('roll'),cd:Math.max(.4,.85-equipBonus('rollCd')),a,grace:0};A.face=a;A.rollAnim=.3;
+  burst(A.x,A.y+6,7,'rgba(160,150,140,.55)',55,.4,3,{k:'smoke',gr:6}); // push-off dust
   Aud.S.swing();burst(A.x,A.y+4,8,'#a89a88',60,.4,3,{k:'smoke',gr:6});
 }
 function novaPress(){
