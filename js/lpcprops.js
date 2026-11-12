@@ -1,4 +1,4 @@
-/* EMBERCROWN - pixel-art props for the LPC art mode (Ashfall Keep).
+/* EMBERCROWN - pixel-art props for pixel art mode (every mission).
    Crates, barrels, tables, pots, urns, candle stands, wall torches, bones, webs and chains are stamped from
    assets/lpc/props.png (built by tools/build_lpc_props.py, credits in CREDITS-LPC.md) instead of the code-drawn art.
    Everything falls back to the original drawing when the mode is off or the image has not loaded. */

@@ -924,7 +924,7 @@ function update(dt){
       }
     }
     if(g.seeing&&!g.was){spotted(g);g.bang=1;g.search=null;if(typeof callAllies==='function')callAllies(g);if(g.kind==='guard'||g.kind==='brute'||g.kind==='archer')bark(g,'alert');
-      if(G.d.alarm&&!G.alarmSt&&!G.runner&&!(G.runCd>0)&&g.kind==='guard'&&!g.boss){const B=beaconItem();if(B&&!B.done&&G.grace<=0)startRunner(g);}G.st.detect++;if(!G.alertSfxT||G.time-G.alertSfxT>1.2){G.alertSfxT=G.time;Aud.S.alert();}}
+      if(G.d.alarm&&!G.alarmSt&&!G.runner&&!(G.runCd>0)&&g.kind==='guard'&&!g.boss){const B=beaconItem();if(B&&!B.done&&G.grace<=0){const rp=foePath(g,B.x,B.y);if(rp&&rp.length)startRunner(g);}} /* only a guard who can actually reach the beacon runs for it (not one in the cellar or the culvert) */G.st.detect++;if(!G.alertSfxT||G.time-G.alertSfxT>1.2){G.alertSfxT=G.time;Aud.S.alert();}}
     if(!g.seeing&&g.was&&!g.spin&&!g.boss&&g.seen){
       // lost sight: go and look
       if(!g.lure&&!g.ret&&!g.search)g.back={x:g.x,y:g.y};

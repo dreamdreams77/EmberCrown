@@ -9,7 +9,7 @@ const {chromium}=require('playwright');
     for(let l=0;l<7;l++){
       __ec.newGame();__ec.startBrief(l);__ec.startPlay();const G=__ec.G;G.cine=null;
       const nq=G.nq;if(!nq){fail.push('FAIL nq '+l);continue;}
-      const gw=G.gw,gh=G.gh,seen=new Set(),sx=Math.round((G.wren.x-16)/32),sy=Math.round((G.wren.y-16)/32),q=[[sx,sy]];seen.add(sx+sy*256);
+      const gw=G.gw,gh=G.gh,seen=new Set(),en=((G.d.mech&&G.d.mech.stairs)||[]).find(s=>s.entry),sx=en?en.b[0]:Math.round((G.wren.x-16)/32),sy=en?en.b[1]:Math.round((G.wren.y-16)/32),q=[[sx,sy]];seen.add(sx+sy*256); // start from the top of the entry ladder when the mission has one
       const pass=(x,y)=>{if(x<0||y<0||x>=gw||y>=gh)return false;const c=G.grid[y][x];if(G.flight)return true;if(c==='#'&&!G.cracks[x+','+y])return false;if(c===' ')return false;return !G.pblock.has(x+y*256);};
       while(q.length){const [x,y]=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+ny*256;if(!seen.has(k)&&pass(nx,ny)){seen.add(k);q.push([nx,ny]);}}}
       for(const n of nq.npcs){if(!seen.has(n.x+n.y*256))fail.push('FAIL npc unreachable '+l+' '+n.id);}

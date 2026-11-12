@@ -10,7 +10,8 @@
     rot     {tiles:[[x,y]],to:[x,y]}        rotten boards: break under a hurrying Shiloh; with `to` she drops there, else she falls and is hurt
     pits    [{id,tiles}]                    chasm: Shiloh and guards cannot cross, Ashling flies over; fx {bridge:id} lays planks
     ducts   [{id,tiles,need}]               drains and grates in the wall that only Ashling can crawl (need: a held lever)
-    stairs  [{id,a,b,label,hidden}]         hatches and stairs: hold E to take both characters to the other end
+    stairs  [{id,a,b,label,hidden,entry}]   hatches and stairs: hold E to take both characters to the other end
+                                            (entry: the mission's way in, e.g. Ashfall's culvert ladder; never optional)
     drops   [{id,x,y,r,rope}]               chandeliers: fx {drop:id} or burn the rope anchor; stuns below, very loud
     steam   [{id,x,y,per,on,ph}]            vents that hide you in steam on a cycle and scald Shiloh
     oil     [{x,y,w,h}]                     lamp oil: Ashling's fire ignites it; burning oil stuns guards who walk in
@@ -19,7 +20,8 @@
     caches  [{id,x,y,label,kind,rew,secret,hidden,chal}]   reward containers
     challenge {id,name,zone,goal,time,rings,rew}
     air     {drakes,ballistae,wind,gulls,fog}  flight encounters
-    guards  [{wp,kind,name}] extra guards    events {O:fx,...} fx when an objective is completed
+    lessons [{zone:[x0,y0,x1,y1],title,touch,keys}]  a hint shown while Shiloh stands in the zone (first match wins)
+    guards  [{wp,kind,name,face}] extra guards (face: a one-post guard keeps looking that way)    events {O:fx,...} fx when an objective is completed
     notes   [{x,y,title,text}]              carved hints (hold E to read)    keep [[x0,y0,x1,y1]] rooms kept clear of furniture */
 (function(){
 const K=(x,y)=>x+y*256;
@@ -50,13 +52,14 @@ function init(g){
   s.oil=(m.oil||[]).map(q=>Object.assign({},q,{st:'wet',t:0,hit:new Set()}));
   s.caches=(m.caches||[]).map(q=>Object.assign({kind:'chest',need:1},q,{open:false,seen:!q.hidden}));
   s.notes=(m.notes||[]).map(q=>Object.assign({},q,{read:false}));
+  s.lessons=m.lessons||[];s.lesson=null;
   for(const c of s.caches)if(c.secret)g.secretsTotal++;
   for(const st of s.stairs)if(st.secret)g.secretsTotal++;
   if(m.disguise){const D=m.disguise;s.dis={at:D.at,on:false,uses:D.uses||2,run:0,blown:0,doors:(D.doors||[]).map(([x,y])=>({x,y,open:false,t:0})),steward:null};
     if(D.steward!=null){const w=g.d.guards[D.steward];if(w){const sg=g.guards.find(q=>q.wp[0][0]===C(w[0][0])&&q.wp[0][1]===C(w[0][1]));if(sg){sg.steward=true;s.dis.steward=sg;}}}}
   if(m.bells)s.bells={list:m.bells.list.map(([x,y,n])=>({x,y,n,ring:0})),seq:m.bells.seq,p:0,solved:false,fx:m.bells.fx};
   if(m.challenge)s.ch=Object.assign({},m.challenge,{st:'idle',t:0,ri:0});
-  for(const q of m.guards||[]){const gd=mkGuard(q.wp,q.kind);if(q.name)gd.mname=q.name;g.guards.push(gd);}
+  for(const q of m.guards||[]){const gd=mkGuard(q.wp,q.kind);if(q.name)gd.mname=q.name;if(q.face!==undefined){gd.face=q.face;gd.post=q.face;}g.guards.push(gd);}
   if(m.air){const A=m.air;s.air={
     drakes:(A.drakes||[]).map(d=>({x:C(d.wp[0][0]),y:C(d.wp[0][1]),wp:d.wp.map(p=>[C(p[0]),C(p[1])]),i:1,face:0,st:'patrol',hp:1.3,cd:1.5,tele:0,see:0,lost:0,stun:0,ph:Math.random()*6,fall:0,last:null})),
     ball:(A.ballistae||[]).map(b=>({x:C(b[0]),y:C(b[1]),base:b[2],a:b[2],cd:2,tele:0,stun:0,burn:0,see:0})),
@@ -317,6 +320,11 @@ function step(dt){
   const s=M;s.t+=dt;
   const W=G.wren;s.wsp=Math.hypot(W.x-s.wx,W.y-s.wy)/Math.max(dt,1e-4);s.wx=W.x;s.wy=W.y;
   const hurry=G.active==='wren'&&!G.sneak&&s.wsp>66&&s.wsp<200;
+  // lessons: the hint for the zone Shiloh is standing in
+  {const tx=Math.floor(W.x/T),ty=Math.floor(W.y/T);s.lesson=null;
+   for(const q of s.lessons){const z=q.zone;if(tx>=z[0]&&tx<=z[2]&&ty>=z[1]&&ty<=z[3]){s.lesson=q;break;}}}
+  // a guard on a fixed post turns back to face it once he is standing there again
+  for(const g of G.guards)if(g.post!==undefined&&!g.seeing&&!g.lure&&!g.ret&&!(g.stun>0)&&!g.ko&&Math.hypot(g.x-g.wp[0][0],g.y-g.wp[0][1])<4)g.face=g.post;
   // levers that must be held
   for(const l of s.levers){
     if(!l.hold||!l.on)continue;
@@ -918,12 +926,27 @@ function drawDrake(c,d,t){
 
 /* ---------------- HUD: livery state and trial timer ---------------- */
 if(typeof drawHud==='function'){const oHud=drawHud;drawHud=function(){oHud();const s=G&&G.mis;if(!s||mode!=='play')return;ctx.save();try{hud(s);}catch(e){console.error(e);}ctx.restore();};}
+// the lesson card: a title and one or two wrapped lines, under the top bar and clear of the middle of the view
+function drawLesson(c,q,U,W,H){
+  const body=typeof BODY!=='undefined'?BODY:'serif',head=typeof HEAD!=='undefined'?HEAD:'serif';
+  const narrow=V.coarse&&W<H; // phone portrait: sit left of the minimap, under the objective line
+  const fs=Math.max(12,Math.round(13*U)),maxW=narrow?W-20-clamp(W*.26,72,110)-12:Math.min(W-24,430),txt=V.coarse?q.touch:q.keys;
+  c.font=fs+'px '+body;const words=txt.split(' '),rows=[];let cur='';
+  for(const w of words){const t=cur?cur+' '+w:w;if(c.measureText(t).width>maxW-28&&cur){rows.push(cur);cur=w;}else cur=t;}
+  if(cur)rows.push(cur);
+  const lh=Math.round(fs*1.35),h=lh*(rows.length+1)+16,x=narrow?10:W/2-maxW/2,y=narrow?Math.round(160*U):Math.round(H*.13),mx=x+maxW/2;
+  c.fillStyle='rgba(14,10,20,.86)';rr(c,x,y,maxW,h,8);c.fill();c.strokeStyle='#e8c060';c.lineWidth=1.5;rr(c,x,y,maxW,h,8);c.stroke();
+  c.textAlign='center';c.fillStyle='#e8c060';c.font='bold '+fs+'px '+head;c.fillText(q.title.toUpperCase(),mx,y+lh+2);
+  c.fillStyle='#eadfd0';c.font=fs+'px '+body;rows.forEach((r,i)=>c.fillText(r,mx,y+lh*(i+2)+4));
+  c.textAlign='left';
+}
 function hud(s){
   const c=ctx,U=V.U||1,W=V.w,H=V.h;
   c.setTransform(V.dpr,0,0,V.dpr,0,0);
   const lines=[];
   if(s.dis&&s.dis.on)lines.push(['IN LIVERY'+(s.dis.run>.05?'  -  slow down!':''),s.dis.run>.05?'#ff9a6a':'#e8c060']);
   if(s.ch&&s.ch.st==='run')lines.push([s.ch.name.toUpperCase()+'  '+Math.max(0,s.ch.t).toFixed(1)+'s'+(s.ch.rings?'  '+s.ch.ri+'/'+s.ch.rings.length:''),'#9fe0b0']);
+  if(s.lesson&&settings.hints!==false&&G.active==='wren'&&!G.cine&&!G.talk)drawLesson(c,s.lesson,U,W,H);
   if(!lines.length)return;
   const fs=Math.max(10,Math.round(11*U));c.font='bold '+fs+'px '+(typeof HEAD!=='undefined'?HEAD:'serif');c.textAlign='center';
   let y=Math.round(H*(V.coarse?.2:.16));
