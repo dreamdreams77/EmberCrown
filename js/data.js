@@ -116,6 +116,7 @@ const LEVELS=[
    {id:'store',a:[17,1],b:[13,17],label:'Go down the store hatch',labelB:'Climb to the egg store',kind:'hatch',kindB:'stairs'},
    {id:'well',a:[11,13],b:[2,20],label:'Climb down the well',labelB:'Climb the well rope',kind:'well',kindB:'stairs'}],
   rot:{tiles:[[13,2],[14,2],[13,3],[14,3]],to:[10,18]},
+  soft:[1,23,23,27],
   lessons:[
    {zone:[12,23,15,27],title:'Lure',touch:'The next guard is watching the door. Throw a BELL and slip past while he checks the noise.',keys:'The next guard is watching the door. Throw a bell (R) and slip past while he checks the noise.'},
    {zone:[7,23,13,27],title:'Takedown',touch:'He has his back to you. Sneak up behind him and STRIKE.',keys:'He has his back to you. Sneak up behind him and strike (SPACE).'},

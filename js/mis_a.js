@@ -20,6 +20,7 @@
     caches  [{id,x,y,label,kind,rew,secret,hidden,chal}]   reward containers
     challenge {id,name,zone,goal,time,rings,rew}
     air     {drakes,ballistae,wind,gulls,fog}  flight encounters
+    soft    [x0,y0,x1,y1]                   learning zone: suspicion builds slowly and being caught sends Shiloh back to the start instead of failing
     lessons [{zone:[x0,y0,x1,y1],title,touch,keys}]  a hint shown while Shiloh stands in the zone (first match wins)
     guards  [{wp,kind,name,face}] extra guards (face: a one-post guard keeps looking that way)    events {O:fx,...} fx when an objective is completed
     notes   [{x,y,title,text}]              carved hints (hold E to read)    keep [[x0,y0,x1,y1]] rooms kept clear of furniture */
@@ -52,7 +53,7 @@ function init(g){
   s.oil=(m.oil||[]).map(q=>Object.assign({},q,{st:'wet',t:0,hit:new Set()}));
   s.caches=(m.caches||[]).map(q=>Object.assign({kind:'chest',need:1},q,{open:false,seen:!q.hidden}));
   s.notes=(m.notes||[]).map(q=>Object.assign({},q,{read:false}));
-  s.lessons=m.lessons||[];s.lesson=null;
+  s.lessons=m.lessons||[];s.lesson=null;s.home={x:g.wren.x,y:g.wren.y};
   for(const c of s.caches)if(c.secret)g.secretsTotal++;
   for(const st of s.stairs)if(st.secret)g.secretsTotal++;
   if(m.disguise){const D=m.disguise;s.dis={at:D.at,on:false,uses:D.uses||2,run:0,blown:0,doors:(D.doors||[]).map(([x,y])=>({x,y,open:false,t:0})),steward:null};
@@ -322,6 +323,7 @@ function step(dt){
   const hurry=G.active==='wren'&&!G.sneak&&s.wsp>66&&s.wsp<200;
   // lessons: the hint for the zone Shiloh is standing in
   {const tx=Math.floor(W.x/T),ty=Math.floor(W.y/T);s.lesson=null;
+   const z=s.m.soft;G.softZone=!!z&&tx>=z[0]&&tx<=z[2]&&ty>=z[1]&&ty<=z[3];
    for(const q of s.lessons){const z=q.zone;if(tx>=z[0]&&tx<=z[2]&&ty>=z[1]&&ty<=z[3]){s.lesson=q;break;}}}
   // a guard on a fixed post turns back to face it once he is standing there again
   for(const g of G.guards)if(g.post!==undefined&&!g.seeing&&!g.lure&&!g.ret&&!(g.stun>0)&&!g.ko&&Math.hypot(g.x-g.wp[0][0],g.y-g.wp[0][1])<4)g.face=g.post;
@@ -926,6 +928,22 @@ function drawDrake(c,d,t){
 
 /* ---------------- HUD: livery state and trial timer ---------------- */
 if(typeof drawHud==='function'){const oHud=drawHud;drawHud=function(){oHud();const s=G&&G.mis;if(!s||mode!=='play')return;ctx.save();try{hud(s);}catch(e){console.error(e);}ctx.restore();};}
+// caught inside the soft zone: back to where the mission began, guards back on their posts, nothing lost
+window.softCatch=function(){
+  const s=G&&G.mis;if(!s||!s.m.soft)return false;
+  const z=s.m.soft,W=G.wren;
+  W.x=s.home.x;W.y=s.home.y;W.vx=W.vy=0;G.alert=0;G.grace=1.5;G.softZone=true;
+  for(const g of G.guards){
+    const tx=Math.floor(g.x/T),ty=Math.floor(g.y/T);if(tx<z[0]||tx>z[2]||ty<z[1]||ty>z[3])continue;
+    g.x=g.wp[0][0];g.y=g.wp[0][1];if(g.post!==undefined)g.face=g.post;
+    g.lure=null;g.ret=false;g.back=null;g.search=null;g.seeing=false;g.was=false;g.seen=null;g.stun=0;g.ko=false;g.hunt=0;g.run=false;
+  }
+  if(G.runner&&!G.runner.run)G.runner=null;
+  G.flash={t:.4,c:'20,14,28'};
+  toast('Spotted','Down here you get another try. In the keep you will not.','#e8c060');
+  say('Shiloh','Too loud. Again, and slower.');
+  return true;
+};
 // the lesson card: a title and one or two wrapped lines, under the top bar and clear of the middle of the view
 function drawLesson(c,q,U,W,H){
   const body=typeof BODY!=='undefined'?BODY:'serif',head=typeof HEAD!=='undefined'?HEAD:'serif';

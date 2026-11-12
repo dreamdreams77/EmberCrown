@@ -934,7 +934,8 @@ function update(dt){
   }
   const gm=G.grace>0?0:G.graceRamp>0?1-G.graceRamp/1.6:1;
   if(G.grace>0)G.grace-=dt;else if(G.graceRamp>0)G.graceRamp-=dt;
-  if(best>0)G.alert+=best*dt*G.gain*gm;else G.alert-=dt*.22*G.decay;
+  // a soft zone (mech.soft, e.g. Ashfall's culvert) is a place to learn: suspicion builds at half speed and drains twice as fast
+  if(best>0)G.alert+=best*dt*G.gain*gm*(G.softZone?.5:1);else G.alert-=dt*.22*G.decay*(G.softZone?2:1);
   G.alert=Math.max(0,G.alert);
   G.st.maxAlert=Math.max(G.st.maxAlert,Math.min(1,G.alert));
   for(const g of G.guards){if(!g.eng)stepGuard(g,dt);}
@@ -991,7 +992,8 @@ function update(dt){
      &&(!G.host||Math.hypot(G.host.x-G.exit.x,G.host.y-G.exit.y)<90)){
     if(G.d.choice||G.d.finale){setMode('choice');Aud.fire(false);}else beginVictory();
   }
-  if(G.alert>=1){
+  if(G.alert>=1&&G.softZone&&typeof softCatch==='function'&&softCatch()){/* caught while learning: sent back to try again, no fail screen */}
+  else if(G.alert>=1){
     setMode('lose');stats.caught++;Aud.fire(false);Aud.S.lost();shake(9);
     G.caughtAt={x:A.x,y:A.y};
   }
