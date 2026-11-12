@@ -249,6 +249,13 @@ function drawRings(){
     c.strokeStyle='rgba('+r.c+','+Math.min(1,r.t*2)*.35+')';c.lineWidth=1;circ(c,r.x,r.y,rad*.82);c.stroke();
   }
 }
+// one floating word ("TAKEDOWN", "STUNNED"); the pixel pass draws these afterwards at full resolution
+function drawFloatText(c,p){
+  const a=Math.max(0,p.l/p.m);
+  c.globalCompositeOperation='source-over';c.globalAlpha=Math.min(1,a*2);c.font='bold '+p.s+'px '+HEAD;c.textAlign='center';
+  c.strokeStyle='rgba(0,0,0,.7)';c.lineWidth=3;c.strokeText(p.txt,p.x,p.y);c.fillStyle=p.c;c.fillText(p.txt,p.x,p.y);c.textAlign='left';
+  c.globalAlpha=1;
+}
 function drawParticles(){
   const c=ctx;
   for(let pass=0;pass<2;pass++){
@@ -258,9 +265,8 @@ function drawParticles(){
       if(p.k==='text'){ if(pass===0)continue; }
       const a=Math.max(0,p.l/p.m);
       if(p.k==='text'){
-        c.globalCompositeOperation='source-over';c.globalAlpha=Math.min(1,a*2);c.font='bold '+p.s+'px '+HEAD;c.textAlign='center';
-        c.strokeStyle='rgba(0,0,0,.7)';c.lineWidth=3;c.strokeText(p.txt,p.x,p.y);c.fillStyle=p.c;c.fillText(p.txt,p.x,p.y);c.textAlign='left';
-        c.globalAlpha=1;c.globalCompositeOperation=pass?'lighter':'source-over';continue;
+        if(!(typeof PX!=='undefined'&&PX.active))drawFloatText(c,p);
+        c.globalCompositeOperation=pass?'lighter':'source-over';continue;
       }
       if(p.k==='smoke'){const r=p.s*(1.7-a*.6);c.globalAlpha=a*.55;c.drawImage(softSprite(p.c),p.x-r,p.y-r,r*2,r*2);continue;}
       c.globalAlpha=pass?a:a*.9;c.fillStyle=p.c;

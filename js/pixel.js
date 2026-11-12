@@ -2,13 +2,16 @@
    With pixel art on, the whole world is drawn into a small buffer at one buffer pixel per world unit
    (the native size of the LPC sprites: a 32px tile is 32 buffer pixels) and then scaled up with hard edges.
    Sprites, tiles, props, light and cones all land on the same pixel grid, so the scene reads as one style.
-   Text that belongs to the world (the interact prompt) is drawn afterwards at full resolution. */
+   Text that belongs to the world (the interact prompt, floating words, guard barks and markers, NPC names)
+   is drawn afterwards at full resolution so it stays crisp. */
 'use strict';
 const PX={cv:document.createElement('canvas'),active:false,was:false,
   on(){return LPC.on();}};
 {
-  const _drawWorld=drawWorld,_drawPrompt=drawPrompt;
+  const _drawWorld=drawWorld,_drawPrompt=drawPrompt,_drawMarkers=drawMarkers;
   drawPrompt=function(){if(!PX.active)_drawPrompt();};
+  drawMarkers=function(g){if(!PX.active)_drawMarkers(g);};
+  if(window.NPC&&NPC.drawFront){const f=NPC.drawFront;NPC.drawFront=function(){if(!PX.active)return f.apply(NPC,arguments);};}
   drawWorld=function(){
     const on=PX.on();
     if(on!==PX.was){PX.was=on;G.dirty=true;G.lightsBaked=false;}
@@ -30,6 +33,10 @@ const PX={cv:document.createElement('canvas'),active:false,was:false,
     main.imageSmoothingEnabled=false;
     main.drawImage(PX.cv,(tx-ix-1)*S,(ty-iy-1)*S,bw*S,bh*S);
     main.imageSmoothingEnabled=true;
-    setWorldTransform();_drawPrompt();
+    setWorldTransform();
+    for(const p of PT)if(p.k==='text')drawFloatText(main,p);
+    for(const g of G.guards)_drawMarkers(g);
+    if(window.NPC&&NPC.drawFront)NPC.drawFront();
+    _drawPrompt();
   };
 }
