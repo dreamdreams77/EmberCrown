@@ -6,6 +6,10 @@ A stealth-action prototype: a spy and her runt dragon infiltrate feuding houses 
 
 **Design doc:** see [PLAYBOOK.md](PLAYBOOK.md).
 
+[![Watch the trailer](docs/trailer/poster.jpg)](docs/trailer/embercrown-trailer.mp4)
+
+**[Watch the 51-second trailer](docs/trailer/embercrown-trailer.mp4)**, recorded from the real game (rebuild it with `tools/trailer/make.sh`).
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch |
