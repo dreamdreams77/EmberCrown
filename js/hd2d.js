@@ -82,11 +82,15 @@ const HD2D=(function(){
 
   // Colour grade (warm light, cool shadow) and a soft vignette, cached per screen size.
   function grade(main,W,H){
-    const key=W+'x'+H;
+    // each house has its own light: [shadow tint (top), light tint (bottom)]
+    const MOOD={marrow:['70,70,170,.30','255,140,70,.18'],grell:['90,40,40,.24','255,190,90,.26'],ostrander:['30,110,150,.30','255,220,150,.16'],
+      sable:['50,70,170,.34','190,200,255,.14'],kest:['80,30,20,.26','255,120,40,.30'],dunmoor:['50,60,150,.30','255,170,200,.18'],
+      hallow:['70,40,30,.26','255,190,110,.28'],hub:['60,50,90,.20','255,180,110,.26']};
+    const hk=typeof TILES!=='undefined'&&TILES.key?TILES.key():'marrow',md=MOOD[hk]||MOOD.marrow,key=W+'x'+H+hk;
     if(gradKey!==key){gradKey=key;gradC=document.createElement('canvas');gradC.width=W;gradC.height=H;const g=gradC.getContext('2d');
-      const lg=g.createLinearGradient(0,0,0,H);lg.addColorStop(0,'rgba(60,80,170,.30)');lg.addColorStop(.55,'rgba(0,0,0,0)');lg.addColorStop(1,'rgba(255,150,70,.20)');
+      const lg=g.createLinearGradient(0,0,0,H);lg.addColorStop(0,'rgba('+md[0]+')');lg.addColorStop(.55,'rgba(0,0,0,0)');lg.addColorStop(1,'rgba('+md[1]+')');
       g.fillStyle=lg;g.fillRect(0,0,W,H);}
-    if(vigKey!==key){vigKey=key;vigC=document.createElement('canvas');vigC.width=W;vigC.height=H;const g=vigC.getContext('2d');
+    if(vigKey!==W+'x'+H){vigKey=W+'x'+H;vigC=document.createElement('canvas');vigC.width=W;vigC.height=H;const g=vigC.getContext('2d');
       const rg=g.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.hypot(W,H)*.62);rg.addColorStop(0,'rgba(0,0,0,0)');rg.addColorStop(1,'rgba(6,4,14,.66)');
       g.fillStyle=rg;g.fillRect(0,0,W,H);}
     main.save();main.setTransform(1,0,0,1,0,0);

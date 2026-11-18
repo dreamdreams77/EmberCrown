@@ -68,3 +68,26 @@ One sheet per layer (walk and hurt animations), taken from the Universal LPC Spr
 - `spear_bg.png / spear_fg.png` (credit row `weapon/polearm/spear/background/walk.png`) - Pierre Vigier (pvigier),Johannes Sjölund (wulax),Inboxninja  - CC-BY-SA 3.0  - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites https://opengameart.org/content/lpc-spear-and-shovel-reworked 
 - `bow_bg.png / bow_fg.png` (credit row `weapon/ranged/bow/normal/walk/background/walk.png`) - Johannes Sjölund (wulax),Pierre Vigier (pvigier)  - OGA-BY 3.0+,GPL 3.0,CC-BY 4.0  - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites https://opengameart.org/content/lpc-walk-animations-for-bows 
 - `axe.png / axe_bg.png` (credit row `weapon/blunt/waraxe/walk.png`) - Benjamin K. Smith (BenCreating),bluecarrot16,Sander Frenken (castelonia)  - CC-BY-SA 3.0,GPL 3.0  - https://opengameart.org/content/lpc-medieval-weapons 
+
+## House floors and walls (assets/lpc/tiles.png, built by tools/build_lpc_tiles.py)
+
+From the LPC Starter Kit (https://github.com/LiberatedPixelCup/RPG_Maker_MZ_LPC_Starter_Kit), CC-BY-SA 3.0 / GPL 3.0; full per-tile authors in its `Final Attribution.txt`:
+- `Interior.png`: the LPC interior set (Lanea Zimmerman / Sharm and contributors listed there).
+- `castlefloors.png`, `castlewalls.png`: Daniel Armstrong (HughSpectrum).
+- `dungeon.png`: Lanea Zimmerman (Sharm).
+- `castle2.png`: the idiotmachine.
+Recoloured and cropped to 32 px cells.
+
+## Bosses (assets/lpc/boss_warden.png, assets/lpc/boss_candle.png)
+
+Composited and recoloured from the Universal LPC Spritesheet Character Generator. Layers, as given in its CREDITS.csv:
+
+- `body/bodies/muscular/` - bluecarrot16,JaidynReiman,Evert,TheraHedwig,MuffinElZangano,Durrani,Sander Frenken (castelonia),Benjamin K. Smith (BenCreating),Eliza Wyatt (ElizaWy),dalonedrau,Stephen Challener (Redshrike) - CC-BY-SA 3.0,GPL 3.0 - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles https://opengameart.org/content/lpc-barbarian-sprite-base https://opengameart.org/content/lpc-muscular-swing-animation https://opengameart.org/content/lpc-muscular-hurt-animation https://opengameart.org/content/lpc-jump-expanded https://opengameart.org/content/lpc-revised-character-basics https://opengameart.org/content/lpc-be-seated https://opengameart.org/content/lpc-jump-expanded https://opengameart.org/content/lpc-character-bases https://opengameart.org/content/lpc-male-jumping-animation-by-durrani
+- `hat/helmet/greathelm/male/` - bluecarrot16 - OGA-BY 3.0,CC-BY 3.0,CC-BY 4.0,GPL 2.0,GPL 3.0 - https://opengameart.org/content/lpc-helmets https://opengameart.org/content/lpc-expanded-hats-facial-helmets
+- `weapon/blunt/mace/` - Johannes Sjölund (wulax),bluecarrot16 - OGA-BY 3.0,CC-BY-SA 3.0 - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites https://opengameart.org/content/lpc-extended-weapon-animations
+- `torso/clothes/robe/female/` - Luke Mehl - CC-BY-SA 3.0,GPL 3.0 - https://opengameart.org/content/female-mage-clothing-set
+- `hat/cloth/hood/adult/` - Johannes Sjölund (wulax),JaidynReiman - OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites https://opengameart.org/content/lpc-expanded-hats-facial-helmets
+- `weapon/magic/simple/` - bluecarrot16,Dr. Jamgo - CC0 - https://opengameart.org/content/lpc-simple-staff
+- `feet/boots/basic/thin/` - JaidynReiman,bluecarrot16,Nila122 - OGA-BY 3.0,CC-BY-SA 3.0,GPL 2.0,GPL 3.0 - https://opengameart.org/content/lpc-clothes-and-hair https://opengameart.org/content/lpc-expanded-socks-shoes
+- `body/bodies/female/` - Benjamin K. Smith (BenCreating),bluecarrot16,TheraHedwig,Evert,MuffinElZangano,Durrani,Pierre Vigier (pvigier),ElizaWy,Matthew Krohn (makrohn),Johannes Sjölund (wulax),Stephen Challener (Redshrike) - OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles https://opengameart.org/content/lpc-medieval-fantasy-character-sprites https://opengameart.org/content/lpc-ladies https://opengameart.org/content/lpc-7-womens-shirts https://opengameart.org/content/lpc-jump-expanded https://opengameart.org/content/lpc-be-seated https://opengameart.org/content/lpc-revised-character-basics https://gitlab.com/vagabondgame/lpc-characters https://opengameart.org/content/lpc-male-jumping-animation-by-durrani https://opengameart.org/content/lpc-runcycle-and-diagonal-walkcycle
+- `head/heads/human/female/` - bluecarrot16,Benjamin K. Smith (BenCreating),Stephen Challener (Redshrike) - OGA-BY 3.0,CC-BY-SA 3.0,GPL 3.0 - https://opengameart.org/content/ https://opengameart.org/content/lpc-character-bases
