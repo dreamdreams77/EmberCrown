@@ -79,6 +79,7 @@ const UI=(()=>{
       case'resume':pauseGame(false);break;
       case'restart':pauseGame(false);if(G&&G.d.hub){Hub.leave();break;}startPlay();break;
       case'how':openModal(howHTML());break;
+      case'trailer':if(typeof Intro!=='undefined')Intro.open();break;
       case'codex':openJournal('codex');break;
       case'case':openJournal('case');break;
       case'journal':openJournal(J.tab);break;
@@ -183,7 +184,7 @@ const UI=(()=>{
         screen('title','<div class="logo"><div class="crown">'+sigil('hallow')+'</div><h1>EMBERCROWN</h1><p class="tag">A spy. A runt dragon. Seven feuding houses. One engineered war.</p></div>'+
         '<div class="menu">'+(cont?btn('Continue<small>'+label+'</small>','continue','primary big')+btn(confirmNew?'Tap again: erase save':'New Game','new','ghost'):btn('Begin','new','primary big'))+
         '<div class="diffrow"><span>Difficulty</span>'+diffChips()+'</div><p class="blurb">'+DIFFS[diff].blurb+'</p>'+
-        '<div class="row">'+btn('How to play','how','ghost small')+btn('Journal','journal','ghost small')+'</div></div>'+
+        '<div class="row">'+btn('How to play','how','ghost small')+btn('Journal','journal','ghost small')+btn('Trailer','trailer','ghost small')+'</div></div>'+
         '<p class="foot">Chapter I &middot; The Hollow Crown &nbsp;&middot;&nbsp; press <kbd>Enter</kbd></p>');
       },
       brief(){
