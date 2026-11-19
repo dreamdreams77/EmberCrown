@@ -1,0 +1,229 @@
+{
+ "timings_raw": {
+  "A/desktop": {
+   "info": {
+    "lpc": true,
+    "hasHD2D": false,
+    "coarse": false,
+    "tier": 0
+   },
+   "errors": [],
+   "median_ms_per_scene": {
+    "default/01-ashfall-start": 16,
+    "default/02-ashfall-patrol": 17,
+    "default/03-gallowmere-hall": 17,
+    "default/04-gallowmere-fire": 17,
+    "default/05-drowned-spire": 17,
+    "default/06-thornwick-hall": 20,
+    "default/07-warden-boss": 20,
+    "default/08-ironvale": 18,
+    "default/09-dunmoor-ball": 22,
+    "default/10-dunmoor-ruins": 16,
+    "default/11-candlemaker-hall": 21,
+    "default/12-candlemaker-boss": 21,
+    "default/13-rookery-hub": 20,
+    "close/01-ashfall-start": 14,
+    "close/02-ashfall-patrol": 13,
+    "close/03-gallowmere-hall": 14,
+    "close/04-gallowmere-fire": 14,
+    "close/05-drowned-spire": 15,
+    "close/06-thornwick-hall": 16,
+    "close/07-warden-boss": 16,
+    "close/08-ironvale": 15,
+    "close/09-dunmoor-ball": 14,
+    "close/10-dunmoor-ruins": 13,
+    "close/11-candlemaker-hall": 19,
+    "close/12-candlemaker-boss": 19,
+    "close/13-rookery-hub": 16
+   }
+  },
+  "A/mobile": {
+   "info": {
+    "lpc": true,
+    "hasHD2D": false,
+    "coarse": true,
+    "tier": 0
+   },
+   "errors": [],
+   "median_ms_per_scene": {
+    "default/01-ashfall-start": 18,
+    "default/02-ashfall-patrol": 20,
+    "default/03-gallowmere-hall": 22,
+    "default/04-gallowmere-fire": 20,
+    "default/05-drowned-spire": 18,
+    "default/06-thornwick-hall": 21,
+    "default/07-warden-boss": 22,
+    "default/08-ironvale": 22,
+    "default/09-dunmoor-ball": 19,
+    "default/10-dunmoor-ruins": 20,
+    "default/11-candlemaker-hall": 23,
+    "default/12-candlemaker-boss": 23,
+    "default/13-rookery-hub": 22
+   }
+  },
+  "E/desktop": {
+   "info": {
+    "hd2d": true,
+    "lpc": true,
+    "hasHD2D": true,
+    "coarse": false,
+    "tier": 0
+   },
+   "errors": [],
+   "median_ms_per_scene": {
+    "default/01-ashfall-start": 33,
+    "default/02-ashfall-patrol": 37,
+    "default/03-gallowmere-hall": 41,
+    "default/04-gallowmere-fire": 42,
+    "default/05-drowned-spire": 31,
+    "default/06-thornwick-hall": 40,
+    "default/07-warden-boss": 51,
+    "default/08-ironvale": 43,
+    "default/09-dunmoor-ball": 35,
+    "default/10-dunmoor-ruins": 29,
+    "default/11-candlemaker-hall": 33,
+    "default/12-candlemaker-boss": 47,
+    "default/13-rookery-hub": 32,
+    "close/01-ashfall-start": 28,
+    "close/02-ashfall-patrol": 36,
+    "close/03-gallowmere-hall": 39,
+    "close/04-gallowmere-fire": 41,
+    "close/05-drowned-spire": 30,
+    "close/06-thornwick-hall": 35,
+    "close/07-warden-boss": 51,
+    "close/08-ironvale": 36,
+    "close/09-dunmoor-ball": 34,
+    "close/10-dunmoor-ruins": 29,
+    "close/11-candlemaker-hall": 35,
+    "close/12-candlemaker-boss": 52,
+    "close/13-rookery-hub": 34
+   }
+  },
+  "B/desktop": {
+   "info": {
+    "hd2d": false,
+    "lpc": true,
+    "hasHD2D": true,
+    "coarse": false,
+    "tier": 0
+   },
+   "errors": [],
+   "median_ms_per_scene": {
+    "default/01-ashfall-start": 16,
+    "default/02-ashfall-patrol": 17,
+    "default/03-gallowmere-hall": 21,
+    "default/04-gallowmere-fire": 17,
+    "default/05-drowned-spire": 17,
+    "default/06-thornwick-hall": 20,
+    "default/07-warden-boss": 19,
+    "default/08-ironvale": 20,
+    "default/09-dunmoor-ball": 17,
+    "default/10-dunmoor-ruins": 17,
+    "default/11-candlemaker-hall": 22,
+    "default/12-candlemaker-boss": 21,
+    "default/13-rookery-hub": 19,
+    "close/01-ashfall-start": 13,
+    "close/02-ashfall-patrol": 14,
+    "close/03-gallowmere-hall": 13,
+    "close/04-gallowmere-fire": 14,
+    "close/05-drowned-spire": 17,
+    "close/06-thornwick-hall": 16,
+    "close/07-warden-boss": 20,
+    "close/08-ironvale": 18,
+    "close/09-dunmoor-ball": 14,
+    "close/10-dunmoor-ruins": 14,
+    "close/11-candlemaker-hall": 22,
+    "close/12-candlemaker-boss": 21,
+    "close/13-rookery-hub": 17
+   }
+  },
+  "B/mobile": {
+   "info": {
+    "hd2d": false,
+    "lpc": true,
+    "hasHD2D": true,
+    "coarse": true,
+    "tier": 0
+   },
+   "errors": [],
+   "median_ms_per_scene": {
+    "default/01-ashfall-start": 19,
+    "default/02-ashfall-patrol": 21,
+    "default/03-gallowmere-hall": 19,
+    "default/04-gallowmere-fire": 19,
+    "default/05-drowned-spire": 19,
+    "default/06-thornwick-hall": 22,
+    "default/07-warden-boss": 22,
+    "default/08-ironvale": 19,
+    "default/09-dunmoor-ball": 17,
+    "default/10-dunmoor-ruins": 18,
+    "default/11-candlemaker-hall": 22,
+    "default/12-candlemaker-boss": 22,
+    "default/13-rookery-hub": 21
+   }
+  },
+  "C/desktop": {
+   "info": {
+    "hd2d": true,
+    "lpc": true,
+    "hasHD2D": true,
+    "coarse": false,
+    "tier": 0
+   },
+   "errors": [],
+   "median_ms_per_scene": {
+    "default/01-ashfall-start": 35,
+    "default/02-ashfall-patrol": 48,
+    "default/03-gallowmere-hall": 40,
+    "default/04-gallowmere-fire": 42,
+    "default/05-drowned-spire": 31,
+    "default/06-thornwick-hall": 41,
+    "default/07-warden-boss": 53,
+    "default/08-ironvale": 43,
+    "default/09-dunmoor-ball": 37,
+    "default/10-dunmoor-ruins": 31,
+    "default/11-candlemaker-hall": 40,
+    "default/12-candlemaker-boss": 50,
+    "default/13-rookery-hub": 32,
+    "close/01-ashfall-start": 27,
+    "close/02-ashfall-patrol": 35,
+    "close/03-gallowmere-hall": 35,
+    "close/04-gallowmere-fire": 40,
+    "close/05-drowned-spire": 29,
+    "close/06-thornwick-hall": 36,
+    "close/07-warden-boss": 48,
+    "close/08-ironvale": 36,
+    "close/09-dunmoor-ball": 33,
+    "close/10-dunmoor-ruins": 26,
+    "close/11-candlemaker-hall": 34,
+    "close/12-candlemaker-boss": 48,
+    "close/13-rookery-hub": 30
+   }
+  },
+  "C/mobile": {
+   "info": {
+    "hd2d": true,
+    "lpc": true,
+    "hasHD2D": true,
+    "coarse": true,
+    "tier": 0
+   },
+   "errors": [],
+   "median_ms_per_scene": {
+    "default/01-ashfall-start": 39,
+    "default/02-ashfall-patrol": 49,
+    "default/03-gallowmere-hall": 50,
+    "default/04-gallowmere-fire": 57,
+    "default/05-drowned-spire": 37,
+    "default/06-thornwick-hall": 51,
+    "default/07-warden-boss": 64,
+    "default/08-ironvale": 51,
+    "default/09-dunmoor-ball": 42,
+    "default/10-dunmoor-ruins": 40,
+    "default/11-candlemaker-hall": 39,
+    "default/12-candlemaker-boss": 60,
+    "default/13-rookery-hub": 37
+   }
+  }
+ }
+}

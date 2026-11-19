@@ -1,0 +1,548 @@
+{
+ "default/01-ashfall-start": {
+  "bloom_cover_gt20_pct": 0.1,
+  "bloom_cover_gt60_pct": 0.01,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.001,
+  "blown_out_ge235_on_pct": 0.0,
+  "detail_under_glow_on_vs_off": null,
+  "sharpness_on_vs_off_top(0-20%)": 0.781,
+  "sharpness_on_vs_off_middle(30-70%)": 1.021,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.039,
+  "grade_shift_rgb_in_unlit_areas": [
+   -1.1,
+   -1.9,
+   -2.8
+  ],
+  "mean_luma_world_off_on": [
+   51.8,
+   49.7
+  ]
+ },
+ "default/02-ashfall-patrol": {
+  "bloom_cover_gt20_pct": 4.79,
+  "bloom_cover_gt60_pct": 0.44,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.0,
+  "blown_out_ge235_on_pct": 0.002,
+  "detail_under_glow_on_vs_off": 0.911,
+  "sharpness_on_vs_off_top(0-20%)": 0.95,
+  "sharpness_on_vs_off_middle(30-70%)": 1.034,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.847,
+  "grade_shift_rgb_in_unlit_areas": [
+   3.1,
+   0.7,
+   -1.8
+  ],
+  "mean_luma_world_off_on": [
+   69.2,
+   73.3
+  ]
+ },
+ "default/03-gallowmere-hall": {
+  "bloom_cover_gt20_pct": 4.33,
+  "bloom_cover_gt60_pct": 0.21,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.015,
+  "blown_out_ge235_off_pct": 0.074,
+  "blown_out_ge235_on_pct": 0.148,
+  "detail_under_glow_on_vs_off": 0.945,
+  "sharpness_on_vs_off_top(0-20%)": 0.857,
+  "sharpness_on_vs_off_middle(30-70%)": 1.023,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.752,
+  "grade_shift_rgb_in_unlit_areas": [
+   0.6,
+   0.0,
+   -1.1
+  ],
+  "mean_luma_world_off_on": [
+   73.4,
+   75.6
+  ]
+ },
+ "default/04-gallowmere-fire": {
+  "bloom_cover_gt20_pct": 14.95,
+  "bloom_cover_gt60_pct": 0.71,
+  "blown_out_ge245_off_pct": 0.281,
+  "blown_out_ge245_on_pct": 0.455,
+  "blown_out_ge235_off_pct": 0.58,
+  "blown_out_ge235_on_pct": 0.811,
+  "detail_under_glow_on_vs_off": 1.059,
+  "sharpness_on_vs_off_top(0-20%)": 0.584,
+  "sharpness_on_vs_off_middle(30-70%)": 1.051,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.105,
+  "grade_shift_rgb_in_unlit_areas": [
+   1.7,
+   -0.0,
+   -1.1
+  ],
+  "mean_luma_world_off_on": [
+   82.2,
+   89.7
+  ]
+ },
+ "default/05-drowned-spire": {
+  "bloom_cover_gt20_pct": 0.42,
+  "bloom_cover_gt60_pct": 0.05,
+  "blown_out_ge245_off_pct": 0.001,
+  "blown_out_ge245_on_pct": 0.001,
+  "blown_out_ge235_off_pct": 0.002,
+  "blown_out_ge235_on_pct": 0.02,
+  "detail_under_glow_on_vs_off": 1.453,
+  "sharpness_on_vs_off_top(0-20%)": 1.204,
+  "sharpness_on_vs_off_middle(30-70%)": 1.062,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.844,
+  "grade_shift_rgb_in_unlit_areas": [
+   -0.3,
+   -2.1,
+   -2.8
+  ],
+  "mean_luma_world_off_on": [
+   55.2,
+   53.0
+  ]
+ },
+ "default/06-thornwick-hall": {
+  "bloom_cover_gt20_pct": 14.0,
+  "bloom_cover_gt60_pct": 1.05,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.032,
+  "blown_out_ge235_on_pct": 0.192,
+  "detail_under_glow_on_vs_off": 0.966,
+  "sharpness_on_vs_off_top(0-20%)": 0.667,
+  "sharpness_on_vs_off_middle(30-70%)": 1.022,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.014,
+  "grade_shift_rgb_in_unlit_areas": [
+   0.9,
+   0.6,
+   2.4
+  ],
+  "mean_luma_world_off_on": [
+   64.7,
+   72.4
+  ]
+ },
+ "default/07-warden-boss": {
+  "bloom_cover_gt20_pct": 37.44,
+  "bloom_cover_gt60_pct": 4.46,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.427,
+  "blown_out_ge235_on_pct": 1.227,
+  "detail_under_glow_on_vs_off": 0.896,
+  "sharpness_on_vs_off_top(0-20%)": 0.908,
+  "sharpness_on_vs_off_middle(30-70%)": 0.928,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.712,
+  "grade_shift_rgb_in_unlit_areas": [
+   -0.1,
+   -0.4,
+   0.8
+  ],
+  "mean_luma_world_off_on": [
+   86.7,
+   104.8
+  ]
+ },
+ "default/08-ironvale": {
+  "bloom_cover_gt20_pct": 4.71,
+  "bloom_cover_gt60_pct": 0.18,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.054,
+  "blown_out_ge235_on_pct": 0.09,
+  "detail_under_glow_on_vs_off": 0.966,
+  "sharpness_on_vs_off_top(0-20%)": 0.632,
+  "sharpness_on_vs_off_middle(30-70%)": 1.038,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.031,
+  "grade_shift_rgb_in_unlit_areas": [
+   3.3,
+   0.2,
+   -1.3
+  ],
+  "mean_luma_world_off_on": [
+   62.3,
+   66.2
+  ]
+ },
+ "default/09-dunmoor-ball": {
+  "bloom_cover_gt20_pct": 4.25,
+  "bloom_cover_gt60_pct": 0.22,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.0,
+  "blown_out_ge235_on_pct": 0.06,
+  "detail_under_glow_on_vs_off": 0.918,
+  "sharpness_on_vs_off_top(0-20%)": 0.689,
+  "sharpness_on_vs_off_middle(30-70%)": 1.011,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.046,
+  "grade_shift_rgb_in_unlit_areas": [
+   1.7,
+   0.2,
+   -0.8
+  ],
+  "mean_luma_world_off_on": [
+   87.8,
+   88.1
+  ]
+ },
+ "default/10-dunmoor-ruins": {
+  "bloom_cover_gt20_pct": 0.37,
+  "bloom_cover_gt60_pct": 0.0,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.0,
+  "blown_out_ge235_on_pct": 0.0,
+  "detail_under_glow_on_vs_off": 0.899,
+  "sharpness_on_vs_off_top(0-20%)": 0.815,
+  "sharpness_on_vs_off_middle(30-70%)": 1.019,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.096,
+  "grade_shift_rgb_in_unlit_areas": [
+   -2.3,
+   -1.7,
+   -1.1
+  ],
+  "mean_luma_world_off_on": [
+   48.1,
+   45.6
+  ]
+ },
+ "default/11-candlemaker-hall": {
+  "bloom_cover_gt20_pct": 1.8,
+  "bloom_cover_gt60_pct": 0.15,
+  "blown_out_ge245_off_pct": 0.123,
+  "blown_out_ge245_on_pct": 0.149,
+  "blown_out_ge235_off_pct": 0.157,
+  "blown_out_ge235_on_pct": 0.292,
+  "detail_under_glow_on_vs_off": 1.328,
+  "sharpness_on_vs_off_top(0-20%)": 0.683,
+  "sharpness_on_vs_off_middle(30-70%)": 1.005,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.065,
+  "grade_shift_rgb_in_unlit_areas": [
+   -0.8,
+   -1.4,
+   -1.5
+  ],
+  "mean_luma_world_off_on": [
+   71.1,
+   69.1
+  ]
+ },
+ "default/12-candlemaker-boss": {
+  "bloom_cover_gt20_pct": 23.38,
+  "bloom_cover_gt60_pct": 0.74,
+  "blown_out_ge245_off_pct": 0.313,
+  "blown_out_ge245_on_pct": 0.639,
+  "blown_out_ge235_off_pct": 1.131,
+  "blown_out_ge235_on_pct": 1.937,
+  "detail_under_glow_on_vs_off": 0.906,
+  "sharpness_on_vs_off_top(0-20%)": 0.866,
+  "sharpness_on_vs_off_middle(30-70%)": 0.964,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.831,
+  "grade_shift_rgb_in_unlit_areas": [
+   2.2,
+   0.6,
+   -1.0
+  ],
+  "mean_luma_world_off_on": [
+   96.8,
+   108.5
+  ]
+ },
+ "default/13-rookery-hub": {
+  "bloom_cover_gt20_pct": 0.27,
+  "bloom_cover_gt60_pct": 0.01,
+  "blown_out_ge245_off_pct": 0.003,
+  "blown_out_ge245_on_pct": 0.021,
+  "blown_out_ge235_off_pct": 0.032,
+  "blown_out_ge235_on_pct": 0.074,
+  "detail_under_glow_on_vs_off": 1.065,
+  "sharpness_on_vs_off_top(0-20%)": 0.527,
+  "sharpness_on_vs_off_middle(30-70%)": 1.007,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.088,
+  "grade_shift_rgb_in_unlit_areas": [
+   -0.6,
+   -1.1,
+   -0.7
+  ],
+  "mean_luma_world_off_on": [
+   64.0,
+   60.2
+  ]
+ },
+ "close/01-ashfall-start": {
+  "bloom_cover_gt20_pct": 0.91,
+  "bloom_cover_gt60_pct": 0.08,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.009,
+  "blown_out_ge235_on_pct": 0.014,
+  "detail_under_glow_on_vs_off": 0.707,
+  "sharpness_on_vs_off_top(0-20%)": 0.887,
+  "sharpness_on_vs_off_middle(30-70%)": 1.058,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.053,
+  "grade_shift_rgb_in_unlit_areas": [
+   -0.3,
+   -1.4,
+   -2.4
+  ],
+  "mean_luma_world_off_on": [
+   56.5,
+   54.9
+  ]
+ },
+ "close/02-ashfall-patrol": {
+  "bloom_cover_gt20_pct": 12.15,
+  "bloom_cover_gt60_pct": 1.32,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.008,
+  "blown_out_ge235_on_pct": 0.026,
+  "detail_under_glow_on_vs_off": 0.981,
+  "sharpness_on_vs_off_top(0-20%)": 1.122,
+  "sharpness_on_vs_off_middle(30-70%)": 1.041,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.853,
+  "grade_shift_rgb_in_unlit_areas": [
+   2.3,
+   -0.2,
+   -3.2
+  ],
+  "mean_luma_world_off_on": [
+   76.2,
+   83.7
+  ]
+ },
+ "close/03-gallowmere-hall": {
+  "bloom_cover_gt20_pct": 3.57,
+  "bloom_cover_gt60_pct": 0.26,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.001,
+  "blown_out_ge235_off_pct": 0.018,
+  "blown_out_ge235_on_pct": 0.024,
+  "detail_under_glow_on_vs_off": 1.025,
+  "sharpness_on_vs_off_top(0-20%)": 1.137,
+  "sharpness_on_vs_off_middle(30-70%)": 1.016,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.814,
+  "grade_shift_rgb_in_unlit_areas": [
+   2.1,
+   1.2,
+   -0.7
+  ],
+  "mean_luma_world_off_on": [
+   70.5,
+   73.4
+  ]
+ },
+ "close/04-gallowmere-fire": {
+  "bloom_cover_gt20_pct": 19.15,
+  "bloom_cover_gt60_pct": 1.0,
+  "blown_out_ge245_off_pct": 0.771,
+  "blown_out_ge245_on_pct": 1.024,
+  "blown_out_ge235_off_pct": 1.29,
+  "blown_out_ge235_on_pct": 1.712,
+  "detail_under_glow_on_vs_off": 1.032,
+  "sharpness_on_vs_off_top(0-20%)": 0.793,
+  "sharpness_on_vs_off_middle(30-70%)": 1.053,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.18,
+  "grade_shift_rgb_in_unlit_areas": [
+   2.0,
+   0.6,
+   -1.2
+  ],
+  "mean_luma_world_off_on": [
+   80.0,
+   91.1
+  ]
+ },
+ "close/05-drowned-spire": {
+  "bloom_cover_gt20_pct": 0.3,
+  "bloom_cover_gt60_pct": 0.03,
+  "blown_out_ge245_off_pct": 0.001,
+  "blown_out_ge245_on_pct": 0.001,
+  "blown_out_ge235_off_pct": 0.003,
+  "blown_out_ge235_on_pct": 0.008,
+  "detail_under_glow_on_vs_off": 1.498,
+  "sharpness_on_vs_off_top(0-20%)": 1.284,
+  "sharpness_on_vs_off_middle(30-70%)": 1.059,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.931,
+  "grade_shift_rgb_in_unlit_areas": [
+   0.2,
+   -1.8,
+   -2.6
+  ],
+  "mean_luma_world_off_on": [
+   56.6,
+   54.7
+  ]
+ },
+ "close/06-thornwick-hall": {
+  "bloom_cover_gt20_pct": 9.75,
+  "bloom_cover_gt60_pct": 0.64,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.017,
+  "blown_out_ge235_on_pct": 0.006,
+  "detail_under_glow_on_vs_off": 0.918,
+  "sharpness_on_vs_off_top(0-20%)": 0.683,
+  "sharpness_on_vs_off_middle(30-70%)": 0.995,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.073,
+  "grade_shift_rgb_in_unlit_areas": [
+   2.2,
+   1.6,
+   2.8
+  ],
+  "mean_luma_world_off_on": [
+   67.0,
+   73.7
+  ]
+ },
+ "close/07-warden-boss": {
+  "bloom_cover_gt20_pct": 46.9,
+  "bloom_cover_gt60_pct": 6.71,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.777,
+  "blown_out_ge235_on_pct": 1.675,
+  "detail_under_glow_on_vs_off": 0.887,
+  "sharpness_on_vs_off_top(0-20%)": 0.841,
+  "sharpness_on_vs_off_middle(30-70%)": 0.921,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.851,
+  "grade_shift_rgb_in_unlit_areas": [
+   1.8,
+   0.3,
+   0.2
+  ],
+  "mean_luma_world_off_on": [
+   99.1,
+   122.4
+  ]
+ },
+ "close/08-ironvale": {
+  "bloom_cover_gt20_pct": 4.7,
+  "bloom_cover_gt60_pct": 0.22,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.008,
+  "blown_out_ge235_on_pct": 0.082,
+  "detail_under_glow_on_vs_off": 1.074,
+  "sharpness_on_vs_off_top(0-20%)": 0.716,
+  "sharpness_on_vs_off_middle(30-70%)": 1.029,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.094,
+  "grade_shift_rgb_in_unlit_areas": [
+   2.3,
+   0.1,
+   -1.2
+  ],
+  "mean_luma_world_off_on": [
+   56.9,
+   60.0
+  ]
+ },
+ "close/09-dunmoor-ball": {
+  "bloom_cover_gt20_pct": 9.44,
+  "bloom_cover_gt60_pct": 0.37,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.0,
+  "blown_out_ge235_on_pct": 0.641,
+  "detail_under_glow_on_vs_off": 0.976,
+  "sharpness_on_vs_off_top(0-20%)": 0.723,
+  "sharpness_on_vs_off_middle(30-70%)": 1.024,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.084,
+  "grade_shift_rgb_in_unlit_areas": [
+   1.9,
+   0.4,
+   -0.6
+  ],
+  "mean_luma_world_off_on": [
+   84.1,
+   87.0
+  ]
+ },
+ "close/10-dunmoor-ruins": {
+  "bloom_cover_gt20_pct": 1.43,
+  "bloom_cover_gt60_pct": 0.04,
+  "blown_out_ge245_off_pct": 0.0,
+  "blown_out_ge245_on_pct": 0.0,
+  "blown_out_ge235_off_pct": 0.0,
+  "blown_out_ge235_on_pct": 0.0,
+  "detail_under_glow_on_vs_off": 1.004,
+  "sharpness_on_vs_off_top(0-20%)": 0.752,
+  "sharpness_on_vs_off_middle(30-70%)": 1.037,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.057,
+  "grade_shift_rgb_in_unlit_areas": [
+   -1.6,
+   -1.3,
+   -0.9
+  ],
+  "mean_luma_world_off_on": [
+   49.9,
+   48.3
+  ]
+ },
+ "close/11-candlemaker-hall": {
+  "bloom_cover_gt20_pct": 2.07,
+  "bloom_cover_gt60_pct": 0.09,
+  "blown_out_ge245_off_pct": 0.106,
+  "blown_out_ge245_on_pct": 0.149,
+  "blown_out_ge235_off_pct": 0.223,
+  "blown_out_ge235_on_pct": 0.407,
+  "detail_under_glow_on_vs_off": 1.003,
+  "sharpness_on_vs_off_top(0-20%)": 0.65,
+  "sharpness_on_vs_off_middle(30-70%)": 1.02,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.049,
+  "grade_shift_rgb_in_unlit_areas": [
+   0.3,
+   -0.7,
+   -1.1
+  ],
+  "mean_luma_world_off_on": [
+   72.7,
+   71.4
+  ]
+ },
+ "close/12-candlemaker-boss": {
+  "bloom_cover_gt20_pct": 35.78,
+  "bloom_cover_gt60_pct": 5.99,
+  "blown_out_ge245_off_pct": 0.577,
+  "blown_out_ge245_on_pct": 1.083,
+  "blown_out_ge235_off_pct": 1.575,
+  "blown_out_ge235_on_pct": 2.843,
+  "detail_under_glow_on_vs_off": 0.912,
+  "sharpness_on_vs_off_top(0-20%)": 0.858,
+  "sharpness_on_vs_off_middle(30-70%)": 1.103,
+  "sharpness_on_vs_off_bottom(80-90%)": 0.806,
+  "grade_shift_rgb_in_unlit_areas": [
+   2.4,
+   -0.1,
+   -2.4
+  ],
+  "mean_luma_world_off_on": [
+   103.8,
+   117.8
+  ]
+ },
+ "close/13-rookery-hub": {
+  "bloom_cover_gt20_pct": 0.54,
+  "bloom_cover_gt60_pct": 0.03,
+  "blown_out_ge245_off_pct": 0.009,
+  "blown_out_ge245_on_pct": 0.041,
+  "blown_out_ge235_off_pct": 0.056,
+  "blown_out_ge235_on_pct": 0.133,
+  "detail_under_glow_on_vs_off": 1.163,
+  "sharpness_on_vs_off_top(0-20%)": 0.569,
+  "sharpness_on_vs_off_middle(30-70%)": 1.017,
+  "sharpness_on_vs_off_bottom(80-90%)": 1.116,
+  "grade_shift_rgb_in_unlit_areas": [
+   -0.8,
+   -1.3,
+   -0.8
+  ],
+  "mean_luma_world_off_on": [
+   65.1,
+   62.4
+  ]
+ }
+}

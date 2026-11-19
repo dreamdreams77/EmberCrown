@@ -1,0 +1,232 @@
+{
+ "A_desktop": {
+  "label": "A_earlier",
+  "profile": "desktop",
+  "tier": 0,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 18,
+    "p90Ms": 28
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 18,
+    "p90Ms": 25
+   },
+   "07-warden-boss": {
+    "medianMs": 21,
+    "p90Ms": 23
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 24,
+    "p90Ms": 27
+   }
+  }
+ },
+ "A_mobile": {
+  "label": "A_earlier",
+  "profile": "mobile",
+  "tier": 0,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 85,
+    "p90Ms": 112
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 93,
+    "p90Ms": 100
+   },
+   "07-warden-boss": {
+    "medianMs": 103,
+    "p90Ms": 136
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 117,
+    "p90Ms": 129
+   }
+  }
+ },
+ "B_desktop": {
+  "label": "B_hd2d-off",
+  "profile": "desktop",
+  "tier": 0,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 19,
+    "p90Ms": 24
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 20,
+    "p90Ms": 22
+   },
+   "07-warden-boss": {
+    "medianMs": 20,
+    "p90Ms": 25
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 24,
+    "p90Ms": 27
+   }
+  }
+ },
+ "B_mobile": {
+  "label": "B_hd2d-off",
+  "profile": "mobile",
+  "tier": 0,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 81,
+    "p90Ms": 96
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 89,
+    "p90Ms": 100
+   },
+   "07-warden-boss": {
+    "medianMs": 106,
+    "p90Ms": 117
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 118,
+    "p90Ms": 127
+   }
+  }
+ },
+ "C_desktop": {
+  "label": "C_hd2d-on",
+  "profile": "desktop",
+  "tier": 0,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 35,
+    "p90Ms": 44
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 47,
+    "p90Ms": 60
+   },
+   "07-warden-boss": {
+    "medianMs": 55,
+    "p90Ms": 59
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 50,
+    "p90Ms": 56
+   }
+  }
+ },
+ "C_desktop_tier2": {
+  "label": "C_hd2d-on_tier2",
+  "profile": "desktop",
+  "tier": 2,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 23,
+    "p90Ms": 26
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 35,
+    "p90Ms": 39
+   },
+   "07-warden-boss": {
+    "medianMs": 40,
+    "p90Ms": 45
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 39,
+    "p90Ms": 50
+   }
+  }
+ },
+ "C_mobile": {
+  "label": "C_hd2d-on",
+  "profile": "mobile",
+  "tier": 0,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 179,
+    "p90Ms": 190
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 257,
+    "p90Ms": 294
+   },
+   "07-warden-boss": {
+    "medianMs": 300,
+    "p90Ms": 337
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 275,
+    "p90Ms": 310
+   }
+  }
+ },
+ "C_mobile_tier2": {
+  "label": "C_hd2d-on_tier2",
+  "profile": "mobile",
+  "tier": 2,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 124,
+    "p90Ms": 145
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 189,
+    "p90Ms": 209
+   },
+   "07-warden-boss": {
+    "medianMs": 241,
+    "p90Ms": 269
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 229,
+    "p90Ms": 250
+   }
+  }
+ },
+ "X_desktop": {
+  "label": "X_890363b_hd2d-on",
+  "profile": "desktop",
+  "tier": 0,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 34,
+    "p90Ms": 46
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 44,
+    "p90Ms": 52
+   },
+   "07-warden-boss": {
+    "medianMs": 55,
+    "p90Ms": 57
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 50,
+    "p90Ms": 54
+   }
+  }
+ },
+ "X_mobile": {
+  "label": "X_890363b_hd2d-on",
+  "profile": "mobile",
+  "tier": 0,
+  "scenes": {
+   "01-ashfall-start": {
+    "medianMs": 190,
+    "p90Ms": 198
+   },
+   "04-gallowmere-fire": {
+    "medianMs": 268,
+    "p90Ms": 281
+   },
+   "07-warden-boss": {
+    "medianMs": 337,
+    "p90Ms": 377
+   },
+   "12-candlemaker-boss": {
+    "medianMs": 275,
+    "p90Ms": 308
+   }
+  }
+ }
+}

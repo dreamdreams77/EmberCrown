@@ -1,0 +1,2411 @@
+{
+ "scenes": {
+  "desktop/default/01-ashfall-start": {
+   "A": {
+    "mean_luma": 44.58,
+    "p99_luma": 141.0,
+    "clipped_pct": 0.009,
+    "crushed_pct": 1.44,
+    "mean_rgb": [
+     48.5,
+     42.0,
+     58.9
+    ]
+   },
+   "E": {
+    "mean_luma": 41.97,
+    "p99_luma": 147.9,
+    "clipped_pct": 0.009,
+    "crushed_pct": 4.3,
+    "mean_rgb": [
+     46.4,
+     39.3,
+     55.0
+    ]
+   },
+   "B": {
+    "mean_luma": 44.58,
+    "p99_luma": 141.0,
+    "clipped_pct": 0.009,
+    "crushed_pct": 1.44,
+    "mean_rgb": [
+     48.5,
+     42.0,
+     58.9
+    ]
+   },
+   "C": {
+    "mean_luma": 41.93,
+    "p99_luma": 147.9,
+    "clipped_pct": 0.009,
+    "crushed_pct": 4.34,
+    "mean_rgb": [
+     46.5,
+     39.3,
+     55.0
+    ]
+   }
+  },
+  "desktop/default/02-ashfall-patrol": {
+   "A": {
+    "mean_luma": 58.29,
+    "p99_luma": 172.8,
+    "clipped_pct": 0.009,
+    "crushed_pct": 1.5,
+    "mean_rgb": [
+     64.0,
+     55.3,
+     70.7
+    ]
+   },
+   "E": {
+    "mean_luma": 58.92,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 2.48,
+    "mean_rgb": [
+     66.8,
+     55.7,
+     67.5
+    ]
+   },
+   "B": {
+    "mean_luma": 58.29,
+    "p99_luma": 172.8,
+    "clipped_pct": 0.009,
+    "crushed_pct": 1.5,
+    "mean_rgb": [
+     64.0,
+     55.3,
+     70.7
+    ]
+   },
+   "C": {
+    "mean_luma": 58.86,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 2.49,
+    "mean_rgb": [
+     66.8,
+     55.6,
+     67.6
+    ]
+   }
+  },
+  "desktop/default/03-gallowmere-hall": {
+   "A": {
+    "mean_luma": 58.48,
+    "p99_luma": 186.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.41,
+    "mean_rgb": [
+     86.3,
+     52.2,
+     39.2
+    ]
+   },
+   "E": {
+    "mean_luma": 57.33,
+    "p99_luma": 187.2,
+    "clipped_pct": 0.017,
+    "crushed_pct": 0.4,
+    "mean_rgb": [
+     84.7,
+     51.2,
+     37.7
+    ]
+   },
+   "B": {
+    "mean_luma": 62.15,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.41,
+    "mean_rgb": [
+     91.4,
+     55.9,
+     38.3
+    ]
+   },
+   "C": {
+    "mean_luma": 60.73,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.017,
+    "crushed_pct": 0.39,
+    "mean_rgb": [
+     89.8,
+     54.6,
+     36.1
+    ]
+   }
+  },
+  "desktop/default/04-gallowmere-fire": {
+   "A": {
+    "mean_luma": 57.01,
+    "p99_luma": 184.8,
+    "clipped_pct": 0.16,
+    "crushed_pct": 0.21,
+    "mean_rgb": [
+     81.3,
+     51.8,
+     36.5
+    ]
+   },
+   "E": {
+    "mean_luma": 60.17,
+    "p99_luma": 192.4,
+    "clipped_pct": 0.254,
+    "crushed_pct": 0.28,
+    "mean_rgb": [
+     86.1,
+     54.7,
+     37.7
+    ]
+   },
+   "B": {
+    "mean_luma": 63.76,
+    "p99_luma": 184.7,
+    "clipped_pct": 0.16,
+    "crushed_pct": 0.17,
+    "mean_rgb": [
+     90.5,
+     58.5,
+     37.0
+    ]
+   },
+   "C": {
+    "mean_luma": 66.14,
+    "p99_luma": 191.2,
+    "clipped_pct": 0.254,
+    "crushed_pct": 0.24,
+    "mean_rgb": [
+     95.0,
+     60.5,
+     37.0
+    ]
+   }
+  },
+  "desktop/default/05-drowned-spire": {
+   "A": {
+    "mean_luma": 51.55,
+    "p99_luma": 163.7,
+    "clipped_pct": 0.011,
+    "crushed_pct": 0.2,
+    "mean_rgb": [
+     30.1,
+     56.4,
+     66.3
+    ]
+   },
+   "E": {
+    "mean_luma": 46.96,
+    "p99_luma": 154.9,
+    "clipped_pct": 0.012,
+    "crushed_pct": 0.25,
+    "mean_rgb": [
+     29.0,
+     51.0,
+     60.1
+    ]
+   },
+   "B": {
+    "mean_luma": 51.55,
+    "p99_luma": 163.7,
+    "clipped_pct": 0.012,
+    "crushed_pct": 0.2,
+    "mean_rgb": [
+     30.1,
+     56.4,
+     66.3
+    ]
+   },
+   "C": {
+    "mean_luma": 47.47,
+    "p99_luma": 154.9,
+    "clipped_pct": 0.012,
+    "crushed_pct": 0.25,
+    "mean_rgb": [
+     28.8,
+     51.7,
+     60.4
+    ]
+   }
+  },
+  "desktop/default/06-thornwick-hall": {
+   "A": {
+    "mean_luma": 47.37,
+    "p99_luma": 169.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.5,
+    "mean_rgb": [
+     46.2,
+     45.6,
+     68.1
+    ]
+   },
+   "E": {
+    "mean_luma": 50.71,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.55,
+    "mean_rgb": [
+     49.8,
+     48.8,
+     72.7
+    ]
+   },
+   "B": {
+    "mean_luma": 54.11,
+    "p99_luma": 173.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.44,
+    "mean_rgb": [
+     53.4,
+     52.3,
+     74.2
+    ]
+   },
+   "C": {
+    "mean_luma": 56.35,
+    "p99_luma": 192.8,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.5,
+    "mean_rgb": [
+     55.3,
+     54.4,
+     78.6
+    ]
+   }
+  },
+  "desktop/default/07-warden-boss": {
+   "A": {
+    "mean_luma": 61.04,
+    "p99_luma": 204.1,
+    "clipped_pct": 0.01,
+    "crushed_pct": 0.5,
+    "mean_rgb": [
+     64.7,
+     58.4,
+     76.7
+    ]
+   },
+   "E": {
+    "mean_luma": 71.14,
+    "p99_luma": 233.2,
+    "clipped_pct": 0.011,
+    "crushed_pct": 0.53,
+    "mean_rgb": [
+     77.7,
+     67.8,
+     84.5
+    ]
+   },
+   "B": {
+    "mean_luma": 72.67,
+    "p99_luma": 207.3,
+    "clipped_pct": 0.011,
+    "crushed_pct": 0.5,
+    "mean_rgb": [
+     77.2,
+     69.8,
+     88.0
+    ]
+   },
+   "C": {
+    "mean_luma": 81.07,
+    "p99_luma": 234.5,
+    "clipped_pct": 0.011,
+    "crushed_pct": 0.54,
+    "mean_rgb": [
+     87.2,
+     77.8,
+     95.2
+    ]
+   }
+  },
+  "desktop/default/08-ironvale": {
+   "A": {
+    "mean_luma": 48.35,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.35,
+    "mean_rgb": [
+     76.3,
+     41.9,
+     29.4
+    ]
+   },
+   "E": {
+    "mean_luma": 50.09,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.36,
+    "mean_rgb": [
+     79.5,
+     43.4,
+     29.8
+    ]
+   },
+   "B": {
+    "mean_luma": 52.09,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.35,
+    "mean_rgb": [
+     84.2,
+     44.8,
+     29.9
+    ]
+   },
+   "C": {
+    "mean_luma": 53.0,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.38,
+    "mean_rgb": [
+     86.8,
+     45.4,
+     28.8
+    ]
+   }
+  },
+  "desktop/default/09-dunmoor-ball": {
+   "A": {
+    "mean_luma": 61.63,
+    "p99_luma": 187.4,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.47,
+    "mean_rgb": [
+     53.6,
+     61.9,
+     82.8
+    ]
+   },
+   "E": {
+    "mean_luma": 59.73,
+    "p99_luma": 193.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.54,
+    "mean_rgb": [
+     53.4,
+     59.7,
+     78.6
+    ]
+   },
+   "B": {
+    "mean_luma": 69.54,
+    "p99_luma": 189.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.38,
+    "mean_rgb": [
+     63.6,
+     69.6,
+     86.4
+    ]
+   },
+   "C": {
+    "mean_luma": 66.68,
+    "p99_luma": 199.6,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.43,
+    "mean_rgb": [
+     62.1,
+     66.5,
+     82.2
+    ]
+   }
+  },
+  "desktop/default/10-dunmoor-ruins": {
+   "A": {
+    "mean_luma": 39.29,
+    "p99_luma": 165.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.63,
+    "mean_rgb": [
+     49.3,
+     36.3,
+     39.8
+    ]
+   },
+   "E": {
+    "mean_luma": 36.52,
+    "p99_luma": 163.9,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.76,
+    "mean_rgb": [
+     45.4,
+     33.7,
+     38.0
+    ]
+   },
+   "B": {
+    "mean_luma": 42.92,
+    "p99_luma": 165.8,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.58,
+    "mean_rgb": [
+     52.8,
+     40.0,
+     42.9
+    ]
+   },
+   "C": {
+    "mean_luma": 39.58,
+    "p99_luma": 163.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.67,
+    "mean_rgb": [
+     48.4,
+     36.8,
+     41.0
+    ]
+   }
+  },
+  "desktop/default/11-candlemaker-hall": {
+   "A": {
+    "mean_luma": 51.49,
+    "p99_luma": 183.4,
+    "clipped_pct": 0.075,
+    "crushed_pct": 0.36,
+    "mean_rgb": [
+     66.2,
+     49.1,
+     31.6
+    ]
+   },
+   "E": {
+    "mean_luma": 49.06,
+    "p99_luma": 182.9,
+    "clipped_pct": 0.089,
+    "crushed_pct": 0.41,
+    "mean_rgb": [
+     63.7,
+     46.6,
+     30.1
+    ]
+   },
+   "B": {
+    "mean_luma": 56.87,
+    "p99_luma": 183.8,
+    "clipped_pct": 0.075,
+    "crushed_pct": 0.33,
+    "mean_rgb": [
+     75.5,
+     53.6,
+     34.6
+    ]
+   },
+   "C": {
+    "mean_luma": 53.8,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.089,
+    "crushed_pct": 0.38,
+    "mean_rgb": [
+     72.4,
+     50.5,
+     31.9
+    ]
+   }
+  },
+  "desktop/default/12-candlemaker-boss": {
+   "A": {
+    "mean_luma": 66.61,
+    "p99_luma": 214.0,
+    "clipped_pct": 0.182,
+    "crushed_pct": 0.34,
+    "mean_rgb": [
+     86.8,
+     63.6,
+     37.3
+    ]
+   },
+   "E": {
+    "mean_luma": 72.05,
+    "p99_luma": 232.2,
+    "clipped_pct": 0.372,
+    "crushed_pct": 0.38,
+    "mean_rgb": [
+     95.1,
+     68.5,
+     39.4
+    ]
+   },
+   "B": {
+    "mean_luma": 76.26,
+    "p99_luma": 218.5,
+    "clipped_pct": 0.179,
+    "crushed_pct": 0.32,
+    "mean_rgb": [
+     104.9,
+     71.1,
+     43.0
+    ]
+   },
+   "C": {
+    "mean_luma": 80.62,
+    "p99_luma": 236.3,
+    "clipped_pct": 0.353,
+    "crushed_pct": 0.36,
+    "mean_rgb": [
+     111.4,
+     75.2,
+     43.4
+    ]
+   }
+  },
+  "desktop/default/13-rookery-hub": {
+   "A": {
+    "mean_luma": 42.43,
+    "p99_luma": 147.6,
+    "clipped_pct": 0.011,
+    "crushed_pct": 1.31,
+    "mean_rgb": [
+     56.6,
+     39.6,
+     29.2
+    ]
+   },
+   "E": {
+    "mean_luma": 38.45,
+    "p99_luma": 149.9,
+    "clipped_pct": 0.02,
+    "crushed_pct": 1.63,
+    "mean_rgb": [
+     51.6,
+     35.7,
+     27.1
+    ]
+   },
+   "B": {
+    "mean_luma": 57.31,
+    "p99_luma": 148.9,
+    "clipped_pct": 0.011,
+    "crushed_pct": 1.33,
+    "mean_rgb": [
+     77.3,
+     54.1,
+     30.0
+    ]
+   },
+   "C": {
+    "mean_luma": 50.92,
+    "p99_luma": 151.0,
+    "clipped_pct": 0.02,
+    "crushed_pct": 1.35,
+    "mean_rgb": [
+     69.4,
+     47.8,
+     27.3
+    ]
+   }
+  },
+  "desktop/close/01-ashfall-start": {
+   "A": {
+    "mean_luma": 45.9,
+    "p99_luma": 162.0,
+    "clipped_pct": 0.009,
+    "crushed_pct": 1.71,
+    "mean_rgb": [
+     49.6,
+     43.2,
+     61.5
+    ]
+   },
+   "E": {
+    "mean_luma": 43.36,
+    "p99_luma": 155.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 3.77,
+    "mean_rgb": [
+     47.6,
+     40.6,
+     57.6
+    ]
+   },
+   "B": {
+    "mean_luma": 45.9,
+    "p99_luma": 162.0,
+    "clipped_pct": 0.009,
+    "crushed_pct": 1.71,
+    "mean_rgb": [
+     49.6,
+     43.2,
+     61.5
+    ]
+   },
+   "C": {
+    "mean_luma": 43.3,
+    "p99_luma": 155.6,
+    "clipped_pct": 0.009,
+    "crushed_pct": 3.8,
+    "mean_rgb": [
+     47.7,
+     40.5,
+     57.7
+    ]
+   }
+  },
+  "desktop/close/02-ashfall-patrol": {
+   "A": {
+    "mean_luma": 57.96,
+    "p99_luma": 190.0,
+    "clipped_pct": 0.009,
+    "crushed_pct": 1.49,
+    "mean_rgb": [
+     63.9,
+     55.0,
+     69.8
+    ]
+   },
+   "E": {
+    "mean_luma": 60.77,
+    "p99_luma": 208.1,
+    "clipped_pct": 0.009,
+    "crushed_pct": 2.34,
+    "mean_rgb": [
+     69.3,
+     57.5,
+     68.3
+    ]
+   },
+   "B": {
+    "mean_luma": 57.96,
+    "p99_luma": 190.0,
+    "clipped_pct": 0.009,
+    "crushed_pct": 1.49,
+    "mean_rgb": [
+     63.9,
+     55.0,
+     69.8
+    ]
+   },
+   "C": {
+    "mean_luma": 60.72,
+    "p99_luma": 208.1,
+    "clipped_pct": 0.009,
+    "crushed_pct": 2.35,
+    "mean_rgb": [
+     69.3,
+     57.4,
+     68.4
+    ]
+   }
+  },
+  "desktop/close/03-gallowmere-hall": {
+   "A": {
+    "mean_luma": 58.96,
+    "p99_luma": 188.8,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.42,
+    "mean_rgb": [
+     88.2,
+     52.2,
+     39.7
+    ]
+   },
+   "E": {
+    "mean_luma": 58.01,
+    "p99_luma": 183.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.41,
+    "mean_rgb": [
+     86.5,
+     51.5,
+     38.4
+    ]
+   },
+   "B": {
+    "mean_luma": 61.01,
+    "p99_luma": 185.6,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.42,
+    "mean_rgb": [
+     91.3,
+     54.3,
+     38.9
+    ]
+   },
+   "C": {
+    "mean_luma": 60.11,
+    "p99_luma": 183.9,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.4,
+    "mean_rgb": [
+     90.0,
+     53.6,
+     36.9
+    ]
+   }
+  },
+  "desktop/close/04-gallowmere-fire": {
+   "A": {
+    "mean_luma": 57.82,
+    "p99_luma": 205.2,
+    "clipped_pct": 0.422,
+    "crushed_pct": 0.26,
+    "mean_rgb": [
+     83.2,
+     52.3,
+     38.2
+    ]
+   },
+   "E": {
+    "mean_luma": 63.14,
+    "p99_luma": 225.8,
+    "clipped_pct": 0.557,
+    "crushed_pct": 0.33,
+    "mean_rgb": [
+     91.2,
+     57.1,
+     40.3
+    ]
+   },
+   "B": {
+    "mean_luma": 61.69,
+    "p99_luma": 206.1,
+    "clipped_pct": 0.422,
+    "crushed_pct": 0.22,
+    "mean_rgb": [
+     88.5,
+     56.0,
+     39.0
+    ]
+   },
+   "C": {
+    "mean_luma": 66.7,
+    "p99_luma": 226.7,
+    "clipped_pct": 0.558,
+    "crushed_pct": 0.29,
+    "mean_rgb": [
+     96.7,
+     60.5,
+     40.0
+    ]
+   }
+  },
+  "desktop/close/05-drowned-spire": {
+   "A": {
+    "mean_luma": 51.66,
+    "p99_luma": 168.0,
+    "clipped_pct": 0.011,
+    "crushed_pct": 0.21,
+    "mean_rgb": [
+     30.2,
+     56.5,
+     66.4
+    ]
+   },
+   "E": {
+    "mean_luma": 47.31,
+    "p99_luma": 160.2,
+    "clipped_pct": 0.012,
+    "crushed_pct": 0.25,
+    "mean_rgb": [
+     29.5,
+     51.3,
+     60.3
+    ]
+   },
+   "B": {
+    "mean_luma": 51.66,
+    "p99_luma": 168.0,
+    "clipped_pct": 0.012,
+    "crushed_pct": 0.21,
+    "mean_rgb": [
+     30.2,
+     56.5,
+     66.4
+    ]
+   },
+   "C": {
+    "mean_luma": 47.82,
+    "p99_luma": 160.5,
+    "clipped_pct": 0.012,
+    "crushed_pct": 0.25,
+    "mean_rgb": [
+     29.3,
+     52.0,
+     60.6
+    ]
+   }
+  },
+  "desktop/close/06-thornwick-hall": {
+   "A": {
+    "mean_luma": 47.33,
+    "p99_luma": 173.3,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.54,
+    "mean_rgb": [
+     46.5,
+     45.5,
+     68.0
+    ]
+   },
+   "E": {
+    "mean_luma": 50.55,
+    "p99_luma": 184.4,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.6,
+    "mean_rgb": [
+     50.2,
+     48.5,
+     71.7
+    ]
+   },
+   "B": {
+    "mean_luma": 54.17,
+    "p99_luma": 177.9,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.54,
+    "mean_rgb": [
+     53.7,
+     52.3,
+     74.3
+    ]
+   },
+   "C": {
+    "mean_luma": 56.55,
+    "p99_luma": 189.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.6,
+    "mean_rgb": [
+     56.1,
+     54.5,
+     78.2
+    ]
+   }
+  },
+  "desktop/close/07-warden-boss": {
+   "A": {
+    "mean_luma": 63.82,
+    "p99_luma": 222.0,
+    "clipped_pct": 0.01,
+    "crushed_pct": 0.49,
+    "mean_rgb": [
+     69.9,
+     60.7,
+     77.2
+    ]
+   },
+   "E": {
+    "mean_luma": 76.77,
+    "p99_luma": 234.5,
+    "clipped_pct": 0.011,
+    "crushed_pct": 0.53,
+    "mean_rgb": [
+     86.7,
+     72.9,
+     86.0
+    ]
+   },
+   "B": {
+    "mean_luma": 76.48,
+    "p99_luma": 222.7,
+    "clipped_pct": 0.011,
+    "crushed_pct": 0.49,
+    "mean_rgb": [
+     83.5,
+     73.1,
+     89.3
+    ]
+   },
+   "C": {
+    "mean_luma": 87.61,
+    "p99_luma": 234.7,
+    "clipped_pct": 0.011,
+    "crushed_pct": 0.53,
+    "mean_rgb": [
+     96.9,
+     83.8,
+     97.6
+    ]
+   }
+  },
+  "desktop/close/08-ironvale": {
+   "A": {
+    "mean_luma": 43.64,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.37,
+    "mean_rgb": [
+     69.8,
+     37.6,
+     26.7
+    ]
+   },
+   "E": {
+    "mean_luma": 44.3,
+    "p99_luma": 185.3,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.41,
+    "mean_rgb": [
+     70.9,
+     38.2,
+     26.5
+    ]
+   },
+   "B": {
+    "mean_luma": 47.81,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.37,
+    "mean_rgb": [
+     77.5,
+     41.0,
+     27.9
+    ]
+   },
+   "C": {
+    "mean_luma": 47.75,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.42,
+    "mean_rgb": [
+     78.2,
+     40.8,
+     26.6
+    ]
+   }
+  },
+  "desktop/close/09-dunmoor-ball": {
+   "A": {
+    "mean_luma": 60.51,
+    "p99_luma": 187.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.4,
+    "mean_rgb": [
+     52.5,
+     60.8,
+     81.3
+    ]
+   },
+   "E": {
+    "mean_luma": 60.02,
+    "p99_luma": 199.0,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.47,
+    "mean_rgb": [
+     53.9,
+     60.0,
+     78.3
+    ]
+   },
+   "B": {
+    "mean_luma": 68.95,
+    "p99_luma": 189.7,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.42,
+    "mean_rgb": [
+     62.6,
+     69.2,
+     85.5
+    ]
+   },
+   "C": {
+    "mean_luma": 67.35,
+    "p99_luma": 208.4,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.44,
+    "mean_rgb": [
+     62.6,
+     67.2,
+     82.4
+    ]
+   }
+  },
+  "desktop/close/10-dunmoor-ruins": {
+   "A": {
+    "mean_luma": 39.24,
+    "p99_luma": 172.1,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.61,
+    "mean_rgb": [
+     49.1,
+     36.2,
+     40.2
+    ]
+   },
+   "E": {
+    "mean_luma": 36.72,
+    "p99_luma": 171.4,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.79,
+    "mean_rgb": [
+     45.6,
+     33.9,
+     38.5
+    ]
+   },
+   "B": {
+    "mean_luma": 42.52,
+    "p99_luma": 172.2,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.58,
+    "mean_rgb": [
+     52.2,
+     39.6,
+     43.0
+    ]
+   },
+   "C": {
+    "mean_luma": 39.48,
+    "p99_luma": 171.5,
+    "clipped_pct": 0.009,
+    "crushed_pct": 0.67,
+    "mean_rgb": [
+     48.2,
+     36.7,
+     41.3
+    ]
+   }
+  },
+  "desktop/close/11-candlemaker-hall": {
+   "A": {
+    "mean_luma": 53.04,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.066,
+    "crushed_pct": 0.31,
+    "mean_rgb": [
+     68.5,
+     50.5,
+     32.2
+    ]
+   },
+   "E": {
+    "mean_luma": 50.46,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.09,
+    "crushed_pct": 0.36,
+    "mean_rgb": [
+     66.0,
+     47.8,
+     30.7
+    ]
+   },
+   "B": {
+    "mean_luma": 58.69,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.066,
+    "crushed_pct": 0.3,
+    "mean_rgb": [
+     78.4,
+     55.2,
+     35.2
+    ]
+   },
+   "C": {
+    "mean_luma": 55.36,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.089,
+    "crushed_pct": 0.35,
+    "mean_rgb": [
+     75.1,
+     51.8,
+     32.5
+    ]
+   }
+  },
+  "desktop/close/12-candlemaker-boss": {
+   "A": {
+    "mean_luma": 71.48,
+    "p99_luma": 226.1,
+    "clipped_pct": 0.324,
+    "crushed_pct": 0.36,
+    "mean_rgb": [
+     93.5,
+     68.1,
+     39.7
+    ]
+   },
+   "E": {
+    "mean_luma": 78.45,
+    "p99_luma": 239.7,
+    "clipped_pct": 0.59,
+    "crushed_pct": 0.37,
+    "mean_rgb": [
+     103.9,
+     74.5,
+     42.3
+    ]
+   },
+   "B": {
+    "mean_luma": 81.61,
+    "p99_luma": 228.5,
+    "clipped_pct": 0.32,
+    "crushed_pct": 0.36,
+    "mean_rgb": [
+     112.7,
+     76.0,
+     45.6
+    ]
+   },
+   "C": {
+    "mean_luma": 87.74,
+    "p99_luma": 242.0,
+    "clipped_pct": 0.59,
+    "crushed_pct": 0.36,
+    "mean_rgb": [
+     121.6,
+     81.8,
+     46.7
+    ]
+   }
+  },
+  "desktop/close/13-rookery-hub": {
+   "A": {
+    "mean_luma": 44.71,
+    "p99_luma": 158.2,
+    "clipped_pct": 0.014,
+    "crushed_pct": 0.88,
+    "mean_rgb": [
+     60.2,
+     41.5,
+     30.5
+    ]
+   },
+   "E": {
+    "mean_luma": 40.97,
+    "p99_luma": 160.2,
+    "clipped_pct": 0.029,
+    "crushed_pct": 1.06,
+    "mean_rgb": [
+     55.6,
+     37.9,
+     28.5
+    ]
+   },
+   "B": {
+    "mean_luma": 58.44,
+    "p99_luma": 160.0,
+    "clipped_pct": 0.014,
+    "crushed_pct": 0.85,
+    "mean_rgb": [
+     79.7,
+     55.0,
+     30.3
+    ]
+   },
+   "C": {
+    "mean_luma": 52.74,
+    "p99_luma": 161.3,
+    "clipped_pct": 0.031,
+    "crushed_pct": 0.84,
+    "mean_rgb": [
+     72.7,
+     49.3,
+     27.9
+    ]
+   }
+  },
+  "mobile/default/01-ashfall-start": {
+   "A": {
+    "mean_luma": 46.82,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.033,
+    "crushed_pct": 2.06,
+    "mean_rgb": [
+     52.0,
+     44.1,
+     58.0
+    ]
+   },
+   "B": {
+    "mean_luma": 46.82,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.033,
+    "crushed_pct": 2.06,
+    "mean_rgb": [
+     52.0,
+     44.1,
+     58.0
+    ]
+   },
+   "C": {
+    "mean_luma": 43.64,
+    "p99_luma": 184.7,
+    "clipped_pct": 0.033,
+    "crushed_pct": 5.08,
+    "mean_rgb": [
+     49.4,
+     40.9,
+     53.8
+    ]
+   }
+  },
+  "mobile/default/02-ashfall-patrol": {
+   "A": {
+    "mean_luma": 62.06,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.033,
+    "crushed_pct": 1.62,
+    "mean_rgb": [
+     69.2,
+     59.0,
+     71.4
+    ]
+   },
+   "B": {
+    "mean_luma": 62.06,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.033,
+    "crushed_pct": 1.62,
+    "mean_rgb": [
+     69.2,
+     59.0,
+     71.4
+    ]
+   },
+   "C": {
+    "mean_luma": 62.37,
+    "p99_luma": 186.5,
+    "clipped_pct": 0.033,
+    "crushed_pct": 2.54,
+    "mean_rgb": [
+     71.8,
+     59.0,
+     67.8
+    ]
+   }
+  },
+  "mobile/default/03-gallowmere-hall": {
+   "A": {
+    "mean_luma": 59.65,
+    "p99_luma": 191.3,
+    "clipped_pct": 0.038,
+    "crushed_pct": 0.55,
+    "mean_rgb": [
+     87.7,
+     53.4,
+     39.4
+    ]
+   },
+   "B": {
+    "mean_luma": 63.78,
+    "p99_luma": 187.7,
+    "clipped_pct": 0.038,
+    "crushed_pct": 0.55,
+    "mean_rgb": [
+     93.2,
+     57.5,
+     39.0
+    ]
+   },
+   "C": {
+    "mean_luma": 62.43,
+    "p99_luma": 192.9,
+    "clipped_pct": 0.062,
+    "crushed_pct": 0.57,
+    "mean_rgb": [
+     91.7,
+     56.3,
+     36.8
+    ]
+   }
+  },
+  "mobile/default/04-gallowmere-fire": {
+   "A": {
+    "mean_luma": 54.7,
+    "p99_luma": 185.9,
+    "clipped_pct": 0.206,
+    "crushed_pct": 0.34,
+    "mean_rgb": [
+     77.6,
+     49.8,
+     36.0
+    ]
+   },
+   "B": {
+    "mean_luma": 61.03,
+    "p99_luma": 186.5,
+    "clipped_pct": 0.206,
+    "crushed_pct": 0.3,
+    "mean_rgb": [
+     86.1,
+     56.1,
+     36.6
+    ]
+   },
+   "C": {
+    "mean_luma": 62.76,
+    "p99_luma": 193.0,
+    "clipped_pct": 0.245,
+    "crushed_pct": 0.37,
+    "mean_rgb": [
+     89.7,
+     57.4,
+     36.1
+    ]
+   }
+  },
+  "mobile/default/05-drowned-spire": {
+   "A": {
+    "mean_luma": 53.35,
+    "p99_luma": 176.0,
+    "clipped_pct": 0.022,
+    "crushed_pct": 0.24,
+    "mean_rgb": [
+     32.9,
+     58.1,
+     66.6
+    ]
+   },
+   "B": {
+    "mean_luma": 53.35,
+    "p99_luma": 176.0,
+    "clipped_pct": 0.022,
+    "crushed_pct": 0.24,
+    "mean_rgb": [
+     32.9,
+     58.1,
+     66.6
+    ]
+   },
+   "C": {
+    "mean_luma": 49.18,
+    "p99_luma": 176.2,
+    "clipped_pct": 0.022,
+    "crushed_pct": 0.28,
+    "mean_rgb": [
+     31.5,
+     53.3,
+     60.7
+    ]
+   }
+  },
+  "mobile/default/06-thornwick-hall": {
+   "A": {
+    "mean_luma": 50.29,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.032,
+    "crushed_pct": 0.54,
+    "mean_rgb": [
+     50.8,
+     48.3,
+     68.2
+    ]
+   },
+   "B": {
+    "mean_luma": 57.26,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.032,
+    "crushed_pct": 0.46,
+    "mean_rgb": [
+     58.1,
+     55.2,
+     74.5
+    ]
+   },
+   "C": {
+    "mean_luma": 59.67,
+    "p99_luma": 201.6,
+    "clipped_pct": 0.032,
+    "crushed_pct": 0.5,
+    "mean_rgb": [
+     60.1,
+     57.5,
+     79.3
+    ]
+   }
+  },
+  "mobile/default/07-warden-boss": {
+   "A": {
+    "mean_luma": 61.13,
+    "p99_luma": 209.2,
+    "clipped_pct": 0.02,
+    "crushed_pct": 0.5,
+    "mean_rgb": [
+     65.6,
+     58.4,
+     74.9
+    ]
+   },
+   "B": {
+    "mean_luma": 71.92,
+    "p99_luma": 211.4,
+    "clipped_pct": 0.02,
+    "crushed_pct": 0.5,
+    "mean_rgb": [
+     77.2,
+     69.0,
+     85.4
+    ]
+   },
+   "C": {
+    "mean_luma": 79.72,
+    "p99_luma": 235.6,
+    "clipped_pct": 0.02,
+    "crushed_pct": 0.53,
+    "mean_rgb": [
+     86.4,
+     76.5,
+     92.1
+    ]
+   }
+  },
+  "mobile/default/08-ironvale": {
+   "A": {
+    "mean_luma": 48.7,
+    "p99_luma": 185.9,
+    "clipped_pct": 0.033,
+    "crushed_pct": 0.66,
+    "mean_rgb": [
+     75.6,
+     42.6,
+     29.8
+    ]
+   },
+   "B": {
+    "mean_luma": 51.96,
+    "p99_luma": 185.9,
+    "clipped_pct": 0.033,
+    "crushed_pct": 0.64,
+    "mean_rgb": [
+     82.6,
+     45.1,
+     29.9
+    ]
+   },
+   "C": {
+    "mean_luma": 53.21,
+    "p99_luma": 190.1,
+    "clipped_pct": 0.033,
+    "crushed_pct": 0.81,
+    "mean_rgb": [
+     85.6,
+     46.0,
+     29.1
+    ]
+   }
+  },
+  "mobile/default/09-dunmoor-ball": {
+   "A": {
+    "mean_luma": 60.43,
+    "p99_luma": 191.9,
+    "clipped_pct": 0.033,
+    "crushed_pct": 1.07,
+    "mean_rgb": [
+     54.6,
+     60.4,
+     77.8
+    ]
+   },
+   "B": {
+    "mean_luma": 66.94,
+    "p99_luma": 193.6,
+    "clipped_pct": 0.033,
+    "crushed_pct": 0.99,
+    "mean_rgb": [
+     62.9,
+     66.8,
+     80.6
+    ]
+   },
+   "C": {
+    "mean_luma": 64.69,
+    "p99_luma": 200.5,
+    "clipped_pct": 0.033,
+    "crushed_pct": 1.38,
+    "mean_rgb": [
+     62.0,
+     64.2,
+     77.1
+    ]
+   }
+  },
+  "mobile/default/10-dunmoor-ruins": {
+   "A": {
+    "mean_luma": 41.5,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.033,
+    "crushed_pct": 1.16,
+    "mean_rgb": [
+     51.4,
+     38.7,
+     40.6
+    ]
+   },
+   "B": {
+    "mean_luma": 44.53,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.033,
+    "crushed_pct": 1.12,
+    "mean_rgb": [
+     54.2,
+     41.8,
+     43.3
+    ]
+   },
+   "C": {
+    "mean_luma": 41.73,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.033,
+    "crushed_pct": 1.01,
+    "mean_rgb": [
+     50.6,
+     39.1,
+     41.6
+    ]
+   }
+  },
+  "mobile/default/11-candlemaker-hall": {
+   "A": {
+    "mean_luma": 52.44,
+    "p99_luma": 189.1,
+    "clipped_pct": 0.093,
+    "crushed_pct": 0.36,
+    "mean_rgb": [
+     67.8,
+     50.0,
+     31.7
+    ]
+   },
+   "B": {
+    "mean_luma": 57.5,
+    "p99_luma": 189.4,
+    "clipped_pct": 0.093,
+    "crushed_pct": 0.34,
+    "mean_rgb": [
+     76.5,
+     54.2,
+     34.5
+    ]
+   },
+   "C": {
+    "mean_luma": 54.38,
+    "p99_luma": 189.6,
+    "clipped_pct": 0.104,
+    "crushed_pct": 0.43,
+    "mean_rgb": [
+     73.3,
+     51.0,
+     31.8
+    ]
+   }
+  },
+  "mobile/default/12-candlemaker-boss": {
+   "A": {
+    "mean_luma": 65.48,
+    "p99_luma": 213.2,
+    "clipped_pct": 0.063,
+    "crushed_pct": 0.34,
+    "mean_rgb": [
+     85.3,
+     62.5,
+     36.7
+    ]
+   },
+   "B": {
+    "mean_luma": 74.75,
+    "p99_luma": 216.4,
+    "clipped_pct": 0.059,
+    "crushed_pct": 0.31,
+    "mean_rgb": [
+     102.9,
+     69.7,
+     42.0
+    ]
+   },
+   "C": {
+    "mean_luma": 77.75,
+    "p99_luma": 219.7,
+    "clipped_pct": 0.202,
+    "crushed_pct": 0.38,
+    "mean_rgb": [
+     107.5,
+     72.5,
+     41.9
+    ]
+   }
+  },
+  "mobile/default/13-rookery-hub": {
+   "A": {
+    "mean_luma": 44.33,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.035,
+    "crushed_pct": 2.16,
+    "mean_rgb": [
+     58.9,
+     41.4,
+     30.2
+    ]
+   },
+   "B": {
+    "mean_luma": 57.69,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.036,
+    "crushed_pct": 2.26,
+    "mean_rgb": [
+     77.7,
+     54.5,
+     30.5
+    ]
+   },
+   "C": {
+    "mean_luma": 51.36,
+    "p99_luma": 185.2,
+    "clipped_pct": 0.041,
+    "crushed_pct": 2.71,
+    "mean_rgb": [
+     69.8,
+     48.2,
+     27.9
+    ]
+   }
+  }
+ },
+ "bands": {
+  "default/01-ashfall-start": {
+   "A": {
+    "top": 2.007,
+    "middle": 4.305,
+    "bottom": 3.709
+   },
+   "E": {
+    "top": 1.56,
+    "middle": 4.399,
+    "bottom": 3.879
+   },
+   "B": {
+    "top": 2.007,
+    "middle": 4.305,
+    "bottom": 3.709
+   },
+   "C": {
+    "top": 1.567,
+    "middle": 4.395,
+    "bottom": 3.854
+   }
+  },
+  "default/02-ashfall-patrol": {
+   "A": {
+    "top": 2.66,
+    "middle": 5.459,
+    "bottom": 6.043
+   },
+   "E": {
+    "top": 2.538,
+    "middle": 5.643,
+    "bottom": 5.128
+   },
+   "B": {
+    "top": 2.66,
+    "middle": 5.459,
+    "bottom": 6.043
+   },
+   "C": {
+    "top": 2.528,
+    "middle": 5.643,
+    "bottom": 5.117
+   }
+  },
+  "default/03-gallowmere-hall": {
+   "A": {
+    "top": 3.793,
+    "middle": 5.205,
+    "bottom": 5.888
+   },
+   "E": {
+    "top": 3.207,
+    "middle": 5.37,
+    "bottom": 5.272
+   },
+   "B": {
+    "top": 2.918,
+    "middle": 5.782,
+    "bottom": 9.082
+   },
+   "C": {
+    "top": 2.5,
+    "middle": 5.916,
+    "bottom": 6.829
+   }
+  },
+  "default/04-gallowmere-fire": {
+   "A": {
+    "top": 5.151,
+    "middle": 4.562,
+    "bottom": 2.394
+   },
+   "E": {
+    "top": 3.397,
+    "middle": 4.897,
+    "bottom": 2.577
+   },
+   "B": {
+    "top": 6.882,
+    "middle": 5.914,
+    "bottom": 2.394
+   },
+   "C": {
+    "top": 4.018,
+    "middle": 6.214,
+    "bottom": 2.646
+   }
+  },
+  "default/05-drowned-spire": {
+   "A": {
+    "top": 0.935,
+    "middle": 3.294,
+    "bottom": 4.053
+   },
+   "E": {
+    "top": 1.119,
+    "middle": 3.5,
+    "bottom": 3.277
+   },
+   "B": {
+    "top": 0.935,
+    "middle": 3.294,
+    "bottom": 4.053
+   },
+   "C": {
+    "top": 1.126,
+    "middle": 3.497,
+    "bottom": 3.421
+   }
+  },
+  "default/06-thornwick-hall": {
+   "A": {
+    "top": 5.152,
+    "middle": 4.509,
+    "bottom": 3.415
+   },
+   "E": {
+    "top": 3.468,
+    "middle": 4.671,
+    "bottom": 3.546
+   },
+   "B": {
+    "top": 5.731,
+    "middle": 5.999,
+    "bottom": 3.623
+   },
+   "C": {
+    "top": 3.822,
+    "middle": 6.132,
+    "bottom": 3.672
+   }
+  },
+  "default/07-warden-boss": {
+   "A": {
+    "top": 5.637,
+    "middle": 8.48,
+    "bottom": 3.899
+   },
+   "E": {
+    "top": 5.51,
+    "middle": 8.137,
+    "bottom": 3.268
+   },
+   "B": {
+    "top": 7.251,
+    "middle": 11.079,
+    "bottom": 5.623
+   },
+   "C": {
+    "top": 6.583,
+    "middle": 10.285,
+    "bottom": 4.001
+   }
+  },
+  "default/08-ironvale": {
+   "A": {
+    "top": 5.616,
+    "middle": 4.496,
+    "bottom": 3.6
+   },
+   "E": {
+    "top": 3.678,
+    "middle": 4.634,
+    "bottom": 3.728
+   },
+   "B": {
+    "top": 5.602,
+    "middle": 4.333,
+    "bottom": 3.6
+   },
+   "C": {
+    "top": 3.538,
+    "middle": 4.498,
+    "bottom": 3.711
+   }
+  },
+  "default/09-dunmoor-ball": {
+   "A": {
+    "top": 5.214,
+    "middle": 5.275,
+    "bottom": 4.5
+   },
+   "E": {
+    "top": 3.539,
+    "middle": 5.415,
+    "bottom": 4.736
+   },
+   "B": {
+    "top": 5.985,
+    "middle": 6.388,
+    "bottom": 4.5
+   },
+   "C": {
+    "top": 4.123,
+    "middle": 6.455,
+    "bottom": 4.706
+   }
+  },
+  "default/10-dunmoor-ruins": {
+   "A": {
+    "top": 1.951,
+    "middle": 3.234,
+    "bottom": 3.571
+   },
+   "E": {
+    "top": 1.671,
+    "middle": 3.298,
+    "bottom": 3.776
+   },
+   "B": {
+    "top": 2.288,
+    "middle": 3.511,
+    "bottom": 3.571
+   },
+   "C": {
+    "top": 1.865,
+    "middle": 3.578,
+    "bottom": 3.915
+   }
+  },
+  "default/11-candlemaker-hall": {
+   "A": {
+    "top": 5.313,
+    "middle": 6.475,
+    "bottom": 3.848
+   },
+   "E": {
+    "top": 3.611,
+    "middle": 6.495,
+    "bottom": 4.016
+   },
+   "B": {
+    "top": 5.157,
+    "middle": 7.029,
+    "bottom": 3.848
+   },
+   "C": {
+    "top": 3.523,
+    "middle": 7.063,
+    "bottom": 4.099
+   }
+  },
+  "default/12-candlemaker-boss": {
+   "A": {
+    "top": 11.707,
+    "middle": 7.392,
+    "bottom": 4.569
+   },
+   "E": {
+    "top": 10.523,
+    "middle": 7.148,
+    "bottom": 3.703
+   },
+   "B": {
+    "top": 12.182,
+    "middle": 7.248,
+    "bottom": 4.322
+   },
+   "C": {
+    "top": 10.546,
+    "middle": 6.985,
+    "bottom": 3.59
+   }
+  },
+  "default/13-rookery-hub": {
+   "A": {
+    "top": 2.331,
+    "middle": 5.974,
+    "bottom": 2.834
+   },
+   "E": {
+    "top": 1.709,
+    "middle": 6.094,
+    "bottom": 2.946
+   },
+   "B": {
+    "top": 5.403,
+    "middle": 8.262,
+    "bottom": 2.834
+   },
+   "C": {
+    "top": 2.848,
+    "middle": 8.319,
+    "bottom": 3.082
+   }
+  },
+  "close/01-ashfall-start": {
+   "A": {
+    "top": 2.487,
+    "middle": 3.675,
+    "bottom": 3.315
+   },
+   "E": {
+    "top": 2.236,
+    "middle": 3.884,
+    "bottom": 3.69
+   },
+   "B": {
+    "top": 2.487,
+    "middle": 3.675,
+    "bottom": 3.315
+   },
+   "C": {
+    "top": 2.207,
+    "middle": 3.887,
+    "bottom": 3.489
+   }
+  },
+  "close/02-ashfall-patrol": {
+   "A": {
+    "top": 1.809,
+    "middle": 7.482,
+    "bottom": 7.716
+   },
+   "E": {
+    "top": 2.041,
+    "middle": 7.782,
+    "bottom": 6.554
+   },
+   "B": {
+    "top": 1.809,
+    "middle": 7.486,
+    "bottom": 7.716
+   },
+   "C": {
+    "top": 2.029,
+    "middle": 7.791,
+    "bottom": 6.579
+   }
+  },
+  "close/03-gallowmere-hall": {
+   "A": {
+    "top": 1.169,
+    "middle": 4.464,
+    "bottom": 8.064
+   },
+   "E": {
+    "top": 1.355,
+    "middle": 4.611,
+    "bottom": 6.923
+   },
+   "B": {
+    "top": 1.197,
+    "middle": 6.118,
+    "bottom": 7.671
+   },
+   "C": {
+    "top": 1.361,
+    "middle": 6.213,
+    "bottom": 6.247
+   }
+  },
+  "close/04-gallowmere-fire": {
+   "A": {
+    "top": 4.455,
+    "middle": 3.103,
+    "bottom": 1.519
+   },
+   "E": {
+    "top": 3.833,
+    "middle": 3.402,
+    "bottom": 1.778
+   },
+   "B": {
+    "top": 4.837,
+    "middle": 4.667,
+    "bottom": 1.519
+   },
+   "C": {
+    "top": 3.836,
+    "middle": 4.915,
+    "bottom": 1.793
+   }
+  },
+  "close/05-drowned-spire": {
+   "A": {
+    "top": 0.858,
+    "middle": 3.078,
+    "bottom": 2.885
+   },
+   "E": {
+    "top": 1.085,
+    "middle": 3.256,
+    "bottom": 2.555
+   },
+   "B": {
+    "top": 0.858,
+    "middle": 3.078,
+    "bottom": 2.885
+   },
+   "C": {
+    "top": 1.101,
+    "middle": 3.259,
+    "bottom": 2.686
+   }
+  },
+  "close/06-thornwick-hall": {
+   "A": {
+    "top": 4.482,
+    "middle": 4.901,
+    "bottom": 3.156
+   },
+   "E": {
+    "top": 3.291,
+    "middle": 4.95,
+    "bottom": 3.43
+   },
+   "B": {
+    "top": 6.859,
+    "middle": 7.027,
+    "bottom": 3.261
+   },
+   "C": {
+    "top": 4.685,
+    "middle": 6.995,
+    "bottom": 3.499
+   }
+  },
+  "close/07-warden-boss": {
+   "A": {
+    "top": 5.679,
+    "middle": 8.257,
+    "bottom": 3.286
+   },
+   "E": {
+    "top": 5.484,
+    "middle": 7.919,
+    "bottom": 3.152
+   },
+   "B": {
+    "top": 8.085,
+    "middle": 10.577,
+    "bottom": 4.279
+   },
+   "C": {
+    "top": 6.801,
+    "middle": 9.738,
+    "bottom": 3.642
+   }
+  },
+  "close/08-ironvale": {
+   "A": {
+    "top": 2.953,
+    "middle": 3.753,
+    "bottom": 3.025
+   },
+   "E": {
+    "top": 2.382,
+    "middle": 3.879,
+    "bottom": 3.281
+   },
+   "B": {
+    "top": 3.525,
+    "middle": 4.697,
+    "bottom": 3.025
+   },
+   "C": {
+    "top": 2.524,
+    "middle": 4.834,
+    "bottom": 3.31
+   }
+  },
+  "close/09-dunmoor-ball": {
+   "A": {
+    "top": 3.649,
+    "middle": 4.434,
+    "bottom": 3.419
+   },
+   "E": {
+    "top": 2.751,
+    "middle": 4.632,
+    "bottom": 3.649
+   },
+   "B": {
+    "top": 4.731,
+    "middle": 5.218,
+    "bottom": 3.419
+   },
+   "C": {
+    "top": 3.422,
+    "middle": 5.345,
+    "bottom": 3.706
+   }
+  },
+  "close/10-dunmoor-ruins": {
+   "A": {
+    "top": 3.231,
+    "middle": 4.079,
+    "bottom": 3.362
+   },
+   "E": {
+    "top": 2.582,
+    "middle": 4.222,
+    "bottom": 3.539
+   },
+   "B": {
+    "top": 3.651,
+    "middle": 4.222,
+    "bottom": 3.362
+   },
+   "C": {
+    "top": 2.744,
+    "middle": 4.378,
+    "bottom": 3.554
+   }
+  },
+  "close/11-candlemaker-hall": {
+   "A": {
+    "top": 5.107,
+    "middle": 6.182,
+    "bottom": 3.836
+   },
+   "E": {
+    "top": 3.217,
+    "middle": 6.271,
+    "bottom": 3.955
+   },
+   "B": {
+    "top": 5.04,
+    "middle": 5.865,
+    "bottom": 3.836
+   },
+   "C": {
+    "top": 3.277,
+    "middle": 5.983,
+    "bottom": 4.026
+   }
+  },
+  "close/12-candlemaker-boss": {
+   "A": {
+    "top": 11.03,
+    "middle": 7.101,
+    "bottom": 3.776
+   },
+   "E": {
+    "top": 9.777,
+    "middle": 7.272,
+    "bottom": 3.283
+   },
+   "B": {
+    "top": 11.38,
+    "middle": 7.034,
+    "bottom": 3.991
+   },
+   "C": {
+    "top": 9.77,
+    "middle": 7.762,
+    "bottom": 3.214
+   }
+  },
+  "close/13-rookery-hub": {
+   "A": {
+    "top": 1.793,
+    "middle": 6.585,
+    "bottom": 2.696
+   },
+   "E": {
+    "top": 1.522,
+    "middle": 6.78,
+    "bottom": 2.951
+   },
+   "B": {
+    "top": 5.005,
+    "middle": 8.963,
+    "bottom": 2.696
+   },
+   "C": {
+    "top": 2.848,
+    "middle": 9.116,
+    "bottom": 3.01
+   }
+  }
+ },
+ "house_colour": {
+  "A": {
+   "mean_chroma_separation": 0.1671,
+   "closest_pair": [
+    "03-gallowmere-hall",
+    "08-ironvale",
+    0.0018
+   ],
+   "mean_rgb": {
+    "01-ashfall-start": [
+     48.5,
+     42.0,
+     58.9
+    ],
+    "03-gallowmere-hall": [
+     86.3,
+     52.2,
+     39.2
+    ],
+    "05-drowned-spire": [
+     30.1,
+     56.4,
+     66.3
+    ],
+    "06-thornwick-hall": [
+     46.2,
+     45.6,
+     68.1
+    ],
+    "08-ironvale": [
+     76.3,
+     41.9,
+     29.4
+    ],
+    "09-dunmoor-ball": [
+     53.6,
+     61.9,
+     82.8
+    ],
+    "11-candlemaker-hall": [
+     66.2,
+     49.1,
+     31.6
+    ]
+   }
+  },
+  "E": {
+   "mean_chroma_separation": 0.1617,
+   "closest_pair": [
+    "03-gallowmere-hall",
+    "08-ironvale",
+    0.0116
+   ],
+   "mean_rgb": {
+    "01-ashfall-start": [
+     46.4,
+     39.3,
+     55.0
+    ],
+    "03-gallowmere-hall": [
+     84.7,
+     51.2,
+     37.7
+    ],
+    "05-drowned-spire": [
+     29.0,
+     51.0,
+     60.1
+    ],
+    "06-thornwick-hall": [
+     49.8,
+     48.8,
+     72.7
+    ],
+    "08-ironvale": [
+     79.5,
+     43.4,
+     29.8
+    ],
+    "09-dunmoor-ball": [
+     53.4,
+     59.7,
+     78.6
+    ],
+    "11-candlemaker-hall": [
+     63.7,
+     46.6,
+     30.1
+    ]
+   }
+  },
+  "B": {
+   "mean_chroma_separation": 0.1758,
+   "closest_pair": [
+    "03-gallowmere-hall",
+    "08-ironvale",
+    0.0156
+   ],
+   "mean_rgb": {
+    "01-ashfall-start": [
+     48.5,
+     42.0,
+     58.9
+    ],
+    "03-gallowmere-hall": [
+     91.4,
+     55.9,
+     38.3
+    ],
+    "05-drowned-spire": [
+     30.1,
+     56.4,
+     66.3
+    ],
+    "06-thornwick-hall": [
+     53.4,
+     52.3,
+     74.2
+    ],
+    "08-ironvale": [
+     84.2,
+     44.8,
+     29.9
+    ],
+    "09-dunmoor-ball": [
+     63.6,
+     69.6,
+     86.4
+    ],
+    "11-candlemaker-hall": [
+     75.5,
+     53.6,
+     34.6
+    ]
+   }
+  },
+  "C": {
+   "mean_chroma_separation": 0.1749,
+   "closest_pair": [
+    "03-gallowmere-hall",
+    "08-ironvale",
+    0.0248
+   ],
+   "mean_rgb": {
+    "01-ashfall-start": [
+     46.5,
+     39.3,
+     55.0
+    ],
+    "03-gallowmere-hall": [
+     89.8,
+     54.6,
+     36.1
+    ],
+    "05-drowned-spire": [
+     28.8,
+     51.7,
+     60.4
+    ],
+    "06-thornwick-hall": [
+     55.3,
+     54.4,
+     78.6
+    ],
+    "08-ironvale": [
+     86.8,
+     45.4,
+     28.8
+    ],
+    "09-dunmoor-ball": [
+     62.1,
+     66.5,
+     82.2
+    ],
+    "11-candlemaker-hall": [
+     72.4,
+     50.5,
+     31.9
+    ]
+   }
+  }
+ }
+}
