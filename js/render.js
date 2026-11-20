@@ -442,7 +442,8 @@ function collectLights(){
   if(!G.flight)add(G.wren.x,G.wren.y,G.active==='wren'?96:70,.85,'210,200,255',.12);
   if(G.ash.on)add(G.ash.x,G.ash.y,G.active==='ash'?118:92,.95,'255,150,70',.4);
   if(G.host&&G.host.on)add(G.host.x,G.host.y,50,.55,'160,220,255',.2);
-  if(G.fireOn){const a=G.ash;add(a.x+Math.cos(a.face)*40,a.y+Math.sin(a.face)*40,150,1,'255,150,50',.8);}
+  if(G.fireOn){const a=G.ash,em=typeof EM!=='undefined'&&EM.on(); // Ember art: a warm pool that keeps the floor's detail, not a white-out
+    add(a.x+Math.cos(a.face)*40,a.y+Math.sin(a.face)*40,em?128:150,em?.85:1,em?'255,138,44':'255,150,50',em?.4:.8);}
   for(const g of G.guards){
     if(g.spin)continue;
     if(g.stun>0||g.dead)continue;

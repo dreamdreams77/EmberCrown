@@ -89,6 +89,7 @@ const UI=(()=>{
       case'music':settings.music=!settings.music;Aud.setOpt('music',settings.music);saveSettings();refresh();break;
       case'minimap':settings.minimap=!settings.minimap;saveSettings();refresh();break;
       case'shake':settings.shake=!settings.shake;saveSettings();refresh();break;
+      case'ember':settings.ember=settings.ember===false;saveSettings();if(window.EM&&EM.applyUI)EM.applyUI();if(typeof G!=='undefined'&&G)G.dirty=true;refresh();break;
       case'hd2d':settings.hd2d=settings.hd2d===false;saveSettings();refresh();break;
       case'lpc':settings.lpc=!settings.lpc;saveSettings();if(typeof G!=='undefined'&&G)G.dirty=true;refresh();break;
       case'perk1':case'perk2':case'perk3':pickPerk(+a.slice(4));break;
@@ -101,8 +102,8 @@ const UI=(()=>{
     const m=mode;if(m==='title'||m==='pause')show(m);
   }
   function toggles(){
-    const t=(k,l)=>'<button type="button" tabindex="-1" class="tog'+(settings[k]?' on':'')+'" data-a="'+k+'"><span>'+l+'</span><i>'+(settings[k]?'On':'Off')+'</i></button>';
-    return'<div class="togs">'+t('sfx','Sound effects')+t('music','Music')+t('minimap','Minimap')+t('shake','Screen shake')+t('lpc','Pixel art')+t('hd2d','HD-2D light')+'</div>';
+    const t=(k,l)=>{const v=k==='ember'?settings.ember!==false:settings[k];return'<button type="button" tabindex="-1" class="tog'+(v?' on':'')+'" data-a="'+k+'"><span>'+l+'</span><i>'+(v?'On':'Off')+'</i></button>';};
+    return'<div class="togs">'+t('sfx','Sound effects')+t('music','Music')+t('minimap','Minimap')+t('shake','Screen shake')+t('lpc','Pixel art')+t('ember','Ember art')+t('hd2d','HD-2D light')+'</div>';
   }
   function howHTML(){
     return'<h2>How to play</h2><div class="howgrid">'+
