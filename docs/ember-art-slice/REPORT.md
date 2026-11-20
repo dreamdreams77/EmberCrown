@@ -72,3 +72,44 @@ somewhat less than that thanks to the shared pieces, with the two bosses and the
 
 **Risks to watch:** inconsistent scale between old and new during the transition (do not ship a mixed mission), keeping faces readable on phones (test each costume at phone zoom), and palette drift: every ramp should be a
 named constant in the pipeline, not a one-off.
+
+---
+
+# Round 2: review of the rendered build, and what changed
+
+Reviewed by playing and photographing the real game (every room of Ashfall Keep at 1280x720 and 844x390, the whole keep zoomed out, close-ups, real keyboard and touch input).
+Sheets: `contact-sheets/round2/`. Raw frames: `review/`.
+
+## What the rendered review found (round 1 build)
+* The whole keep was one flat lavender wash: floors, walls and light were the same value, no warm light anywhere, no dark corners.
+* Rooms were empty slabs with old-style black-pit rugs. Doors, chests, pots, braziers and Pip were still the old art, and the ruined state had no Ember art at all.
+* Characters were fine; the world around them was not.
+
+## What was done (all hand-authored sprites and tiles, built by `tools/ember_art/`)
+1. **Lighting, as a model and not a filter.** Cool indigo ambient (a warmer dark when ruined); every light is now a pixel-stepped pool of four bands with an ordered dither between them, drawn at 2 world units per cell (4 once the game has dropped quality). Warm sconce and brazier light gets a strong pool, cool light (vault wards, the exit) stays gentle, so nothing blows out to white. The old smooth black wall gradient is replaced by dithered, indigo wall-shadow tiles (north, west, east and corner pieces), so corners are cool and dark.
+2. **Floor detail.** Floors are now large calm slabs with seven drawn detail tiles scattered at about 8%: drain grate with a damp trail, puddle with a highlight, scorch, bones and a skull, a long crack, a faint plum rune circle, rubble. All darker than round 1 so figures read against them.
+3. **A Marrow rug kit.** Corner, edge, field and a bone-crescent medallion in plum and bone with a gold rule, assembled to any room size, two colourways. It replaces the black-pit rugs.
+4. **Doors, gates, chests, pots, urns, braziers.** Plank door with iron straps, open door, portcullis (down and raised), the plum rune seal (two frames), banded chest with a bone inlay (closed, open with coins), a terracotta pot, a plum-glazed urn, a tripod brazier (three flame frames and unlit).
+5. **Pip and Hale.** Pip: a small scullion with a flat cap, goggles pushed up, freckles, a slop pail and a grubby apron. Hale: striped jersey, red bandana, grey beard, manacles; unchained once freed. Both have walk and idle in three views, blink and react, and their dialogue portraits come from the same sprites and faces.
+6. **The ruined state, for every prop and surface.** Burnt versions of every prop, chest, pot, urn and door (their own ramps re-mapped to charred and ash tones, then chipped, cracked, sooted and glinted with embers), five collapsed floor tiles (plain, cracked, ash-drifted, charred, pit), three broken wall faces with gaps and soot streaks, scorched wall tops, rubble piles beside burnt props, and a scorched rug. This is processing of designed sprites plus hand-drawn rubble, not a filter on the screen.
+7. **Checks.** Full suite: 33 of 33 pass, with `tests/ember.test.js` now covering the ruined state, stepped light, the saved-profile skin and the toggle. Real-input gameplay run on the final single-file build: 24 of 24 checks pass on desktop (keyboard) and phone (touch): start from the title, walk, strike, take a guard down, talk to Pip, swap to Ashling, breathe fire, pause, resume, get caught, retry.
+
+## Performance (headless Chromium, software rendering: read the gap, not the numbers)
+| | Original | Ember |
+|---|---|---|
+| Desktop, real time | 57.2 fps | 57.0 fps |
+| Phone viewport, 4x CPU throttle, real time | 22.5 fps (quality tier 3) | 22.2 fps (quality tier 3) |
+| Desktop, JS time per frame | 8.6 ms | 8.0 ms |
+| Phone, JS time per frame, 4x throttle | 39 ms | 36.5 ms |
+
+No measurable cost. The finer light layer is the one thing that could cost; it falls back to the coarse grid when the game drops quality.
+
+## Remaining issues, honestly
+* **The ruined state never happens in Ashfall Keep.** In the game only Dunmoor Marsh time-shifts into ruin, and Dunmoor is not part of this slice. I made the Ember art handle `G.state==='ruin'` and verified it by forcing the state in Ashfall (tests and `normal-vs-ruin` sheets); it has not been seen in a real Dunmoor run, and Dunmoor would still draw its own non-Ember art.
+* **Chests are not on the normal Ashfall route.** They appear in the vault. I verified them by placing them in the game (closed, open, ruined), not by reaching them in play.
+* **Light pools are soft and a little pink-grey** rather than a clean orange, and the 2-pixel dither can read as faint grain over large areas. A hand-tuned palette per light would be better.
+* **The room is still mostly one family of purple.** Contrast is better, but a premium finish would add a second material (timber floors in barracks, rush mats, a cold stone cellar) so rooms differ from each other.
+* **Still the old art in this room:** gems, egg, beacon and key pickups, hold-to-interact rings, story-point scenes, hidden-chamber cracks, the stained-glass windows, floating text and speech bubbles, the vision cones, pipe and small fires, the vault's chalk glyphs. The title, brief, win and lose screens have the new UI skin but not new illustration.
+* **Characters:** right-facing is a mirror; Hale has no seated or chained pose and no side-view beard; Pip and Hale have idle and walk only; guards have no attack or talk animation; Shiloh's strike is 5 frames. Ember figures are about a quarter bigger than the old ones and doors and ceilings were not rescaled to match.
+* **Not measured on a real phone.** The phone numbers are an emulated, throttled viewport.
+* **Scope:** this is still Ashfall Keep only. Other missions, the hub, and the other NPCs keep LPC art.

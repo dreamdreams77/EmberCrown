@@ -303,7 +303,7 @@ function bakeStatic(){
     c.beginPath();for(let i=0;i<5;i++){const a=-1.57+i*2.513;const px=cx+Math.cos(a)*50,py=cy+Math.sin(a)*50;i?c.lineTo(px,py):c.moveTo(px,py);}c.closePath();c.stroke();
   }
   // wall shadows on floors
-  if(!G.flight)for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){
+  if(!G.flight&&!(typeof EM!=='undefined'&&EM.env.ready()))for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){ // Ember art draws its own dithered shadow tiles
     if(isW(x,y))continue;
     const px=x*T,py=y*T;
     if(isW(x,y-1)){const g=c.createLinearGradient(0,py,0,py+14);g.addColorStop(0,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(px,py,T,14);}
@@ -408,9 +408,11 @@ function drawLights(c,list,amb){
   c.fillStyle='rgba('+amb[0]+','+amb[1]+','+amb[2]+','+amb[3]+')';c.fillRect(0,0,LT.cv.width,LT.cv.height);
   c.globalCompositeOperation='destination-out';
   const spr=lightSprite();
+  const stp=typeof EM!=='undefined'&&EM.env.ready();
   for(const l of list){
     c.globalAlpha=clamp(l.a,0,1);
-    c.drawImage(spr,(l.x-l.r)/k,(l.y-l.r)/k,l.r*2/k,l.r*2/k);
+    if(stp){const s=EM.env.stepped('l',l.r,k);c.drawImage(s,Math.round((l.x-l.r)/k),Math.round((l.y-l.r)/k),s.width,s.height);}
+    else c.drawImage(spr,(l.x-l.r)/k,(l.y-l.r)/k,l.r*2/k,l.r*2/k);
   }
   c.globalAlpha=1;c.globalCompositeOperation='source-over';
 }
@@ -462,6 +464,8 @@ function drawDarkness(){
   if(G.d.finale)amb[3]=clamp(amb[3]+(5-Math.min(5,G.candlesLit||0))*.055,0,.8);
   amb[3]=clamp(amb[3]+(G.shiftT>0?.1*G.shiftT:0),0,.85);
   if(typeof PX!=='undefined'&&PX.active)amb[3]=Math.min(.74,amb[3]+.2); // deeper shadow in pixel mode so lit figures stand out
+  const em=typeof EM!=='undefined'&&EM.env.ready(); // Ember art: cool ambient, pixel-stepped light at 2 world units per cell
+  if(em){LT.k=(typeof Q!=='undefined'&&Q.tier>=2)?4:2;amb=EM.env.ambient(amb);}else LT.k=4; // cheaper cells once the game has dropped quality
   const W=G.gw*T,H=G.gh*T,k=LT.k;
   const lw=Math.ceil(W/k),lh=Math.ceil(H/k);
   if(LT.cv.width!==lw||LT.cv.height!==lh){LT.cv.width=lw;LT.cv.height=lh;}
@@ -474,12 +478,15 @@ function drawDarkness(){
   gc.globalCompositeOperation='source-over';gc.globalAlpha=1;gc.clearRect(0,0,lw,lh);
   gc.globalCompositeOperation='lighter';
   for(const l of list){
-    const ga=l.gl*.5*l.a;if(ga<.06)continue; // too faint to see: skip the draw
-    gc.globalAlpha=Math.min(ga,.7);
-    const rr_=l.r*1.15;gc.drawImage(glowSprite(l.col),(l.x-rr_)/k,(l.y-rr_)/k,rr_*2/k,rr_*2/k);
+    let mult=1;if(em){const cc=String(l.col).split(',');mult=(+cc[2]>+cc[0])?1.15:2.3;} // warm light gets the pool; cool light (vault wards, the exit) stays gentle
+    const ga=l.gl*.5*l.a*mult;if(ga<.06)continue; // too faint to see: skip the draw
+    gc.globalAlpha=Math.min(ga,em?.8:.7);
+    const rr_=l.r*1.15;
+    if(em){const s=EM.env.stepped('g',rr_,k,l.col);gc.drawImage(s,Math.round((l.x-rr_)/k),Math.round((l.y-rr_)/k),s.width,s.height);}
+    else gc.drawImage(glowSprite(l.col),(l.x-rr_)/k,(l.y-rr_)/k,rr_*2/k,rr_*2/k);
   }
   gc.globalAlpha=1;gc.globalCompositeOperation='source-over';
-  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingEnabled=!em;
   blitVisible(LT.cv,1/k,k);
   ctx.globalCompositeOperation='lighter';blitVisible(GL.cv,1/k,k);ctx.globalCompositeOperation='source-over';
 }

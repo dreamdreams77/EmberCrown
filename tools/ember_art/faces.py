@@ -111,6 +111,12 @@ def face(view, expr, st):
         elif mood in ('alarm', 'shout'): P(mx, my - 1, M); P(mx, my, M); P(mx + 1, my, M); P(mx, my + 1, M)
         elif mood in ('hurt', 'ko'): P(mx, my, M); P(mx + 1, my + 1, M)
         elif mood == 'rage': P(mx, my, hexc('#fff8ec')); P(mx + 1, my, M); P(mx, my - 1, M)
+    if st.get('freckles') and view == 'down':
+        for (x, y) in ((6, 10), (8, 11), (15, 11), (17, 10)): P(x, y, hexc(st['freckles']))
+    if st.get('beard') and view == 'down':
+        B2 = hexc(st['beard'])
+        for x in range(6, 18): P(x, 12 + (1 if 8 < x < 15 else 0), B2); P(x, 13 + (1 if 9 < x < 14 else 0), B2) if 7 < x < 16 else None
+        for x in range(9, 15): P(x, 14, B2)
     if st.get('stache') and view == 'down':
         S = hexc(st['stache'])
         for x in range(8, 16): P(x, 11, S)

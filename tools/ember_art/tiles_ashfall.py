@@ -5,13 +5,13 @@ import numpy as np
 from pix import *
 
 T = 32
-ST = ramp('#827c98', '#2a2040', '#e8dcf0')     # flagstone
-STD = ramp('#6e6888', '#221a38', '#d0c4e4')    # darker slab
-MORT = hexc('#3a3252'); MORT2 = hexc('#2e2642')
+ST = ramp('#645e80', '#1c1434', '#d0c4ec')     # flagstone
+STD = ramp('#554f70', '#181030', '#b8acd8')    # darker slab
+MORT = hexc('#2a2242'); MORT2 = hexc('#2e2642')
 BONE = ramp('#d8cfb8', '#5a3a58', '#fffbe8')
 PLUM = ramp('#7a3a6a', '#26102c', '#f0a0c0')
-WALL = ramp('#5a4a74', '#140c26', '#c8a8d8')
-WALLD = ramp('#46385e', '#100820', '#a888c0')
+WALL = ramp('#4a3c66', '#100820', '#b898d0')
+WALLD = ramp('#3a3054', '#0c0618', '#9878b8')
 BRASS = ramp('#d9a441', '#5a2a22', '#fff0a0')
 IRON = ramp('#6a6e88', '#16183a', '#d8def0')
 WOOD = ramp('#8a5a38', '#2a1418', '#e8b070')

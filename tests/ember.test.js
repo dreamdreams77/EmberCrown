@@ -7,16 +7,21 @@ const {chromium}=require('playwright');
   await p.goto('http://localhost:8123/index.html');await p.waitForTimeout(900);
   const r=await p.evaluate(async()=>{
     const o={};const wait=ms=>new Promise(r=>setTimeout(r,ms));
-    o.ready=['shiloh','pell','gaunt','cinder','ashling','faces_shiloh','faces_pell','faces_gaunt'].every(n=>EM.ready(n))&&EM.ok.tiles&&EM.ok.props;
+    o.ready=['shiloh','pell','gaunt','cinder','ashling','pip','hale','halefree','faces_shiloh','faces_pell','faces_gaunt','faces_pip','faces_hale'].every(n=>EM.ready(n))&&EM.ok.tiles&&EM.ok.props&&EM.ok.set2;
     o.defaults=settings.ember!==false&&settings.hd2d===false;
     newGame();startBrief(0);startPlay();G.cine=null;G.grace=1e9;G.god=true;await wait(300);
-    o.onAshfall=EM.on();o.ui=document.body.classList.contains('ember-ui');
+    o.onAshfall=EM.on();o.envReady=EM.env.ready();o.ui=document.body.classList.contains('ember-ui');
     // every state draws: walk, idle, strike, hurt, ko guard, seeing guard, cinderlings in every state, Ashling firing
     spawnFoe('cinder',G.wren.x+60,G.wren.y);for(const f of G.foes)f.state='wind';
     G.guards[0].ko=true;G.guards[0].stun=5;G.guards[1].seeing=true;
     for(let i=0;i<90;i++){G.wren.atk=i%30<8?{a:0,t:.1,t0:.22,combo:1}:null;G.fireOn=i>60;update(1/60);}
     for(const s of['chase','lunge','recover','dead'])for(const f of G.foes){f.state=s;f.t=.2;}
     await wait(300);
+    // the ruined state: every prop, door, chest, pot, brazier, rug, floor and wall draws, with the ember art on
+    G.state='ruin';G.dirty=true;await wait(300);for(let i=0;i<40;i++)update(1/60);await wait(200);o.ruinDraws=EM.env.ready()&&!!EM.M.set2.ruin_crate&&!!EM.M.set2.rfloor_pit;
+    G.state='';G.dirty=true;await wait(200);
+    // lighting: the pixel-stepped light is in use and a light layer exists
+    o.lightK=LT.k===2;
     // the same frame with ember off must come from the LPC art
     settings.ember=false;EM.applyUI();G.dirty=true;await wait(200);o.offAshfall=EM.on();o.uiOff=document.body.classList.contains('ember-ui');
     settings.ember=true;EM.applyUI();
@@ -25,6 +30,9 @@ const {chromium}=require('playwright');
     return o;});
   const fail=[];
   if(!r.ready)fail.push('ember assets not loaded');
+  if(!r.envReady)fail.push('Ashfall environment art not ready');
+  if(!r.ruinDraws)fail.push('ruined state missing art');
+  if(!r.lightK)fail.push('stepped light not active');
   if(!r.defaults)fail.push('defaults: ember on, hd2d off');
   if(!r.onAshfall)fail.push('ember art not active in Ashfall Keep');
   if(!r.ui)fail.push('ember UI skin not applied');
