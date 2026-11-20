@@ -30,7 +30,7 @@ const EM=(function(){
     const n=m.counts?m.counts[anim]:m.meta[anim].n;fr=Math.max(0,Math.min(n-1,fr|0));
     const fw=m.fw,fh=m.fh,sx=fr*fw,sy=(ai*3+vi)*fh,sc=o.sc||1;
     const X=Math.round(x-fw/2*sc),Y=Math.round(y+(o.drop===undefined?8:o.drop)-m.foot*sc);
-    const sm=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
+    const sm=c.imageSmoothingEnabled,ga0=c.globalAlpha;c.imageSmoothingEnabled=false;
     if(o.alpha!=null)c.globalAlpha=o.alpha;
     c.save();c.translate(X,Y);if(o.flip){c.translate(fw*sc,0);c.scale(-1,1);}c.scale(sc,sc);
     if(o.line){const s=sil(name,sx,sy,fw,fh,o.line);for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])c.drawImage(s,dx,dy);}
@@ -42,19 +42,19 @@ const EM=(function(){
       const F=M.faces,ei=Math.max(0,F.expr.indexOf(o.mood));
       if(hd)c.drawImage(IMG['faces_'+o.who],ei*F.fw,(vi===2?1:0)*F.fh,F.fw,F.fh,hd[0]-F.fw/2,hd[1]-F.fh/2,F.fw,F.fh);
     }
-    c.restore();c.globalAlpha=1;c.imageSmoothingEnabled=sm;
+    c.restore();c.globalAlpha=ga0;c.imageSmoothingEnabled=sm;
   }
   function blitBaked(name,anim,vi,fr,x,y,o){ // cinderling: faces are baked into the sheet
     o=o||{};const m=M[name],c=ctx;if(!m||!ok[name])return;
     const ai=m.anims.indexOf(anim);if(ai<0)return;fr=Math.max(0,Math.min(m.counts[anim]-1,fr|0));
     const fw=m.fw,fh=m.fh,sx=fr*fw,sy=(ai*3+vi)*fh,sc=o.sc||1;
     const X=Math.round(x-fw/2*sc),Y=Math.round(y+(o.drop===undefined?7:o.drop)-m.foot*sc);
-    const sm=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
+    const sm=c.imageSmoothingEnabled,ga0=c.globalAlpha;c.imageSmoothingEnabled=false;
     if(o.alpha!=null)c.globalAlpha=o.alpha;
     c.save();c.translate(X,Y);if(o.flip){c.translate(fw*sc,0);c.scale(-1,1);}c.scale(sc,sc);
     c.drawImage(IMG[name],sx,sy,fw,fh,0,0,fw,fh);
     if(o.flash){c.globalAlpha=.8;c.drawImage(sil(name,sx,sy,fw,fh,'#ffffff'),0,0);}
-    c.restore();c.globalAlpha=1;c.imageSmoothingEnabled=sm;
+    c.restore();c.globalAlpha=ga0;c.imageSmoothingEnabled=sm;
   }
   const walkFrame=ph=>Math.floor((((ph/(Math.PI*2))%1)+1)%1*6);
   function blinking(ph){return (G.time*.7+(ph||0))%3.7<.12;}
@@ -86,7 +86,7 @@ const EM=(function(){
     else blit('shiloh','idle',V_.v,0,w.x,w.y+(Math.sin(G.time*2.2)>.6?-.5:0),o);
   }
   /* ---- the watch ---- */
-  function who(g){const i=G.guards.indexOf(g);return (i%2===0)?'pell':'gaunt';}
+  function who(g){if(!g._who)g._who=(G.guards.indexOf(g)%2===0)?'pell':'gaunt';return g._who;} // fixed once, so removing a guard never changes anyone's face
   function drawWatch(g){
     const name=who(g),hit=G.time-(g.hitT===undefined?-9:g.hitT)<.09;
     if(g.ko&&g.stun>0){shadowAt(g.x,g.y+6,15,5,.4);blit(name,'ko',0,0,g.x,g.y+3,{who:name,flash:hit});return;}
@@ -277,6 +277,7 @@ if(typeof TILES!=='undefined'){
   const _panelBox=panelBox;
   const grain=(()=>{const g=document.createElement('canvas');g.width=g.height=48;const x=g.getContext('2d');
     for(let i=0;i<260;i++){x.fillStyle='rgba('+(i%3?'255,235,200':'0,0,0')+','+(.05+((i*7)%5)*.012)+')';x.fillRect((i*37)%48,(i*53)%48,1,1);}return g;})();
+  let pat=null;
   panelBox=function(c,x,y,w,h,r,glow){
     if(settings.ember===false)return _panelBox(c,x,y,w,h,r,glow);
     x=Math.round(x);y=Math.round(y);w=Math.round(w);h=Math.round(h);const k=Math.min(4,Math.max(2,Math.round(Math.min(w,h)/10)));
@@ -285,7 +286,7 @@ if(typeof TILES!=='undefined'){
     c.fillStyle='rgba(8,4,16,.55)';path(x,y+3,w,h,k);c.fill();                       // hard pixel shadow
     const g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'rgba(46,32,70,.94)');g.addColorStop(1,'rgba(24,14,40,.94)');
     c.fillStyle=g;path(x,y,w,h,k);c.fill();
-    c.save();path(x,y,w,h,k);c.clip();c.globalAlpha=.5;c.fillStyle=c.createPattern(grain,'repeat');c.fillRect(x,y,w,h);c.restore();
+    c.save();path(x,y,w,h,k);c.clip();c.globalAlpha=.5;c.fillStyle=pat||(pat=c.createPattern(grain,'repeat'));c.fillRect(x,y,w,h);c.restore();
     c.strokeStyle='#0e0818';c.lineWidth=2;path(x,y,w,h,k);c.stroke();                 // dark outer edge
     c.strokeStyle=glow||'rgba(226,172,72,.75)';c.lineWidth=1;path(x+2.5,y+2.5,w-5,h-5,Math.max(1,k-1));c.stroke();   // gold inner rule
     c.fillStyle=glow||'#f4d890';for(const [px,py] of[[x+1,y+1],[x+w-3,y+1],[x+1,y+h-3],[x+w-3,y+h-3]])c.fillRect(px,py,2,2);  // corner studs
@@ -314,4 +315,4 @@ EM.portrait=function(c,id,x,y,s,mood){
   c.strokeStyle='#0e0818';c.lineWidth=2;c.strokeRect(x+1,y+1,s-2,s-2);c.strokeStyle='rgba(226,172,72,.85)';c.lineWidth=1;c.strokeRect(x+3.5,y+3.5,s-7,s-7);
   return true;
 };
-if(window.Portraits){const _pd=Portraits.draw;Portraits.draw=function(c,id,x,y,s,mood,o){if(settings.ember!==false&&EM.portrait(c,id,x,y,s,mood))return;return _pd.apply(this,arguments);};}
+if(window.Portraits){const _pd=Portraits.draw;Portraits.draw=function(c,id,x,y,s,mood,o){if(settings.ember!==false&&EM.on()&&EM.portrait(c,id,x,y,s,mood))return;return _pd.apply(this,arguments);};}

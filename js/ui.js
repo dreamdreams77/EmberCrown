@@ -89,7 +89,7 @@ const UI=(()=>{
       case'music':settings.music=!settings.music;Aud.setOpt('music',settings.music);saveSettings();refresh();break;
       case'minimap':settings.minimap=!settings.minimap;saveSettings();refresh();break;
       case'shake':settings.shake=!settings.shake;saveSettings();refresh();break;
-      case'ember':settings.ember=settings.ember===false;saveSettings();if(window.EM&&EM.applyUI)EM.applyUI();if(typeof G!=='undefined'&&G)G.dirty=true;refresh();break;
+      case'ember':settings.ember=settings.ember===false;saveSettings();if(typeof EM!=='undefined'&&EM.applyUI)EM.applyUI();if(typeof G!=='undefined'&&G)G.dirty=true;refresh();break;
       case'hd2d':settings.hd2d=settings.hd2d===false;saveSettings();refresh();break;
       case'lpc':settings.lpc=!settings.lpc;saveSettings();if(typeof G!=='undefined'&&G)G.dirty=true;refresh();break;
       case'perk1':case'perk2':case'perk3':pickPerk(+a.slice(4));break;

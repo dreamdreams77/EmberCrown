@@ -31,6 +31,21 @@ const {chromium}=require('playwright');
   if(r.offAshfall)fail.push('toggle off did not disable');
   if(r.uiOff)fail.push('toggle off left the UI skin on');
   if(r.onGallowmere)fail.push('ember art leaked outside Ashfall Keep');
+  // a saved ember:false profile must reload with the original UI, and a removed guard must not change anyone's face
+  const ctx2=await b.newContext({viewport:{width:900,height:560}});
+  await ctx2.addInitScript(()=>{try{localStorage.setItem('embercrown.settings.v1',JSON.stringify({ember:false,lpc:true}));}catch(e){}});
+  const p2=await ctx2.newPage();p2.on('pageerror',e=>errs.push('PAGEERR '+e.message));
+  await p2.goto('http://localhost:8123/index.html');await p2.waitForTimeout(900);
+  r.reloadOff=await p2.evaluate(()=>!document.body.classList.contains('ember-ui')&&settings.ember===false);
+  await p.evaluate(()=>{settings.ember=true;EM.applyUI();newGame();startBrief(0);startPlay();G.cine=null;});
+  // the pause-menu toggle itself (not a direct call) must flip the skin
+  r.menuToggle=await p.evaluate(()=>{settings.ember=true;EM.applyUI();const on=document.body.classList.contains('ember-ui');
+    const btn=document.createElement('button');btn.dataset.a='ember';const h=UI;try{newGame();startBrief(0);startPlay();G.cine=null;pauseGame(true);}catch(e){}
+    const b=document.querySelector('[data-a="ember"]');if(b)b.click();return on&&!document.body.classList.contains('ember-ui');});
+  if(!r.menuToggle)fail.push('pause-menu Ember art toggle did not restore the original UI skin');
+  r.stableWho=await p.evaluate(()=>{const a=G.guards.filter(g=>!g.boss&&!g.spin&&(g.kind||'guard')==='guard');const before=a.map(g=>{drawGuard(g);return g._who;});G.guards.splice(G.guards.indexOf(a[0]),1);const after=a.slice(1).map(g=>{drawGuard(g);return g._who;});return JSON.stringify(before.slice(1))===JSON.stringify(after);});
+  if(!r.reloadOff)fail.push('saved ember:false came back with the Ember UI skin');
+  if(!r.stableWho)fail.push('guard faces changed after another guard was removed');
   console.log(JSON.stringify(r));console.log(fail.length?'FAIL '+fail.join('; '):'ok');console.log(errs.length?errs.join('\n'):'no errors');
   await b.close();
 })();
