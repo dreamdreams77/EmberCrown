@@ -366,7 +366,7 @@ function bakeForeground(){
   }
   if(window.TILES)TILES.fg(c);
   // rafters in timbered halls
-  if(th.rafters&&G.state!=='ruin'){
+  if(th.rafters&&G.state!=='ruin'&&!(window.EMX&&EMX.beams&&EMX.beams(c,gw,gh))){ // Ember art draws its own timber beams
     for(let y=0;y<gh;y++){
       if((y%5)!==2)continue;
       let x0=-1;
