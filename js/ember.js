@@ -189,6 +189,16 @@ EM.env=(function(){
     const rm=G.rooms&&G.roomOf&&G.roomOf[y]&&G.roomOf[y][x]>=0?G.rooms[G.roomOf[y][x]]:null;
     if(rm&&rm.tint&&rm.tint<1){c.fillStyle='rgba(0,0,0,'+((1-rm.tint)*1.2).toFixed(3)+')';c.fillRect(x*T,y*T,T,T);}
   }
+  /* Room identities: each room of Ashfall Keep has its own floor and wall family (rects are tile coordinates, inclusive) */
+  const ROOMS=[
+    ['scullery',1,1,4,3,'kitchen','sooty'],['store',6,1,14,3,'kitchen','sooty'],['egg',16,1,23,3,'relic','relic'],
+    ['barracks',1,5,11,7,'barracks','timber'],['mess',13,5,23,7,null,null],['guardroom',13,9,23,13,'store','timber'],
+    ['courtyard',1,9,11,13,'yard',null],['vault',24,9,32,14,'relic','relic'],
+    ['coalcellar',1,17,4,20,'coal','sooty'],['storecellar',6,17,14,20,'store','culvert'],['ossuary',16,17,23,20,'ossuary','bone'],
+    ['culvert',1,23,23,27,'culvert','culvert']];
+  const FAM={kitchen:3,store:4,relic:3,barracks:4,yard:4,coal:3,ossuary:4,culvert:4};
+  const WFAM={sooty:2,timber:3,relic:1,culvert:2,bone:2};
+  function roomAt(x,y){for(const r of ROOMS)if(x>=r[1]&&x<=r[3]&&y>=r[2]&&y<=r[4])return r;return null;}
   const DETAIL=['drain','puddle','scorch','bones','crack','rune','rubble'];
   const RFLOOR=['pit','cracked','ash','char'];
   function floor(c,x,y){
@@ -198,8 +208,9 @@ EM.env=(function(){
       const r=hash(x,y,5);
       const k=r<.62?'plain':r<.80?'cracked':r<.92?'ash':r<.97?'char':'pit';s2(c,'rfloor_'+k,x*T,y*T);
     }else{
-      const d=hash(x,y,9);
-      if(d<.085&&!G.doors[x+','+y]&&M.set2['floor_'+DETAIL[Math.floor(d/.085*7)%7]])s2(c,'floor_'+DETAIL[Math.floor(d/.085*7)%7],x*T,y*T);
+      const d=hash(x,y,9),rm=roomAt(x,y),fam=rm&&rm[5]&&M.set2['f_'+rm[5]+'0']?rm[5]:null;
+      if(fam)s2(c,'f_'+fam+Math.floor(hash(x,y,4)*FAM[fam]),x*T,y*T);                    // the room's own material
+      else if(d<.085&&!G.doors[x+','+y]&&M.set2['floor_'+DETAIL[Math.floor(d/.085*7)%7]])s2(c,'floor_'+DETAIL[Math.floor(d/.085*7)%7],x*T,y*T);
       else tile(c,'floor'+(h<.45?3:Math.floor((h-.45)/.55*3)),x,y);
     }
     shade(c,x,y);
@@ -211,7 +222,8 @@ EM.env=(function(){
   function wall(c,x,y){
     if(isWall(x,y+1)||y+1>=G.gh){if(ruin())s2(c,'rtop_'+((x+y)&1),x*T,y*T);else tile(c,'top'+((x+y)&1),x,y);return;}
     if(ruin()){const r=hash(x,y,6);s2(c,'rface_'+(r<.5?0:r<.8?1:2),x*T,y*T);c.fillStyle='rgba(0,0,0,.28)';c.fillRect(x*T,y*T+T-3,T,3);return;}
-    const h=hash(x,y,2);let k;
+    const h=hash(x,y,2),rm=roomAt(x,y+1),wf=rm&&rm[6]&&M.set2['w_'+rm[6]+'0']?rm[6]:null;let k;
+    if(wf){s2(c,'w_'+wf+Math.floor(hash(x,y,3)*WFAM[wf]),x*T,y*T);c.fillStyle='rgba(8,6,24,.34)';c.fillRect(x*T,y*T+T-3,T,3);return;}
     if(h<.10)k='face_niche';else if(h<.19)k='face_slit';
     else k=['face_plain','face_plain2','face_plain3'][Math.floor(hash(x,y,3)*3)];
     tile(c,k,x,y);
@@ -241,6 +253,17 @@ EM.env=(function(){
       case'statue':return sprite(c,'statue',cx,by,v);
       case'sarcophagus':return sprite(c,'sarcophagus',cx,by,v);
       case'barrels':return sprite(c,'barrel',cx,by,v);
+      case'treasure':return s2base(c,'chest_closed',cx,by,true);
+      case'vase':return s2base(c,'urn',cx,by,true);
+      case'longtable':return s2base(c,'longtable',cx,by+2,true);
+      case'cauldron':return s2base(c,'cauldron',cx,by,true);
+      case'bookcase':return s2base(c,'bookcase',cx,by,true);
+      case'altar':return s2base(c,'altar',cx,by,true);
+      case'coal':return s2base(c,'coal',cx,by,true);
+      case'lectern':return s2base(c,'lectern',cx,by,true);
+      case'toolrack':return s2base(c,'toolrack',cx,by,true);
+      case'pillarstub':return s2base(c,'pillarstub',cx,by,true);
+      case'furnace':return s2base(c,'furnace_body',cx,by+2,true);
     }
     return false;
   }
@@ -251,6 +274,25 @@ EM.env=(function(){
     c.drawImage(IMG.props,a[0],a[1],a[2],a[3],Math.round(tr.x-a[2]/2),Math.round(tr.y-18),a[2],a[3]);c.imageSmoothingEnabled=sm;
     if(!tr.out&&Math.random()<.02*Q.amb)pt(tr.x,tr.y-10,(Math.random()-.5)*8,-18-Math.random()*10,.9,.9,'#ffb040',{add:true});
     return true;
+  }
+  /* the hearth: its flames are drawn live over the baked furnace, and furnaces, altars and cauldrons light the room */
+  function hearths(){
+    const c=ctx,t=G.time;
+    for(const p of G.props||[]){
+      if(p.type!=='furnace')continue;
+      const a=M.set2['furnace_flame'+(Math.floor(t*8+(p.seed%7))%3)];if(!a)continue;
+      const cx=(p.x+p.w/2)*T,by=(p.y+p.h)*T-2+2;
+      const sm=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;c.drawImage(IMG.set2,a[0],a[1],a[2],a[3],Math.round(cx-a[2]/2),Math.round(by-a[3]),a[2],a[3]);c.imageSmoothingEnabled=sm;
+    }
+  }
+  function lights(L){
+    for(const p of G.props||[]){
+      const cx=(p.x+p.w/2)*T,cy=(p.y+.5)*T;
+      if(p.type==='furnace')L.push({x:cx,y:cy+6,r:124,a:.95,col:'255,150,56',gl:.7});
+      else if(p.type==='altar')L.push({x:cx,y:cy-6,r:74,a:.8,col:'255,190,110',gl:.55});
+      else if(p.type==='cauldron')L.push({x:cx,y:cy+8,r:58,a:.7,col:'255,140,60',gl:.5});
+    }
+    return L;
   }
   /* doors and gates */
   function door(d){
@@ -323,6 +365,7 @@ EM.env=(function(){
       for(let y=ry;y<ry+rh&&ok;y++)for(let x=rx;x<rx+rw;x++)if(G.roomOf[y][x]!==R.id){ok=false;break;}
       for(const [ex,ey,ew,eh] of th.rugs||[])if(rx<ex+ew&&rx+rw>ex&&ry<ey+eh&&ry+rh>ey)ok=false;
       if(!ok)continue;
+      const idr=roomAt(Math.round((R.x0+R.x1)/2),Math.round((R.y0+R.y1)/2));if(idr&&/^(culvert|coal|yard|ossuary|kitchen)$/.test(idr[5]||''))continue;   // no rugs on wet cobble, coal, bone marble or the kitchen tiles
       rug(c,rx,ry,rw,rh,R.rug<.25?0:1);
     }
   }
@@ -345,7 +388,7 @@ EM.env=(function(){
   }
   const AMB=[8,10,34];
   function ambient(a){return ruin()?[34,12,18,Math.min(.8,Math.max(a[3],.68))]:[AMB[0],AMB[1],AMB[2],Math.min(.8,Math.max(a[3],.70))];} // the ruin is lit by embers: a warmer dark
-  return{ready,floor,wall,prop,torch,door,chests,pots,braziers,autoRugs,stepped,ambient,s2,ruin,hash};
+  return{ready,floor,wall,prop,torch,door,chests,pots,braziers,autoRugs,stepped,ambient,s2,ruin,hash,hearths,lights,roomAt};
 })();
 if(typeof TILES!=='undefined'){
   const _floor=TILES.floor,_wall=TILES.wall;
@@ -360,6 +403,7 @@ if(typeof TILES!=='undefined'){
     if(!EM.on()||!EM.ok.props)return _drawFlames();
     const hold=G.torches;
     // our torches first; anything we do not draw (pipes, small fires) goes through the original
+    if(EM.env.ready())EM.env.hearths();
     const rest=[];for(const tr of hold||[])if(!EM.env.torch(tr))rest.push(tr);
     G.torches=rest;try{_drawFlames();}finally{G.torches=hold;}
   };
@@ -454,6 +498,7 @@ if(window.Portraits){const _pd=Portraits.draw;Portraits.draw=function(c,id,x,y,s
   };
   const _pots=drawPots;drawPots=function(){if(!EM.env.ready())return _pots();const hold=G.pots;G.pots=[];try{_pots();}finally{G.pots=hold;}EM.env.pots();};
   const _braz=drawBraziers;drawBraziers=function(){if(!EM.env.ready())return _braz();const hold=G.braz;G.braz=[];try{_braz();}finally{G.braz=hold;}EM.env.braziers();};
+  const _cl=collectLights;collectLights=function(){const L=_cl.apply(this,arguments);return EM.env.ready()&&!EM.env.ruin()?EM.env.lights(L):L;};
   const _rugs=autoRugs;autoRugs=function(c,th,rnd){if(EM.env.ready())return EM.env.autoRugs(c,th,rnd);return _rugs(c,th,rnd);};
   if(window.drawNpcFigure){
     const _fig=window.drawNpcFigure,E=EM;

@@ -6,7 +6,7 @@ import os, sys, json
 sys.path.insert(0, os.path.dirname(__file__))
 from pix import *
 from biped import *
-import faces, shiloh, guards, cinder, ashling, people2, set2, ruin
+import faces, shiloh, guards, cinder, ashling, people2, set2, ruin, rooms_ashfall, props3
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), '..', '..', 'assets', 'ember')
 os.makedirs(OUT, exist_ok=True)
@@ -92,7 +92,7 @@ meta = {
     'halefree': build_person('halefree', people2.CFG_HALE_FREE, people2.FACE_HALE),
     'faces': dict(fw=faces.FW, fh=faces.FH, expr=faces.EXPR),
 }
-_s2 = set2.build(OUT); _s2.update(ruin.build()); meta['set2'] = set2.pack(_s2, OUT, 'set2')
+_s2 = set2.build(OUT); _s2.update(ruin.build()); _s2.update(rooms_ashfall.build()); _s2.update(props3.build()); meta['set2'] = set2.pack(_s2, OUT, 'set2')
 try:
     import props_ashfall, tiles_ashfall
     meta.update(props_ashfall.build(OUT)); meta.update(tiles_ashfall.build(OUT))
