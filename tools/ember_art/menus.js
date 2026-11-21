@@ -27,6 +27,7 @@ const ART = art; (async () => {
   const shot = async (id, setup, n = 40) => { const f = await p.evaluate((s) => { try { __seed(4242); new Function(s)(); return null; } catch (e) { return String(e.message || e); } }, setup);
     if (f) { console.log('SKIP', id, f); return; }
     for (let i = 0; i < n; i++) await p.evaluate(() => { if (typeof G !== 'undefined' && G && mode === 'play') { G.grace = 1e9; G.alert = 0; } __step(33.333); });
+    if (/win|lose/.test(id)) await p.waitForTimeout(1300);
     await p.screenshot({ path: path.join(OUT, id + '.png') }); process.stdout.write('m'); };
   await shot('m01-title', "toTitle();");
   await shot('m02-brief', "newGame();startBrief(0);");
@@ -34,5 +35,7 @@ const ART = art; (async () => {
   await shot('m04-case-file', "go(1);UI.openJournal('case');");
   await shot('m05-court', "newGame();lvl=1;setMode('court');");
   await shot('m06-hub', "newGame();run.ranks[0]='A';Hub.enter(1);G.grace=1e9;G.god=true;G.cine=null;", 60);
+  await shot('m07-win', "go(0);G.gems=3;finishLevel();", 60);
+  await shot('m08-lose', "go(0);G.god=false;G.hp=0;G.defeat='down';setMode('lose');", 80);
   console.log('\nerrors:', [...new Set(errs)].slice(0, 4)); await b.close(); srv.close();
 })();
