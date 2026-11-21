@@ -10,8 +10,8 @@
 4. **Enemy: the Cinderling** (the coal-sprite from the Marrow vault). Angry grin and brows, flame crest, squash when it winds up, stretch when it lunges, face-down when it dies.
 5. **Ashling**, the runt dragon, redrawn to match (big head, glossy eyes, tail flame, wings; idle, walk, fire, hurt, down).
 6. **A redesigned Marrow room.** Original flagstone floors (four variants, mostly large calm slabs), stone walls with ossuary niches and arrow slits, plum banners with a
-   bone crescent, iron wall sconces with a 3-frame flame, and furniture: crates, barrel, table with candle and bowl, bench, cot with a plum blanket, weapon rack, sacks, the hooded
-   mourner statue, a sarcophagus, plus skulls, bones, webs and chains. Bone is Marrow's ornament.
+   bone crescent, iron wall sconces with a 3-frame flame, and furniture art: crates, barrel, table with candle and bowl, bench, cot with a plum blanket, weapon rack, sacks, the hooded
+   mourner statue, a sarcophagus, plus skulls, bones, webs and chains. (Correction: in rounds 1-2 most of this furniture existed as sprites but the mission's own level data barely placed it; it is actually placed in the mission as of round 3, phase 1.) Bone is Marrow's ornament.
 7. **One UI language.** HUD panels, hearts, objective box, ability bar, dialogue bubble, title, menus, cards, journal and the touch buttons share plum ink panels, a dark edge, a thin gold rule,
    chamfered corners and a hard pixel shadow. Dialogue portraits for Shiloh and Ashling are cut from the very sprites and faces used in play.
 8. **Lighting and effects.** HD-2D is off by default (configuration B) and still selectable. The fire light on Ashling's breath is now a warm pool that keeps floor detail instead of a white-out.
@@ -26,7 +26,7 @@ The UI finally looks like one piece with the art, on desktop and on the phone la
 **What is not good enough yet** (so you do not have to find it):
 * **The room is paler and busier than it should be.** The new floor and wall are lighter than the original and the 16px slab grid is visible everywhere. The ambient darkness is
   the game's old one; the slice has not had a proper lighting pass (warm pools around sconces, cooler shadow in corners, floor decals, rugs in the Marrow palette). This is the next thing to do.
-* **Mixed leftovers in the same room.** Pots/urns, braziers, the doors, chests, Pip and the other NPCs are still the old art. It is a slice, not a replacement.
+* **Mixed leftovers in the same room.** (Round-1 statement; superseded: pots, braziers, doors, chests and Pip were redrawn in round 2 and the remaining objects in round 3.)
 * **Scale.** Ember figures are about a quarter bigger than the LPC ones (so faces survive normal zoom). Doors, ceilings and NPCs have not been resized to match.
 * **Walk and strike are 6 and 5 frames.** Convincing, not luxurious: no anticipation or follow-through on the strike beyond the crescent, the guards have no attack or talk animations.
 * **Right-facing figures are mirrors**, so asymmetric details (satchel, sword hand) flip sides.
@@ -92,7 +92,7 @@ Sheets: `contact-sheets/round2/`. Raw frames: `review/`.
 4. **Doors, gates, chests, pots, urns, braziers.** Plank door with iron straps, open door, portcullis (down and raised), the plum rune seal (two frames), banded chest with a bone inlay (closed, open with coins), a terracotta pot, a plum-glazed urn, a tripod brazier (three flame frames and unlit).
 5. **Pip and Hale.** Pip: a small scullion with a flat cap, goggles pushed up, freckles, a slop pail and a grubby apron. Hale: striped jersey, red bandana, grey beard, manacles; unchained once freed. Both have walk and idle in three views, blink and react, and their dialogue portraits come from the same sprites and faces.
 6. **The ruined state, for every prop and surface.** Burnt versions of every prop, chest, pot, urn and door (their own ramps re-mapped to charred and ash tones, then chipped, cracked, sooted and glinted with embers), five collapsed floor tiles (plain, cracked, ash-drifted, charred, pit), three broken wall faces with gaps and soot streaks, scorched wall tops, rubble piles beside burnt props, and a scorched rug. This is processing of designed sprites plus hand-drawn rubble, not a filter on the screen.
-7. **Checks.** Full suite: 33 of 33 pass, with `tests/ember.test.js` now covering the ruined state, stepped light, the saved-profile skin and the toggle. Real-input gameplay run on the final single-file build: 24 of 24 checks pass on desktop (keyboard) and phone (touch): start from the title, walk, strike, take a guard down, talk to Pip, swap to Ashling, breathe fire, pause, resume, get caught, retry.
+7. **Checks.** Full suite at that commit: 30 suites plus the syntax check (31 PASS lines; an earlier draft of this report said "33 of 33", which was a miscount), with `tests/ember.test.js` now covering the ruined state, stepped light, the saved-profile skin and the toggle. Real-input gameplay run on the final single-file build: 24 of 24 checks pass on desktop (keyboard) and phone (touch): start from the title, walk, strike, take a guard down, talk to Pip, swap to Ashling, breathe fire, pause, resume, get caught, retry.
 
 ## Performance (headless Chromium, software rendering: read the gap, not the numbers)
 | | Original | Ember |
@@ -113,3 +113,33 @@ No measurable cost. The finer light layer is the one thing that could cost; it f
 * **Characters:** right-facing is a mirror; Hale has no seated or chained pose and no side-view beard; Pip and Hale have idle and walk only; guards have no attack or talk animation; Shiloh's strike is 5 frames. Ember figures are about a quarter bigger than the old ones and doors and ceilings were not rescaled to match.
 * **Not measured on a real phone.** The phone numbers are an emulated, throttled viewport.
 * **Scope:** this is still Ashfall Keep only. Other missions, the hub, and the other NPCs keep LPC art.
+
+
+---
+
+# Round 3: furnishing, remaining art, presentation (feature/ember-art-slice only)
+
+Commits: `0ed15b2` Phase 1, `81b1f94` Phase 2, `8aded60` Phase 3 (local, not pushed). Gameplay rules, stealth, combat and level logic are unchanged; every art change is behind the Ember art toggle.
+Evidence: `phase1/`, `phase2/`, `phase3/` (desktop 1280x720 and phone 844x390 screenshots, taken from the running game, plus real-input gameplay frames).
+Verified on the final tree: full suite ALL PASSED (33 suites + syntax; includes new `layout_ashfall`, `ember_visible`, `ember_screens`) and the 24 real-input gameplay checks (desktop keyboard + phone touch) on the rebuilt single-file build.
+
+## Phase 1: environment
+* Ashfall's level data now carries a documented `set:` list of 19 forced furniture pieces (crates, barrels, tables, benches, cots, weapon racks, sacks, statues, sarcophagi) placed by a planner (`plan.js`) that mirrors the game's own clearing rules (mechanism zones, plates, NPC and item spots, guard routes). `tests/layout_ashfall.test.js` proves every piece exists, nothing sits on a door, stair, lever, cache, plate, item, NPC spot or guard route, the whole keep stays reachable (ladders/hatches followed), and every guard still patrols.
+* `js/props.js` placement check was relaxed for forced pieces only so reachability, not an adjacency heuristic, decides.
+* Rooms have their own floor/wall families (scullery, west store, barracks, east hall, courtyard, guardroom, culvert, cellars, ossuary, annex) and hearth lights.
+
+## Phase 2: remaining original art
+Redrawn and verified drawing in the real mission (traced by `appear.js` and `tests/ember_visible.test.js`, not merely present in the asset sheets): pickups (gem, cluster, relic, scroll, keg, egg, beacon), floor plates (rattle, dart), rotten boards, hatch/steps/well, lever, caches, notes, portcullis, grates, story scenes (bones, tablet, banner), the hidden crack, arches, hanging cages, ceiling beams, alert markers, hearts and ability icons, minimap contents, particles, interaction prompt.
+**Real finding:** in the original LPC game, `js/lpcprops.js` replaces the prop drawer and bypasses `mis_a.js`'s floor drawer, so mission mechanisms (plates, levers, hatches, caches) were never drawn at all in LPC mode. Ember mode draws them via a new `window.drawMissionFloor`. The original-art mode is left as it was, so that pre-existing gap remains when the toggle is off.
+
+## Phase 3: presentation
+Four painted illustrations (title: Shiloh and Cinder on the rampart under the burning Embercrown; briefing: Ashfall Keep gate by night, Gaunt in the arch; victory: dawn over the walls; defeat: the lantern finds Shiloh) are shown as pixel-sharp panels on the DOM screens, only with Ember art on (verified off again by `ember_screens`). The briefing illustration is Ashfall-specific (class `m0`).
+
+## What remains (honest list)
+* **Round-3 commits are not pushed.** Nothing has been pushed or merged since `0833065`; `main` is untouched. Waiting for your permission.
+* **Phase 2 state-dependent sprites** (lever on, dart plate fired, opened caches, rot variants, unlit beacon, empty hearts, some ability icons) are drawn only when those states occur; I verified their default states in play and the others through the sprite sheets and close-ups, not by playing through every mechanism state.
+* The title art is only partly visible behind the desktop menu panel; on phone the crown sits behind the buttons. The briefing art exists for Ashfall only; other missions keep the original vector sigil. Victory/defeat banners are small on phones to keep the existing screens fitting.
+* Furniture and room identity were checked visually per room and by the layout test, not by a full human playthrough of all routes.
+* Ruined state still only happens in Dunmoor (not in the slice). Mirror-for-right-facing, limited animation sets and the scale mismatch listed above still apply.
+* Performance after round 3 was not re-measured on a real phone; the earlier emulated measurement predates the new hooks and sprites.
+* The scene illustrations are generated by code-driven painters with hand-placed stamps; they are original, but a human artist's pass would still raise them.
