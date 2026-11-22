@@ -650,6 +650,7 @@ function drawMarkers(g){
     return;
   }
   if(g.spin||g.eng)return;
+  if(g.run&&typeof beaconItem==='function'){const B=beaconItem();if(B&&!B.done){c.save();c.setLineDash([6,6]);c.lineDashOffset=-G.time*30;c.strokeStyle='rgba(255,120,40,.55)';c.lineWidth=2;c.beginPath();c.moveTo(g.x,g.y);c.lineTo(B.x,B.y);c.stroke();c.restore();}} // where the runner is heading
   if(g.run){c.save();c.strokeStyle='rgba(255,120,40,.9)';c.lineWidth=2;circ(c,g.x,g.y,16+Math.sin(G.time*10)*2);c.stroke();c.fillStyle='rgba(255,140,60,.9)';c.font='bold 9px '+BODY;c.textAlign='center';c.fillText('RUNNER',g.x,g.y+26);c.restore();}
   if(g.say){
     const k=Math.min(1,g.say.t/.3,(1.7-g.say.t)/.12+.01);

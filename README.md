@@ -65,7 +65,7 @@ The plan for the other houses, and the review screenshots from each round, are o
 
 ## The opening
 
-Ashfall Keep starts in the culvert under the keep, three small rooms that teach one thing each before the keep opens up: grates that rattle unless you sneak, a guard with his back turned (takedown), and a guard watching a door (throw a bell). A ladder then climbs into the keep. The culvert is a soft zone (`mech.soft`): suspicion builds at half speed there, and being caught sends Shiloh back to the start of it instead of ending the mission. The rooms and hints are data in `LEVELS[0]` (`mech.lessons`, `mech.plates`, `mech.guards`, the `culvert` stairs marked `entry`).
+Ashfall Keep starts in the culvert under the keep, three small rooms that teach one thing each before the keep opens up: loose boards hung with bone chimes that rattle unless you sneak, a guard with his back turned (takedown), and a guard watching the ladder by the door (throw a bell to turn him away). A ladder then climbs into the keep. The culvert is a soft zone (`mech.soft`): suspicion builds at half speed there, and being caught sends Shiloh back to the start of it instead of ending the mission. The rooms and hints are data in `LEVELS[0]` (`mech.lessons`, `mech.plates`, `mech.guards`, the `culvert` stairs marked `entry`).
 
 ## Project layout
 
