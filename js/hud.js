@@ -152,6 +152,7 @@ function drawHud(){
   for(let i=0;i<G.maxHp;i++){
     const hx=ox+pad+i*(hs+3)+hs/2,full=i<G.hp,sh_=G.hpShake>0?Math.sin(G.hpShake*60)*2:0;
     c.save();c.translate(hx,hy+hh/2+sh_);const sc=hs/16*(full&&G.hp<=1&&Math.sin(G.time*8)>0?1.12:1);c.scale(sc,sc);
+    if(window.EMX&&EMX.heart&&EMX.heart(c,full)){c.restore();continue;}
     c.beginPath();c.moveTo(0,6);c.bezierCurveTo(-11,-1,-6,-9,0,-3.5);c.bezierCurveTo(6,-9,11,-1,0,6);
     if(full){const g=c.createLinearGradient(0,-8,0,7);g.addColorStop(0,'#ff7a8a');g.addColorStop(1,'#d02a40');c.fillStyle=g;c.fill();c.fillStyle='rgba(255,255,255,.5)';c.beginPath();c.arc(-3.4,-2.6,1.6,0,6.3);c.fill();}
     else{c.fillStyle='rgba(0,0,0,.45)';c.fill();}

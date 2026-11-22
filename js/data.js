@@ -139,6 +139,10 @@ const LEVELS=[
   keep:[[1,17,23,20],[1,23,23,27]]},
  inspect:[[1,5,'Scorched Barracks Wall','Tally marks, hundreds of them, ending abruptly. Under the last: "They never opened the egg room. They only fed the fire."'],[23,9,'Marrow Banner, Torn','The banner shows a skull wearing a crown of bone. Someone has stitched a small, careful candle into the corner.']],
  extra:[[9,6,'o'],[20,11,'o'],[3,13,'s']],
+ /* Ember art slice: Ashfall's furniture, room by room. Planned with tools/ember_art/plan.js to survive the game's own clearing rules (js/mis_a.js, js/npcs.js) and to stay
+    off every route, door, plate, stair, item, NPC and mission object, with every item, door, ladder and the Ossuary Walk's plate-free path still reachable.
+    The culvert and cellars stay empty by the mission design. Types are the game's own, so the original art draws them too. */
+ set:[[6,1,'furnace',2,1],[7,3,'cauldron',1,1],[23,3,'altar',1,1],[20,1,'statue',1,1],[2,7,'cot',2,1],[11,5,'weaponrack',1,1],[20,7,'weaponrack',1,1],[23,6,'statue',1,1],[20,5,'bench',2,1],[16,5,'barrels',1,1],[17,13,'longtable',5,1],[13,9,'bookcase',2,1],[13,13,'bench',2,1],[16,9,'weaponrack',1,1],[20,9,'weaponrack',1,1],[8,13,'barrels',1,1],[11,9,'barrels',1,1],[1,10,'sacks',1,1],[5,13,'crates',2,1]],
  guards:[
   [[7,2],[12,2]],
   [[17,2],[22,2],[22,3],[17,3]],

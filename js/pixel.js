@@ -35,8 +35,8 @@ const PX={cv:document.createElement('canvas'),active:false,was:false,
     main.imageSmoothingEnabled=true;
     setWorldTransform();
     for(const p of PT)if(p.k==='text')drawFloatText(main,p);
-    for(const g of G.guards)_drawMarkers(g);
+    for(const g of G.guards)(window.EMX&&EMX.markers?EMX.markers(g,_drawMarkers):_drawMarkers(g));
     if(window.NPC&&NPC.drawFront)NPC.drawFront();
-    _drawPrompt();
+    (window.EMX&&EMX.prompt?EMX.prompt(_drawPrompt):_drawPrompt());
   };
 }

@@ -612,6 +612,7 @@ function plateRaw(c,x,y,trap,lit){
   if(trap){c.fillStyle=lit?'rgba(255,80,50,.75)':'rgba(255,90,60,.45)';c.beginPath();c.moveTo(x+16,y+9);c.lineTo(x+22,y+16);c.lineTo(x+16,y+23);c.lineTo(x+10,y+16);c.closePath();c.fill();}
 }
 function drawPlate(c,p,t){
+  if(window.EMX&&EMX.mech&&EMX.mech('plate',c,p,t))return;
   const x=p.x*T,y=p.y*T,dn=p.on?1.5:0;
   if(p.hidden&&!p.rev){plateTile(c,x,y,false,false);return;}
   c.save();c.translate(0,dn);
@@ -622,7 +623,7 @@ function drawPlate(c,p,t){
   c.restore();
   if(p.kind==='dart'){c.fillStyle=INK;for(let i=0;i<3;i++){circ(c,x+1,y+10+i*6,1.4);c.fill();}}
 }
-function drawRot(c,r,t){c.drawImage(spr("rot"+r.st,g=>rotRaw(g,{x:0,y:0,st:r.st})),r.x*T,r.y*T,T,T);}
+function drawRot(c,r,t){if(window.EMX&&EMX.mech&&EMX.mech('rot',c,r,t))return;c.drawImage(spr("rot"+r.st,g=>rotRaw(g,{x:0,y:0,st:r.st})),r.x*T,r.y*T,T,T);}
 function rotRaw(c,r){
   const x=r.x*T,y=r.y*T;
   if(r.st===2){
@@ -674,6 +675,7 @@ function pitTile(c,mk,br){
   }
 }
 function drawGrate(c,x,y,open,over){
+  if(window.EMX&&EMX.mech&&EMX.mech('grate',c,x,y,open,over))return;
   c.fillStyle=over?'rgba(18,14,22,.55)':'#0e0a12';if(!over)c.fillRect(x+5,y+7,T-10,T-12);
   c.strokeStyle=over?'rgba(110,104,120,.85)':'#5a5662';c.lineWidth=2;
   for(let i=0;i<4;i++){c.beginPath();c.moveTo(x+8+i*5.4,y+7);c.lineTo(x+8+i*5.4,y+T-5);c.stroke();}
@@ -681,6 +683,7 @@ function drawGrate(c,x,y,open,over){
   if(!over){c.fillStyle=open?'rgba(255,150,70,.55)':'rgba(140,130,150,.35)';circ(c,x+16,y+T-3,1.6);c.fill();}
 }
 function drawStairs(c,st,end,k,t){
+  if(window.EMX&&EMX.mech&&EMX.mech('stairs',c,st,end,k,t))return;
   const x=end[0]*T,y=end[1]*T;
   if(!st.found){ // a slab that does not quite sit right
     const near_=Math.hypot(G.wren.x-C(end[0]),G.wren.y-C(end[1]))<2.6*T;
@@ -711,6 +714,7 @@ function drawVentGrille(c,v,t){
   if(v.off){c.strokeStyle='#8a6a3a';c.lineWidth=2;c.beginPath();c.moveTo(x-8,y-8);c.lineTo(x+8,y+8);c.stroke();}
 }
 function drawLever(c,l,t){
+  if(window.EMX&&EMX.mech&&EMX.mech('lever',c,l,t))return;
   const x=C(l.x),y=C(l.y),on=l.on||(l.used&&l.once&&!l.hold);
   shadowAt(x+1,y+9,11,4,.3);
   // winch drum on a post
@@ -724,6 +728,7 @@ function drawLever(c,l,t){
   if(l.hold&&l.on){c.strokeStyle='rgba(255,220,140,'+(.5+.3*Math.sin(t*8))+')';c.lineWidth=1.4;circ(c,x,y,15);c.stroke();}
 }
 function drawCache(c,q,t){
+  if(window.EMX&&EMX.mech&&EMX.mech('cache',c,q,t,M))return;
   const x=C(q.x),y=C(q.y),o=q.open;
   if(q.kind==='stone'){
     c.fillStyle=o?'#120c10':'#5a5462';c.fillRect(x-9,y-8,18,13);c.strokeStyle=INK;c.lineWidth=1.1;c.strokeRect(x-9,y-8,18,13);
@@ -752,6 +757,7 @@ function drawCache(c,q,t){
   if(q.chal&&M.ch&&M.ch.st!=='done'){c.strokeStyle=M.ch.st==='run'?'rgba(120,240,150,.8)':'rgba(255,200,120,.5)';c.lineWidth=1.4;circ(c,x,y,18+Math.sin(t*3)*1.5);c.stroke();}
 }
 function drawNote(c,n,t){
+  if(window.EMX&&EMX.mech&&EMX.mech('note',c,n,t))return;
   const x=C(n.x),y=C(n.y);
   c.fillStyle='#5a5664';rr(c,x-9,y-12,18,22,3);c.fill();ink(c,1.1);
   c.fillStyle='rgba(255,255,255,.1)';c.fillRect(x-8,y-11,16,2);
@@ -792,6 +798,7 @@ function drawServDoor(c,d,t){
   const D=G.mis.dis;if(!D.on&&Math.hypot(G.wren.x-C(d.x),G.wren.y-C(d.y))<1.6*T&&!G.mis.said.sd){G.mis.said.sd=1;say('Shiloh',"A servants' door. It opens for livery, not for me.");}
 }
 function drawPortcullis(c,q,t){
+  if(window.EMX&&EMX.mech&&EMX.mech('portcullis',c,q,t))return;
   const x=q.x*T,y=q.y*T,up=q.anim*(T-7);
   c.fillStyle='#14101a';c.fillRect(x,y+1,3,T-2);c.fillRect(x+T-3,y+1,3,T-2);
   c.save();c.beginPath();c.rect(x,y,T,T);c.clip();

@@ -478,6 +478,7 @@ function storyFloor(c,kind,px,py,r){
 }
 function story(c){
   const list=G.d.hub?[]:(STORY[LEVELS.indexOf(G.d)]||[]),r=mulberry(4401+lvl);
+  if(window.EMX&&EMX.story&&EMX.story(c,list,r))return; // Ember art draws its own story scenes
   for(const [x,y,k] of list){
     if(!G.grid[y]||isW(x,y))continue;
     if(k[0]==='f'&&k!=='fhedge'){storyFloor(c,k,x*T,y*T,r);continue;}

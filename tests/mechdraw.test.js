@@ -1,4 +1,4 @@
-// Mission mechanisms (plates, levers, hatches, caches, grates, gates) are drawn in both art modes: pixel art (the default) and the original drawn art.
+// Mission mechanisms (plates, levers, hatches, caches, grates, gates) are drawn in every art mode: pixel art (the default), the original drawn art, and Ember art (Ashfall only), once per frame.
 const {chromium}=require('playwright');
 (async()=>{
   const b=await chromium.launch();const errs=[];
@@ -8,18 +8,20 @@ const {chromium}=require('playwright');
   const r=await p.evaluate(async()=>{
     const wait=ms=>new Promise(r=>setTimeout(r,ms));const out={};
     let n=0;
-    for(const lpc of [true,false])for(const L of [0,1,2,3]){
-      settings.lpc=lpc;newGame();startBrief(L);startPlay();G.cine=null;G.grace=1e9;G.god=true;G.dirty=true;
+    const runs=[];for(const lpc of [true,false])for(const L of [0,1,2,3])runs.push([lpc?'pixel':'drawn',lpc,false,L]);runs.push(['ember',true,true,0]);
+    for(const [tag,lpc,ember,L] of runs){
+      settings.lpc=lpc;settings.ember=ember;newGame();startBrief(L);startPlay();G.cine=null;G.grace=1e9;G.god=true;G.dirty=true;
       await wait(120);
       // freeze the rules (hit-stop) so only rendering runs, then count reads of the mission's pit table: only the floor drawer reads it each frame
       G.hitstop=1e9;const M=G.mis,pt=M.pitT;Object.defineProperty(M,'pitT',{configurable:true,get(){n++;return pt;}});
-      n=0;await wait(400);G.hitstop=0;
+      n=0;let fr=0,live=true;const tick=()=>{if(live){fr++;requestAnimationFrame(tick);}};requestAnimationFrame(tick);
+      await wait(400);live=false;G.hitstop=0;
       if(!G.mis)throw new Error("no mission mechanics in level "+L);
-      out[(lpc?'pixel':'drawn')+L]=n;
+      out[tag+L]=[n,fr];
     }
-    settings.lpc=true;return out;});
-  const fail=Object.entries(r).filter(([k,v])=>!(v>0)).map(([k])=>k+': mission floor not drawn');
-  for(const [k,v] of Object.entries(r))if(v>60)fail.push(k+': mission floor drawn more than once a frame ('+v+')');
+    settings.lpc=true;settings.ember=false;return out;});
+  const fail=[];
+  for(const [k,[n,fr]] of Object.entries(r)){if(!(n>0))fail.push(k+': mission floor not drawn');else if(n>fr+2)fail.push(k+': mission floor drawn more than once a frame ('+n+' draws in '+fr+' frames)');}
   console.log(JSON.stringify(r));
   if(errs.length)console.log(errs.join('\n'));
   console.log(fail.length?'FAIL '+fail.join('; '):'mechdraw ok');

@@ -52,6 +52,17 @@ Switch it with **Pixel art** in the pause menu to compare with the original draw
 
 **Feel.** A guard who spots you jumps while the frame holds for a beat and the screen blinks red; running, rolling and striking kick up dust (sneaking does not); guards flash white when hit.
 
+## Ember art (beta)
+
+An original art style, drawn for this game, is being built to replace the LPC art. It is **off by default** and so far covers **Ashfall Keep only**: turn on **Ember (beta)** in the pause menu to see it there. Elsewhere the game keeps the pixel art above.
+
+- **Characters**: Shiloh, two Marrow guards (Pell the pikeman, Sergeant Gaunt), the Cinderling, Ashling, Pip and Hale. Faces are a separate atlas drawn on the head every frame, so characters blink and react: calm, wary, alarmed, hurt, knocked out.
+- **Ashfall Keep**: furnished room by room (`set:` in `LEVELS[0]`, checked by `tests/layout_ashfall.test.js`), its own floors, walls, rugs, doors, chests, braziers and mission mechanisms, and pixel-stepped light pools.
+- **UI**: one skin for the HUD, menus and touch buttons, and painted title, briefing, victory and defeat screens.
+- **Code and assets**: `js/ember.js`, `ember.css`, `assets/ember/` (built by `tools/ember_art/build_ember.py`). No third-party art, so as it spreads it removes the LPC licence dependency.
+
+The plan for the other houses, and the review screenshots from each round, are on the `feature/ember-art-slice` branch (`docs/ember-art-slice/REPORT.md`).
+
 ## The opening
 
 Ashfall Keep starts in the culvert under the keep, three small rooms that teach one thing each before the keep opens up: grates that rattle unless you sneak, a guard with his back turned (takedown), and a guard watching a door (throw a bell). A ladder then climbs into the keep. The culvert is a soft zone (`mech.soft`): suspicion builds at half speed there, and being caught sends Shiloh back to the start of it instead of ending the mission. The rooms and hints are data in `LEVELS[0]` (`mech.lessons`, `mech.plates`, `mech.guards`, the `culvert` stairs marked `entry`).
@@ -74,6 +85,8 @@ js/world.js       props, particles, ambience, parallax, world draw pass
 js/hud.js         HUD, minimap, screen effects, title scene
 js/ui.js          menus, Forge, pause, codex, touch and mouse input
 js/main.js        boot, main loop, adaptive quality
+js/lpc*.js        pixel art: LPC characters, props and tiles
+js/ember.js       Ember art (beta, Ashfall Keep), with ember.css and assets/ember/
 ```
 
 No build step or dependencies. Serve the folder (or open `index.html`) in any modern browser.

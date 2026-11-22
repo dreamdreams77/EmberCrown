@@ -51,7 +51,10 @@ function buildProps(g){
       for(const [tx,ty] of tiles)for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++)if(g.pblock.has(pkey(tx+i,ty+j))&&type!=='crate'&&type!=='crates')return false;}
     const before=reach();
     tiles.forEach(([tx,ty])=>g.pblock.add(pkey(tx,ty)));
-    if(reach()!==before-tiles.length){tiles.forEach(([tx,ty])=>g.pblock.delete(pkey(tx,ty)));return false;}
+    const after=reach();
+    // a prop set by hand (force) is planned and checked offline (tools/ember_art/plan.js follows ladders and hatches, which this flood from the start cannot:
+    // Ashfall's keep is only reached by ladder), so only unforced, random props are held to this walking-only reachability test
+    if(!force&&after!==before-tiles.length){tiles.forEach(([tx,ty])=>g.pblock.delete(pkey(tx,ty)));return false;}
     g.props.push(Object.assign({type,x,y,w,h,seed:Math.floor(rnd()*1e6)},opt||{}));return true;
   };
   g.placeProp=place;
@@ -363,7 +366,7 @@ function bakeForeground(){
   }
   if(window.TILES)TILES.fg(c);
   // rafters in timbered halls
-  if(th.rafters&&G.state!=='ruin'){
+  if(th.rafters&&G.state!=='ruin'&&!(window.EMX&&EMX.beams&&EMX.beams(c,gw,gh))){ // Ember art draws its own timber beams
     for(let y=0;y<gh;y++){
       if((y%5)!==2)continue;
       let x0=-1;
