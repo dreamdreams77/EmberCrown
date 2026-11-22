@@ -22,7 +22,7 @@
     air     {drakes,ballistae,wind,gulls,fog}  flight encounters
     soft    [x0,y0,x1,y1]                   learning zone: suspicion builds slowly and being caught sends Shiloh back to the start instead of failing
     lessons [{zone:[x0,y0,x1,y1],title,touch,keys}]  a hint shown while Shiloh stands in the zone (first match wins)
-    guards  [{wp,kind,name,face}] extra guards (face: a one-post guard keeps looking that way)    events {O:fx,...} fx when an objective is completed
+    guards  [{wp,kind,name,face,lureT}] extra guards (face: a one-post guard keeps looking that way; lureT: seconds he spends checking a noise)    events {O:fx,...} fx when an objective is completed
     notes   [{x,y,title,text}]              carved hints (hold E to read)    keep [[x0,y0,x1,y1]] rooms kept clear of furniture */
 (function(){
 const K=(x,y)=>x+y*256;
@@ -53,14 +53,16 @@ function init(g){
   s.oil=(m.oil||[]).map(q=>Object.assign({},q,{st:'wet',t:0,hit:new Set()}));
   s.caches=(m.caches||[]).map(q=>Object.assign({kind:'chest',need:1},q,{open:false,seen:!q.hidden}));
   s.notes=(m.notes||[]).map(q=>Object.assign({},q,{read:false}));
-  s.lessons=m.lessons||[];s.lesson=null;s.home={x:g.wren.x,y:g.wren.y};
+  s.lessons=m.lessons||[];s.lesson=null;s.home={x:g.wren.x,y:g.wren.y,gad:Object.assign({},g.gad)};
+  // Retry after the mission's way in (an entry stair, e.g. Ashfall's culvert ladder) was taken: start at its top, not back in the lessons
+  {const cp=window.EC_CP,st=s.stairs.find(q=>q.entry);if(cp&&cp.retry&&cp.lvl===lvl&&st){cp.retry=false;g.wren.x=C(st.b[0]);g.wren.y=C(st.b[1]);g.wren.vx=g.wren.vy=0;s.fromCP=true;}}
   for(const c of s.caches)if(c.secret)g.secretsTotal++;
   for(const st of s.stairs)if(st.secret)g.secretsTotal++;
   if(m.disguise){const D=m.disguise;s.dis={at:D.at,on:false,uses:D.uses||2,run:0,blown:0,doors:(D.doors||[]).map(([x,y])=>({x,y,open:false,t:0})),steward:null};
     if(D.steward!=null){const w=g.d.guards[D.steward];if(w){const sg=g.guards.find(q=>q.wp[0][0]===C(w[0][0])&&q.wp[0][1]===C(w[0][1]));if(sg){sg.steward=true;s.dis.steward=sg;}}}}
   if(m.bells)s.bells={list:m.bells.list.map(([x,y,n])=>({x,y,n,ring:0})),seq:m.bells.seq,p:0,solved:false,fx:m.bells.fx};
   if(m.challenge)s.ch=Object.assign({},m.challenge,{st:'idle',t:0,ri:0});
-  for(const q of m.guards||[]){const gd=mkGuard(q.wp,q.kind);if(q.name)gd.mname=q.name;if(q.face!==undefined){gd.face=q.face;gd.post=q.face;}g.guards.push(gd);}
+  for(const q of m.guards||[]){const gd=mkGuard(q.wp,q.kind);if(q.name)gd.mname=q.name;if(q.face!==undefined){gd.face=q.face;gd.post=q.face;}if(q.lureT)gd.lureT=q.lureT;g.guards.push(gd);}
   if(m.air){const A=m.air;s.air={
     drakes:(A.drakes||[]).map(d=>({x:C(d.wp[0][0]),y:C(d.wp[0][1]),wp:d.wp.map(p=>[C(p[0]),C(p[1])]),i:1,face:0,st:'patrol',hp:1.3,cd:1.5,tele:0,see:0,lost:0,stun:0,ph:Math.random()*6,fall:0,last:null})),
     ball:(A.ballistae||[]).map(b=>({x:C(b[0]),y:C(b[1]),base:b[2],a:b[2],cd:2,tele:0,stun:0,burn:0,see:0})),
@@ -260,6 +262,7 @@ function activate(t){
     if(r.secret){G.secretsFound++;toast(r.title||'Hidden way',r.sub||'Stairs lead down into the dark.','#ffe9a0');}
     if(r.findSay)say(r.findSay[0],r.findSay[1]);
   } else if(t.mk==='stairs'){
+    if(r.entry&&t.to===r.b)window.EC_CP={lvl,retry:false}; // checkpoint for Retry (see the level setup above)
     travel(t.to,r);
   } else if(t.mk==='livery'){
     r.on=true;r.uses--;r.run=0;Aud.S.swap();burst(G.wren.x,G.wren.y,14,'#e8c060',50,.6,2,{add:true});
@@ -948,9 +951,11 @@ window.softCatch=function(){
     g.lure=null;g.ret=false;g.back=null;g.search=null;g.seeing=false;g.was=false;g.seen=null;g.stun=0;g.ko=false;g.hunt=0;g.run=false;
   }
   if(G.runner&&!G.runner.run)G.runner=null;
+  // nothing lost: gadgets spent on a failed try come back, or a player could run out of bells before the lure lesson
+  if(s.home.gad)for(const k in s.home.gad)G.gad[k]=Math.max(G.gad[k]||0,s.home.gad[k]);
   G.flash={t:.4,c:'20,14,28'};
   toast('Spotted','Down here you get another try. In the keep you will not.','#e8c060');
-  say('Shiloh','Too loud. Again, and slower.');
+  say('Shiloh','Caught. Again: slower, quieter, out of their sight.');
   return true;
 };
 // the lesson card: a title and one or two wrapped lines, under the top bar and clear of the middle of the view

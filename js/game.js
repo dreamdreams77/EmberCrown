@@ -340,6 +340,15 @@ function startPlay(){
   if(typeof onLevelStart==='function')onLevelStart();
 }
 
+/* Begin starts a mission from its very start; Retry (after being caught) resumes at a checkpoint when the mission has one
+   (window.EC_CP, set by js/mis_a.js when the mission's way in, e.g. Ashfall's culvert ladder, is climbed) */
+function beginMission(){window.EC_CP=null;startPlay();}
+function retryMission(){
+  if(window.EC_CP)EC_CP.retry=true;
+  startPlay();
+  if(G&&G.mis&&G.mis.fromCP){toast('Checkpoint','Back at the top of the ladder.','#e8c060');say('Shiloh','Up the ladder again. Quieter this time.');}
+}
+
 /* ---------- input ---------- */
 addEventListener('keydown',e=>{
   if(e.metaKey||e.ctrlKey||e.altKey)return;
@@ -376,8 +385,8 @@ function press(k){
   if(mode==='title'&&['1','2','3'].includes(k)){diff=+k-1;if(typeof UI!=='undefined')UI.onMode('title');Aud.S.click();}
   else if(mode==='title'&&k==='enter'){if(saved&&continueGame()){}else newGame();}
   else if(mode==='choice'&&['1','2','3'].includes(k))makeChoice(+k);
-  else if(mode==='brief'&&k==='enter')startPlay();
-  else if(mode==='lose'&&k==='enter')startPlay();
+  else if(mode==='brief'&&k==='enter')beginMission();
+  else if(mode==='lose'&&k==='enter')retryMission();
   else if(mode==='win'&&k==='enter')continueFromWin();
   else if(mode==='court'&&['1','2','3'].includes(k))pickPerk(+k);
   else if(mode==='end'&&k==='enter')toTitle();
@@ -417,7 +426,7 @@ function lureNear(x,y,r,noise){
     if(g.stun>0||(noise&&g.boss)||g.eng)continue;
     if(Math.hypot(g.x-x,g.y-y)<r&&los(g.x,g.y,x,y)){
       if(!g.lure&&!g.ret)g.back={x:g.x,y:g.y};
-      g.lure={x,y,t:3};g.ret=false;g.quest=1.4;bark(g,'lure');
+      g.lure={x,y,t:g.lureT||3};g.ret=false;g.quest=1.4;bark(g,'lure');
     }
   }
   for(const f of G.foes||[]){if(f.state!=='dead'&&Math.hypot(f.x-x,f.y-y)<r*.8)f.lure={x,y,t:3};}
@@ -489,7 +498,10 @@ function moveG(g,tx,ty,dt,spd){
   g.x=nx;g.y=ny;g.ph+=st*.18;return false;
 }
 function stepGuard(g,dt){
-  if(g.stun>0){g.stun-=dt;return;}
+  if(g.stun>0){g.stun-=dt;
+    // coming round from a takedown: a groggy moment before he can see, so waking is never an instant catch
+    if(g.stun<=0&&g.ko){g.ko=false;g.groggy=1.2;g.say={t:1.7,x:'Ngh... my head...'};}
+    return;}
   if(g.run){runStep(g,dt);return;}
   if(g.seeing)return;
   if(g.toastT>0){g.toastT-=dt;g.face=Math.atan2(G.d.feast.table[1]*T-g.y,G.d.feast.table[0]*T-g.x);return;}
@@ -832,10 +844,12 @@ function update(dt){
   const holding=actHeld&&(G.active==='wren'||G.flight);
   const tgtNow=(G.active==='wren'||G.flight)?findTarget(A):null;
   G.prompt=tgtNow;
-  if(holding){
+  if(!actHeld)G.holdLock=false;
+  if(holding&&!G.holdLock){
     const tgt=tgtNow;
     if(tgt&&G.holdT&&G.holdT.ref===tgt.ref)G.hold+=dt;else{G.hold=0;G.holdT=tgt;}
-    if(tgt&&G.hold>=tgt.need){completeTarget(tgt);G.hold=0;G.holdT=null;}
+    // one action per press: a held key must be let go first (or a ladder would carry you up and straight back down)
+    if(tgt&&G.hold>=tgt.need){completeTarget(tgt);G.hold=0;G.holdT=null;G.holdLock=true;}
     else if(tgt&&Math.random()<dt*10)pt(tgt.x+(Math.random()-.5)*16,tgt.y+(Math.random()-.5)*10,0,-14,.5,1.6,'#ffe0a0',{add:true});
   } else {G.hold=0;G.holdT=null;}
   // pickups
@@ -910,6 +924,7 @@ function update(dt){
     if(g.eng){g.was=false;continue;}
     if(g.bang>0)g.bang-=dt;if(g.quest>0)g.quest-=dt;if(g.say){g.say.t-=dt;if(g.say.t<=0)g.say=null;}
     if(g.stun>0){g.was=false;continue;}
+    if(g.groggy>0){g.groggy-=dt;g.was=false;continue;}
     for(const t of targets){
       const isActive=t.host?true:(t===G.wren)===(G.active==='wren');
       let mul=(t===G.ash?1.45:1)*(isActive?1:.6)*G.rangeMul*(G.maskT>0?.65:1);

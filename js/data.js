@@ -109,7 +109,7 @@ const LEVELS=[
     door; the Ossuary dart trial; a sapper's cache; the yard portcullis drops when the egg is taken and Ashling can raise it
     from inside through the drain */
  mech:{
-  stairs:[{id:'culvert',entry:true,a:[23,27],b:[2,2],label:'Climb the ladder into the keep',labelB:'Climb down to the culvert',kind:'stairs',kindB:'hatch',
+  stairs:[{id:'culvert',entry:true,a:[15,23],b:[2,2],label:'Climb the ladder into the keep',labelB:'Climb down to the culvert',kind:'stairs',kindB:'hatch',
      say:['Shiloh','Inside. Marrow stamps a bone on everything. Look for the bone.']},
    {id:'chute',a:[4,1],b:[2,17],label:'Climb into the coal chute',labelB:'Climb the coal chute',kind:'hatch',kindB:'stairs',
      say:['Shiloh','The cellar. Dark, damp, and nobody guards a coal chute.']},
@@ -118,7 +118,7 @@ const LEVELS=[
   rot:{tiles:[[13,2],[14,2],[13,3],[14,3]],to:[10,18]},
   soft:[1,23,23,27],
   lessons:[
-   {zone:[12,23,15,27],title:'Lure',touch:'The next guard is watching the door. Throw a BELL and slip past while he checks the noise.',keys:'The next guard is watching the door. Throw a bell (R) and slip past while he checks the noise.'},
+   {zone:[12,23,15,27],title:'Lure',touch:'The ladder up is just through the door, and a guard is watching it. Throw a BELL through the door, then slip to the ladder while he turns to check the noise.',keys:'The ladder up is just through the door, and a guard is watching it. Throw a bell (R) through the door, then slip to the ladder while he turns to check the noise.'},
    {zone:[7,23,13,27],title:'Takedown',touch:'He has his back to you. Sneak up behind him and STRIKE.',keys:'He has his back to you. Sneak up behind him and strike (SPACE).'},
    {zone:[1,23,6,27],title:'Sneak',touch:'Loose grates ahead. Hold SNEAK to cross them without a sound.',keys:'Loose grates ahead. Hold SHIFT to sneak across them without a sound.'},
    {zone:[16,23,23,27],title:'The way in',touch:'The ladder in the corner climbs into the keep.',keys:'The ladder in the corner climbs into the keep.'}],
@@ -126,7 +126,7 @@ const LEVELS=[
    {x:8,y:18,kind:'rattle'},{x:11,y:19,kind:'rattle'},{x:12,y:17,kind:'rattle'},{x:7,y:20,kind:'rattle'},
    {x:18,y:17,kind:'dart'},{x:21,y:17,kind:'dart'},{x:17,y:18,kind:'dart'},{x:22,y:18,kind:'dart'},{x:20,y:19,kind:'dart'},{x:18,y:20,kind:'dart'},{x:21,y:20,kind:'dart'},{x:16,y:17,kind:'dart'}],
   guards:[{wp:[[7,17],[13,17],[13,20],[7,20]],name:'Jailer'},
-   {wp:[[11,25]],face:0,name:'Drain-keeper'},{wp:[[20,25]],face:Math.PI,name:'Ladder watch'}],
+   {wp:[[11,25]],face:0,name:'Drain-keeper'},{wp:[[17,23]],face:Math.PI,lureT:5,name:'Ladder watch'}],
   gates:[{id:'yard',x:5,y:8,open:true}],
   ducts:[{id:'drain',tiles:[[8,8]]}],
   levers:[{id:'yardwinch',x:9,y:9,by:'any',label:'Turn the yard winch',fx:{open:'yard',say:['Ashling','Winch turned. Tiny claws, big results.']},once:true}],

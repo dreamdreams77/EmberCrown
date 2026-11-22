@@ -642,6 +642,11 @@ function drawMarkers(g){
     const t=G.time;
     for(let i=0;i<3;i++){const a=t*4+i*2.09;c.fillStyle='#ffe27a';c.beginPath();const sx=g.x+Math.cos(a)*9,sy=g.y-17+Math.sin(a)*3.5;
       c.moveTo(sx,sy-3);c.lineTo(sx+1.2,sy-1);c.lineTo(sx+3,sy);c.lineTo(sx+1.2,sy+1);c.lineTo(sx,sy+3);c.lineTo(sx-1.2,sy+1);c.lineTo(sx-3,sy);c.lineTo(sx-1.2,sy-1);c.fill();}
+    if(g.ko&&g.koMax){ // takedown timer: the ring empties as he comes round, red for the last two seconds
+      const k=Math.max(0,Math.min(1,g.stun/g.koMax)),low=g.stun<2,cy=g.y-30;
+      c.save();c.lineWidth=2.5;c.strokeStyle='rgba(20,14,28,.6)';circ(c,g.x,cy,6);c.stroke();
+      c.strokeStyle=low?(Math.sin(t*14)>0?'#ff5a4a':'#ffb0a0'):'#9fd8ff';c.beginPath();c.arc(g.x,cy,6,-Math.PI/2,-Math.PI/2+k*Math.PI*2);c.stroke();c.restore();
+    }
     return;
   }
   if(g.spin||g.eng)return;

@@ -40,6 +40,8 @@ const CTIPS=[
  'Smoke breaks line of sight, so foes lose track of you. A thrown bell pulls them away.',
  'Hollow Husks block most damage from the front. Slip behind them, or wait for the slam recovery.',
  'Spend cinders at the Ember Forge: extra hearts and Ember Nova make fights far easier.'];
+// before Ashling has hatched (or while she is not with you) the lose screen must not have her speak or advise a swap
+const SOLOQ=[['Shiloh: ...that went poorly.','Shiloh: Again. Slower. Out of the light.'],['Shiloh: Seen. Of course I was seen.','Shiloh: Cones first, then feet.'],['Shiloh: Again?','Shiloh: Again.']];
 const QUIPS=[['Shiloh: ...that went poorly.','Ashling: I said nothing. Loudly.'],['Shiloh: They saw the dragon.','Ashling: They saw a very small, very menacing dragon.'],['Shiloh: Again?','Ashling: I had a plan. It involved less running.']];
 
 const UI=(()=>{
@@ -71,13 +73,13 @@ const UI=(()=>{
     switch(a){
       case'new':if(saved&&!confirmNew){confirmNew=true;show('title');return;}confirmNew=false;newGame();break;
       case'continue':continueGame();break;
-      case'begin':startPlay();break;
+      case'begin':beginMission();break;
       case'hub':if(window.Hub)Hub.enter(lvl);break;
-      case'retry':startPlay();break;
+      case'retry':retryMission();break;
       case'next':continueFromWin();break;
       case'title':if(mode==='pause'&&!confirmQuit){confirmQuit=true;show('pause');return;}confirmQuit=false;toTitle();break;
       case'resume':pauseGame(false);break;
-      case'restart':pauseGame(false);if(G&&G.d.hub){Hub.leave();break;}startPlay();break;
+      case'restart':pauseGame(false);if(G&&G.d.hub){Hub.leave();break;}window.EC_CP=null;startPlay();break;
       case'how':openModal(howHTML());break;
       case'trailer':if(typeof Intro!=='undefined')Intro.open();break;
       case'codex':openJournal('codex');break;
@@ -229,7 +231,9 @@ const UI=(()=>{
       },
       lose(){
         const down=G&&G.defeat==='down';
-        const q=down?DOWNQ[Math.floor(Math.random()*DOWNQ.length)]:QUIPS[Math.floor(Math.random()*QUIPS.length)],tip=(down?CTIPS:TIPS)[Math.floor(Math.random()*(down?CTIPS:TIPS).length)];
+        const solo=!!G&&!G.ash.on,pick=a=>a[Math.floor(Math.random()*a.length)];
+        const tips=(down?CTIPS:TIPS).filter(t=>!solo||!/Ashling|partner|swap|dragon|Nova/i.test(t));
+        const q=solo?pick(SOLOQ):down?pick(DOWNQ):pick(QUIPS),tip=pick(tips.length?tips:(down?CTIPS:TIPS));
         screen('lose over','<h2 style="color:#ff6a5a">'+(down?'OVERWHELMED':'CAUGHT')+'</h2><p class="lead">'+q[0]+'<br>'+q[1]+'</p><p class="tip"><b>Tip.</b> '+tip+'</p>'+
         '<div class="row">'+btn('Retry mission','retry','primary big')+btn('Quit to title','title','ghost')+'</div><p class="foot">press <kbd>Enter</kbd></p>');
       },
