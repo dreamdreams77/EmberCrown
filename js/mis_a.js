@@ -577,7 +577,9 @@ function vis(x,y,m){const v=VR||viewRect();m=m||40;return x>v.x-m&&x<v.x+v.w+m&&
 const SPR=new Map();
 function spr(key,fn){let cv=SPR.get(key);if(!cv){cv=document.createElement("canvas");cv.width=cv.height=T*2;const g=cv.getContext("2d");g.scale(2,2);fn(g);SPR.set(key,cv);}return cv;}
 const oPots=drawPots;
-drawPots=function(){oPots();const s=G&&G.mis;if(!s)return;ctx.save();try{drawFloor(s);}catch(e){console.error(e);}ctx.restore();};
+// the mission floor layer (plates, levers, hatches, caches, grates, gates...). Pixel art mode replaces drawPots (js/lpcprops.js) and calls this itself.
+window.drawMissionFloor=function(){const s=G&&G.mis;if(!s)return;ctx.save();try{drawFloor(s);}catch(e){console.error(e);}ctx.restore();};
+drawPots=function(){oPots();drawMissionFloor();};
 function drawFloor(s){VR=viewRect();M=s;
   const c=ctx,t=G.time;
   for(const o of s.oil)if(vis((o.x+o.w/2)*T,(o.y+o.h/2)*T,o.w*T))drawOil(c,o,t);

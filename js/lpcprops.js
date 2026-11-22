@@ -30,6 +30,7 @@ const LPCP=(function(){
       LPCP.base(ctx,p.kind==='pot'?'pot':'urn',p.x*T+16+sq,p.y*T+T-1);
       if(p.hit>0)p.hit-=.016;
     }
+    if(window.drawMissionFloor)drawMissionFloor(); // the mission's plates, levers, hatches and caches (js/mis_a.js hangs them off drawPots)
   };
   const _drawBraziers=drawBraziers;
   drawBraziers=function(){
