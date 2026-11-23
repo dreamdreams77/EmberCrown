@@ -56,7 +56,7 @@ function frame(t){
   requestAnimationFrame(frame);
 }
 function boot(){
-  loadSettings();loadSave();
+  loadSettings();if(typeof EM!=='undefined'&&EM.applyUI)EM.applyUI();loadSave();
   UI.init();
   layout();
   if(window.ResizeObserver)new ResizeObserver(()=>layout()).observe(document.getElementById('stage'));

@@ -76,7 +76,7 @@ const LEVELS=[
  "#....#.........#.......O#",
  "#....#....g....#........#",
  "#.........#....D........#",
- "####.######....#####.####",
+ "###########....#####.####",
  "#...........#...........#",
  "#.....g.....#.....g.....#",
  "#...........D...........#",
@@ -104,12 +104,12 @@ const LEVELS=[
  "#.....#.......#.........#",
  "#########################"]}]),
  vault:VAULTS[0].info,
- /* mission mechanics (js/mis_a.js): the culvert opening (grates that rattle unless you sneak, a guard with his back turned,
+ /* mission mechanics (js/mis_a.js): the culvert opening (bone-chime boards that rattle unless you sneak, a guard with his back turned,
     a guard watching a door, then a ladder into the keep); coal chute, store hatch and yard well into the cellar; rotten boards before the egg-store
     door; the Ossuary dart trial; a sapper's cache; the yard portcullis drops when the egg is taken and Ashling can raise it
     from inside through the drain */
  mech:{
-  stairs:[{id:'culvert',entry:true,a:[23,27],b:[2,2],label:'Climb the ladder into the keep',labelB:'Climb down to the culvert',kind:'stairs',kindB:'hatch',
+  stairs:[{id:'culvert',entry:true,a:[15,23],b:[2,2],label:'Climb the ladder into the keep',labelB:'Climb down to the culvert',kind:'stairs',kindB:'hatch',
      say:['Shiloh','Inside. Marrow stamps a bone on everything. Look for the bone.']},
    {id:'chute',a:[4,1],b:[2,17],label:'Climb into the coal chute',labelB:'Climb the coal chute',kind:'hatch',kindB:'stairs',
      say:['Shiloh','The cellar. Dark, damp, and nobody guards a coal chute.']},
@@ -118,15 +118,16 @@ const LEVELS=[
   rot:{tiles:[[13,2],[14,2],[13,3],[14,3]],to:[10,18]},
   soft:[1,23,23,27],
   lessons:[
-   {zone:[12,23,15,27],title:'Lure',touch:'The next guard is watching the door. Throw a BELL and slip past while he checks the noise.',keys:'The next guard is watching the door. Throw a bell (R) and slip past while he checks the noise.'},
+   {zone:[12,23,15,27],title:'Lure',touch:'The ladder up is just through the door, and a guard is watching it. Throw a BELL through the door, then slip to the ladder while he turns to check the noise.',keys:'The ladder up is just through the door, and a guard is watching it. Throw a bell (R) through the door, then slip to the ladder while he turns to check the noise.'},
    {zone:[7,23,13,27],title:'Takedown',touch:'He has his back to you. Sneak up behind him and STRIKE.',keys:'He has his back to you. Sneak up behind him and strike (SPACE).'},
-   {zone:[1,23,6,27],title:'Sneak',touch:'Loose grates ahead. Hold SNEAK to cross them without a sound.',keys:'Loose grates ahead. Hold SHIFT to sneak across them without a sound.'},
+   {zone:[1,23,6,27],title:'Sneak',touch:'Loose boards ahead, with bone chimes hung under them. Hold SNEAK to cross without a sound.',keys:'Loose boards ahead, with bone chimes hung under them. Hold SHIFT to sneak across without a sound.'},
+   {zone:[1,1,4,3],title:'The keep',touch:'One guard paces the next room. Wait here until he walks away, then follow him and STRIKE from behind.',keys:'One guard paces the next room. Wait here until he walks away, then follow him and strike (SPACE) from behind.'},
    {zone:[16,23,23,27],title:'The way in',touch:'The ladder in the corner climbs into the keep.',keys:'The ladder in the corner climbs into the keep.'}],
   plates:[{x:6,y:25,kind:'rattle'},{x:7,y:24,kind:'rattle'},{x:7,y:25,kind:'rattle'},{x:7,y:26,kind:'rattle'},
    {x:8,y:18,kind:'rattle'},{x:11,y:19,kind:'rattle'},{x:12,y:17,kind:'rattle'},{x:7,y:20,kind:'rattle'},
    {x:18,y:17,kind:'dart'},{x:21,y:17,kind:'dart'},{x:17,y:18,kind:'dart'},{x:22,y:18,kind:'dart'},{x:20,y:19,kind:'dart'},{x:18,y:20,kind:'dart'},{x:21,y:20,kind:'dart'},{x:16,y:17,kind:'dart'}],
   guards:[{wp:[[7,17],[13,17],[13,20],[7,20]],name:'Jailer'},
-   {wp:[[11,25]],face:0,name:'Drain-keeper'},{wp:[[20,25]],face:Math.PI,name:'Ladder watch'}],
+   {wp:[[11,25]],face:0,name:'Drain-keeper'},{wp:[[17,23]],face:Math.PI,lureT:5,name:'Ladder watch'}],
   gates:[{id:'yard',x:5,y:8,open:true}],
   ducts:[{id:'drain',tiles:[[8,8]]}],
   levers:[{id:'yardwinch',x:9,y:9,by:'any',label:'Turn the yard winch',fx:{open:'yard',say:['Ashling','Winch turned. Tiny claws, big results.']},once:true}],
@@ -139,6 +140,10 @@ const LEVELS=[
   keep:[[1,17,23,20],[1,23,23,27]]},
  inspect:[[1,5,'Scorched Barracks Wall','Tally marks, hundreds of them, ending abruptly. Under the last: "They never opened the egg room. They only fed the fire."'],[23,9,'Marrow Banner, Torn','The banner shows a skull wearing a crown of bone. Someone has stitched a small, careful candle into the corner.']],
  extra:[[9,6,'o'],[20,11,'o'],[3,13,'s']],
+ /* Ember art slice: Ashfall's furniture, room by room. Planned with tools/ember_art/plan.js to survive the game's own clearing rules (js/mis_a.js, js/npcs.js) and to stay
+    off every route, door, plate, stair, item, NPC and mission object, with every item, door, ladder and the Ossuary Walk's plate-free path still reachable.
+    The culvert and cellars stay empty by the mission design. Types are the game's own, so the original art draws them too. */
+ set:[[6,1,'furnace',2,1],[7,3,'cauldron',1,1],[23,3,'altar',1,1],[20,1,'statue',1,1],[2,7,'cot',2,1],[11,5,'weaponrack',1,1],[20,7,'weaponrack',1,1],[23,6,'statue',1,1],[20,5,'bench',2,1],[16,5,'barrels',1,1],[17,13,'longtable',5,1],[13,9,'bookcase',2,1],[13,13,'bench',2,1],[16,9,'weaponrack',1,1],[20,9,'weaponrack',1,1],[8,13,'barrels',1,1],[11,9,'barrels',1,1],[1,10,'sacks',1,1],[5,13,'crates',2,1]],
  guards:[
   [[7,2],[12,2]],
   [[17,2],[22,2],[22,3],[17,3]],

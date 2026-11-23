@@ -303,7 +303,7 @@ function bakeStatic(){
     c.beginPath();for(let i=0;i<5;i++){const a=-1.57+i*2.513;const px=cx+Math.cos(a)*50,py=cy+Math.sin(a)*50;i?c.lineTo(px,py):c.moveTo(px,py);}c.closePath();c.stroke();
   }
   // wall shadows on floors
-  if(!G.flight)for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){
+  if(!G.flight&&!(typeof EM!=='undefined'&&EM.env.ready()))for(let y=0;y<gh;y++)for(let x=0;x<gw;x++){ // Ember art draws its own dithered shadow tiles
     if(isW(x,y))continue;
     const px=x*T,py=y*T;
     if(isW(x,y-1)){const g=c.createLinearGradient(0,py,0,py+14);g.addColorStop(0,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(px,py,T,14);}
@@ -408,9 +408,11 @@ function drawLights(c,list,amb){
   c.fillStyle='rgba('+amb[0]+','+amb[1]+','+amb[2]+','+amb[3]+')';c.fillRect(0,0,LT.cv.width,LT.cv.height);
   c.globalCompositeOperation='destination-out';
   const spr=lightSprite();
+  const stp=typeof EM!=='undefined'&&EM.env.ready();
   for(const l of list){
     c.globalAlpha=clamp(l.a,0,1);
-    c.drawImage(spr,(l.x-l.r)/k,(l.y-l.r)/k,l.r*2/k,l.r*2/k);
+    if(stp){const s=EM.env.stepped('l',l.r,k);c.drawImage(s,Math.round((l.x-l.r)/k),Math.round((l.y-l.r)/k),s.width,s.height);}
+    else c.drawImage(spr,(l.x-l.r)/k,(l.y-l.r)/k,l.r*2/k,l.r*2/k);
   }
   c.globalAlpha=1;c.globalCompositeOperation='source-over';
 }
@@ -442,7 +444,8 @@ function collectLights(){
   if(!G.flight)add(G.wren.x,G.wren.y,G.active==='wren'?96:70,.85,'210,200,255',.12);
   if(G.ash.on)add(G.ash.x,G.ash.y,G.active==='ash'?118:92,.95,'255,150,70',.4);
   if(G.host&&G.host.on)add(G.host.x,G.host.y,50,.55,'160,220,255',.2);
-  if(G.fireOn){const a=G.ash;add(a.x+Math.cos(a.face)*40,a.y+Math.sin(a.face)*40,150,1,'255,150,50',.8);}
+  if(G.fireOn){const a=G.ash,em=typeof EM!=='undefined'&&EM.on(); // Ember art: a warm pool that keeps the floor's detail, not a white-out
+    add(a.x+Math.cos(a.face)*40,a.y+Math.sin(a.face)*40,em?128:150,em?.85:1,em?'255,138,44':'255,150,50',em?.4:.8);}
   for(const g of G.guards){
     if(g.spin)continue;
     if(g.stun>0||g.dead)continue;
@@ -461,6 +464,8 @@ function drawDarkness(){
   if(G.d.finale)amb[3]=clamp(amb[3]+(5-Math.min(5,G.candlesLit||0))*.055,0,.8);
   amb[3]=clamp(amb[3]+(G.shiftT>0?.1*G.shiftT:0),0,.85);
   if(typeof PX!=='undefined'&&PX.active)amb[3]=Math.min(.74,amb[3]+.2); // deeper shadow in pixel mode so lit figures stand out
+  const em=typeof EM!=='undefined'&&EM.env.ready(); // Ember art: cool ambient, pixel-stepped light at 2 world units per cell
+  if(em){LT.k=(typeof Q!=='undefined'&&Q.tier>=2)?4:2;amb=EM.env.ambient(amb);}else LT.k=4; // cheaper cells once the game has dropped quality
   const W=G.gw*T,H=G.gh*T,k=LT.k;
   const lw=Math.ceil(W/k),lh=Math.ceil(H/k);
   if(LT.cv.width!==lw||LT.cv.height!==lh){LT.cv.width=lw;LT.cv.height=lh;}
@@ -473,12 +478,15 @@ function drawDarkness(){
   gc.globalCompositeOperation='source-over';gc.globalAlpha=1;gc.clearRect(0,0,lw,lh);
   gc.globalCompositeOperation='lighter';
   for(const l of list){
-    const ga=l.gl*.5*l.a;if(ga<.06)continue; // too faint to see: skip the draw
-    gc.globalAlpha=Math.min(ga,.7);
-    const rr_=l.r*1.15;gc.drawImage(glowSprite(l.col),(l.x-rr_)/k,(l.y-rr_)/k,rr_*2/k,rr_*2/k);
+    let mult=1;if(em){const cc=String(l.col).split(',');mult=(+cc[2]>+cc[0])?1.15:2.3;} // warm light gets the pool; cool light (vault wards, the exit) stays gentle
+    const ga=l.gl*.5*l.a*mult;if(ga<.06)continue; // too faint to see: skip the draw
+    gc.globalAlpha=Math.min(ga,em?.8:.7);
+    const rr_=l.r*1.15;
+    if(em){const s=EM.env.stepped('g',rr_,k,l.col);gc.drawImage(s,Math.round((l.x-rr_)/k),Math.round((l.y-rr_)/k),s.width,s.height);}
+    else gc.drawImage(glowSprite(l.col),(l.x-rr_)/k,(l.y-rr_)/k,rr_*2/k,rr_*2/k);
   }
   gc.globalAlpha=1;gc.globalCompositeOperation='source-over';
-  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingEnabled=!em;
   blitVisible(LT.cv,1/k,k);
   ctx.globalCompositeOperation='lighter';blitVisible(GL.cv,1/k,k);ctx.globalCompositeOperation='source-over';
 }
@@ -634,9 +642,15 @@ function drawMarkers(g){
     const t=G.time;
     for(let i=0;i<3;i++){const a=t*4+i*2.09;c.fillStyle='#ffe27a';c.beginPath();const sx=g.x+Math.cos(a)*9,sy=g.y-17+Math.sin(a)*3.5;
       c.moveTo(sx,sy-3);c.lineTo(sx+1.2,sy-1);c.lineTo(sx+3,sy);c.lineTo(sx+1.2,sy+1);c.lineTo(sx,sy+3);c.lineTo(sx-1.2,sy+1);c.lineTo(sx-3,sy);c.lineTo(sx-1.2,sy-1);c.fill();}
+    if(g.ko&&g.koMax){ // takedown timer: the ring empties as he comes round, red for the last two seconds
+      const k=Math.max(0,Math.min(1,g.stun/g.koMax)),low=g.stun<2,cy=g.y-30;
+      c.save();c.lineWidth=2.5;c.strokeStyle='rgba(20,14,28,.6)';circ(c,g.x,cy,6);c.stroke();
+      c.strokeStyle=low?(Math.sin(t*14)>0?'#ff5a4a':'#ffb0a0'):'#9fd8ff';c.beginPath();c.arc(g.x,cy,6,-Math.PI/2,-Math.PI/2+k*Math.PI*2);c.stroke();c.restore();
+    }
     return;
   }
   if(g.spin||g.eng)return;
+  if(g.run&&typeof beaconItem==='function'){const B=beaconItem();if(B&&!B.done){c.save();c.setLineDash([6,6]);c.lineDashOffset=-G.time*30;c.strokeStyle='rgba(255,120,40,.55)';c.lineWidth=2;c.beginPath();c.moveTo(g.x,g.y);c.lineTo(B.x,B.y);c.stroke();c.restore();}} // where the runner is heading
   if(g.run){c.save();c.strokeStyle='rgba(255,120,40,.9)';c.lineWidth=2;circ(c,g.x,g.y,16+Math.sin(G.time*10)*2);c.stroke();c.fillStyle='rgba(255,140,60,.9)';c.font='bold 9px '+BODY;c.textAlign='center';c.fillText('RUNNER',g.x,g.y+26);c.restore();}
   if(g.say){
     const k=Math.min(1,g.say.t/.3,(1.7-g.say.t)/.12+.01);

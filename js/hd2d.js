@@ -1,53 +1,28 @@
 /* EMBERCROWN - HD-2D lighting for the pixel-art mode.
    The pixel pass (js/pixel.js) draws the world on a hard-edged pixel grid. This layer adds smooth, modern
    light on top of it at full resolution, the way HD-2D games light pixel sprites:
-   - bloom: soft additive halos and hot cores around flames, braziers, beacons, candles and Ashling's fire;
+   - bloom: tight additive pools and hot cores around flames, braziers, beacons, candles and Ashling's fire;
    - light shafts: faint warm beams falling from wall torches;
    - dust motes drifting slowly through the light pools;
-   - tilt-shift depth of field: the top and bottom of the screen go softly out of focus;
    - grade and vignette: warm light, cool shadow, darker corners.
    Only while pixel art is on, and settings.hd2d is not false ("HD-2D light" in the pause menu).
-   Cost is a few full-screen draws; the quality tiers drop depth of field and dust first. */
+   Cost is a few full-screen draws; the quality tiers drop the shafts and dust first. */
 'use strict';
 const HD2D=(function(){
-  const blur={cv:document.createElement('canvas')},mask={cv:document.createElement('canvas')};
   const motes=[];let gradKey='',gradC=null,vigKey='',vigC=null;
   function on(){return typeof PX!=='undefined'&&PX.on()&&settings.hd2d!==false&&mode!=='title';}
   function rnd(a,b){return a+Math.random()*(b-a);}
-
-  // Depth of field: a low-resolution, smoothed copy of the pixel buffer drawn over the top and bottom bands,
-  // faded in with a vertical mask so the middle stays sharp.
-  function dof(main,W,H){
-    if(Q.tier>=2)return;
-    const src=PX.cv;if(!src.width)return;
-    const k=V.coarse?.14:.16,bw=Math.max(8,Math.round(W*k)),bh=Math.max(8,Math.round(H*k));
-    if(blur.cv.width!==bw||blur.cv.height!==bh){blur.cv.width=bw;blur.cv.height=bh;}
-    const b=blur.cv.getContext('2d');
-    b.globalCompositeOperation='source-over';b.imageSmoothingEnabled=true;b.clearRect(0,0,bw,bh);
-    b.drawImage(main.canvas,0,0,W,H,0,0,bw,bh);                       // downsample the finished world frame
-    const key=bw+'x'+bh;
-    if(mask.key!==key){                                              // vertical focus mask: sharp band in the middle
-      mask.cv.width=1;mask.cv.height=bh;mask.key=key;const m=mask.cv.getContext('2d');
-      const g=m.createLinearGradient(0,0,0,bh);
-      g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(.26,'rgba(0,0,0,0)');g.addColorStop(.74,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,1)');
-      m.fillStyle=g;m.fillRect(0,0,1,bh);
-    }
-    b.globalCompositeOperation='destination-in';b.drawImage(mask.cv,0,0,bw,bh);
-    main.save();main.setTransform(1,0,0,1,0,0);main.imageSmoothingEnabled=true;main.imageSmoothingQuality='high';
-    main.drawImage(blur.cv,0,0,W,H);main.restore();
-  }
 
   // Bloom and light shafts, in world space over the upscaled pixels.
   function bloom(main){
     if(typeof collectLights!=='function')return;
     const L=collectLights(),t=G.time;
     // dark levels get full bloom, bright halls much less (otherwise warm rooms blow out to white)
-    const amb=(G.d.th&&G.d.th.amb)?G.d.th.amb[3]:.3,K=Math.max(.22,Math.min(.75,(amb-.12)*2.2));
+    const amb=(G.d.th&&G.d.th.amb)?G.d.th.amb[3]:.3,K=Math.max(.22,Math.min(.75,(amb-.12)*2.2))*.5;
     main.save();setWorldTransform();main.globalCompositeOperation='lighter';main.imageSmoothingEnabled=true;
     for(const l of L){
       if(!l.gl||l.gl<.35||l.a<.5)continue;
       const fl=1+Math.sin(t*7+l.x*.13)*.05,r=Math.min(220,l.r*.95)*fl;
-      main.globalAlpha=Math.min(.42,l.gl*.38)*K;main.drawImage(glowSprite(l.col),l.x-r*1.5,l.y-r*1.5,r*3,r*3); // wide soft halo
       main.globalAlpha=Math.min(.6,l.gl*.55)*K;main.drawImage(glowSprite(l.col),l.x-r*.55,l.y-r*.55,r*1.1,r*1.1); // bright pool
       const rc=Math.min(30,r*.16);main.globalAlpha=Math.min(.9,l.gl*.9)*(.5+.5*K);main.drawImage(glowSprite('255,244,214'),l.x-rc,l.y-rc,rc*2,rc*2);
     }
@@ -104,7 +79,8 @@ const HD2D=(function(){
     if(!on())return;
     const main=ctx,W=main.canvas.width,H=main.canvas.height;
     const dt=lastT==null?0:Math.min(.05,Math.max(0,G.time-lastT));lastT=G.time;
-    dof(main,W,H);bloom(main);dust(main,dt);grade(main,W,H);
+    // no depth-of-field blur and no wide halo: over pixel art they smear the pixels and wash bright halls out
+    bloom(main);dust(main,dt);grade(main,W,H);
     main.globalAlpha=1;main.globalCompositeOperation='source-over';
   }
   return{on,post};

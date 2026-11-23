@@ -40,6 +40,8 @@ const CTIPS=[
  'Smoke breaks line of sight, so foes lose track of you. A thrown bell pulls them away.',
  'Hollow Husks block most damage from the front. Slip behind them, or wait for the slam recovery.',
  'Spend cinders at the Ember Forge: extra hearts and Ember Nova make fights far easier.'];
+// before Ashling has hatched (or while she is not with you) the lose screen must not have her speak or advise a swap
+const SOLOQ=[['Shiloh: ...that went poorly.','Shiloh: Again. Slower. Out of the light.'],['Shiloh: Seen. Of course I was seen.','Shiloh: Cones first, then feet.'],['Shiloh: Again?','Shiloh: Again.']];
 const QUIPS=[['Shiloh: ...that went poorly.','Ashling: I said nothing. Loudly.'],['Shiloh: They saw the dragon.','Ashling: They saw a very small, very menacing dragon.'],['Shiloh: Again?','Ashling: I had a plan. It involved less running.']];
 
 const UI=(()=>{
@@ -71,13 +73,13 @@ const UI=(()=>{
     switch(a){
       case'new':if(saved&&!confirmNew){confirmNew=true;show('title');return;}confirmNew=false;newGame();break;
       case'continue':continueGame();break;
-      case'begin':startPlay();break;
+      case'begin':beginMission();break;
       case'hub':if(window.Hub)Hub.enter(lvl);break;
-      case'retry':startPlay();break;
+      case'retry':retryMission();break;
       case'next':continueFromWin();break;
       case'title':if(mode==='pause'&&!confirmQuit){confirmQuit=true;show('pause');return;}confirmQuit=false;toTitle();break;
       case'resume':pauseGame(false);break;
-      case'restart':pauseGame(false);if(G&&G.d.hub){Hub.leave();break;}startPlay();break;
+      case'restart':pauseGame(false);if(G&&G.d.hub){Hub.leave();break;}window.EC_CP=null;startPlay();break;
       case'how':openModal(howHTML());break;
       case'trailer':if(typeof Intro!=='undefined')Intro.open();break;
       case'codex':openJournal('codex');break;
@@ -89,6 +91,7 @@ const UI=(()=>{
       case'music':settings.music=!settings.music;Aud.setOpt('music',settings.music);saveSettings();refresh();break;
       case'minimap':settings.minimap=!settings.minimap;saveSettings();refresh();break;
       case'shake':settings.shake=!settings.shake;saveSettings();refresh();break;
+      case'ember':settings.ember=settings.ember===false;saveSettings();if(typeof EM!=='undefined'&&EM.applyUI)EM.applyUI();if(typeof G!=='undefined'&&G)G.dirty=true;refresh();break;
       case'hd2d':settings.hd2d=settings.hd2d===false;saveSettings();refresh();break;
       case'lpc':settings.lpc=!settings.lpc;saveSettings();if(typeof G!=='undefined'&&G)G.dirty=true;refresh();break;
       case'perk1':case'perk2':case'perk3':pickPerk(+a.slice(4));break;
@@ -101,8 +104,8 @@ const UI=(()=>{
     const m=mode;if(m==='title'||m==='pause')show(m);
   }
   function toggles(){
-    const t=(k,l)=>'<button type="button" tabindex="-1" class="tog'+(settings[k]?' on':'')+'" data-a="'+k+'"><span>'+l+'</span><i>'+(settings[k]?'On':'Off')+'</i></button>';
-    return'<div class="togs">'+t('sfx','Sound effects')+t('music','Music')+t('minimap','Minimap')+t('shake','Screen shake')+t('lpc','Pixel art')+t('hd2d','HD-2D light')+'</div>';
+    const t=(k,l)=>{const v=k==='ember'?settings.ember!==false:settings[k];return'<button type="button" tabindex="-1" class="tog'+(v?' on':'')+'" data-a="'+k+'"><span>'+l+'</span><i>'+(v?'On':'Off')+'</i></button>';};
+    return'<div class="togs">'+t('sfx','Sound effects')+t('music','Music')+t('minimap','Minimap')+t('shake','Screen shake')+t('lpc','Pixel art')+t('ember','Ember (beta)')+t('hd2d','HD-2D light')+'</div>';
   }
   function howHTML(){
     return'<h2>How to play</h2><div class="howgrid">'+
@@ -192,7 +195,7 @@ const UI=(()=>{
         const stand=(R.f+R.e+R.r>0)?'<div class="stand"><b>Standing</b> Favor '+R.f+' &middot; Fear '+R.e+' &middot; Ruin '+R.r+'<br><span>Suspicion fades '+Math.round((R.decay-1)*100)+'% faster &middot; guard sight -'+Math.round((1-R.sight)*100)+'% &middot; alert gain +'+Math.round((R.gain-1)*100)+'% &middot; guards fled '+R.fled+'</span></div>':'';
         let fin='';if(d.finale){const hc=houseCounts();fin='<div class="stand"><span>Favor sends +'+Math.min(3,hc.f)+' whisper bells &middot; Fear stands down '+Math.min(3,hc.e)+' guards &middot; Ruin: he starts at '+(100-8*hc.r)+' HP</span></div>';}
         const rel=run.relics.length?'<div class="relrow">'+run.relics.map(k=>'<span title="'+RELICS[k].name+'">'+ricon(RELICS[k].icon)+'</span>').join('')+'</div>':'';
-        screen('brief','<div class="bleft">'+sigil(d.sigil)+'<div class="mnum">Mission '+(lvl+1)+' of '+LEVELS.length+'</div><h2>'+d.name+'</h2><div class="house">'+d.house+'</div>'+rel+'</div>'+
+        screen('brief m'+lvl,'<div class="bleft">'+sigil(d.sigil)+'<div class="mnum">Mission '+(lvl+1)+' of '+LEVELS.length+'</div><h2>'+d.name+'</h2><div class="house">'+d.house+'</div>'+rel+'</div>'+
         '<div class="bright"><div class="intro">'+d.intro.map(l=>l?'<p>'+l+'</p>':'<div class="gap"></div>').join('')+'</div>'+stand+fin+(window.NPC?NPC.briefHtml(lvl):'')+btn('Begin mission','begin','primary big')+'<div class="row">'+(window.Hub&&Hub.canVisit(lvl)?btn('The Rookery','hub','ghost small'):'')+(run.cinders>0||run.talents.length?btn('Ember Forge'+forgeBadge(),'forge','ghost small'):'')+btn('Gear &amp; hero','journal','ghost small')+(lvl>0?btn('Case file','case','ghost small'):'')+'</div><p class="foot">press <kbd>Enter</kbd> &middot; <kbd>J</kbd> journal</p></div>');
       },
       court(){
@@ -228,7 +231,9 @@ const UI=(()=>{
       },
       lose(){
         const down=G&&G.defeat==='down';
-        const q=down?DOWNQ[Math.floor(Math.random()*DOWNQ.length)]:QUIPS[Math.floor(Math.random()*QUIPS.length)],tip=(down?CTIPS:TIPS)[Math.floor(Math.random()*(down?CTIPS:TIPS).length)];
+        const solo=!!G&&!G.ash.on,pick=a=>a[Math.floor(Math.random()*a.length)];
+        const tips=(down?CTIPS:TIPS).filter(t=>!solo||!/Ashling|partner|swap|dragon|Nova/i.test(t));
+        const q=solo?pick(SOLOQ):down?pick(DOWNQ):pick(QUIPS),tip=pick(tips.length?tips:(down?CTIPS:TIPS));
         screen('lose over','<h2 style="color:#ff6a5a">'+(down?'OVERWHELMED':'CAUGHT')+'</h2><p class="lead">'+q[0]+'<br>'+q[1]+'</p><p class="tip"><b>Tip.</b> '+tip+'</p>'+
         '<div class="row">'+btn('Retry mission','retry','primary big')+btn('Quit to title','title','ghost')+'</div><p class="foot">press <kbd>Enter</kbd></p>');
       },

@@ -403,7 +403,7 @@ function resolveStrike(){
     const behind=angDiff(Math.atan2(A.y-g.y,A.x-g.x),g.face)>1.5,unaware=!g.seeing&&g.stun<=0;
     hit++;
     if(unaware&&behind&&!g.lure){ // silent takedown
-      g.hitT=G.time;g.stun=Math.max(g.stun,hasT('silent')?16:9);g.ko=true;G.st.takedowns=(G.st.takedowns||0)+1;G.st.stuns++;
+      g.hitT=G.time;g.stun=Math.max(g.stun,hasT('silent')?16:9);g.koMax=g.stun;g.ko=true;G.st.takedowns=(G.st.takedowns||0)+1;G.st.stuns++;
       floatText(g.x,g.y-24,'TAKEDOWN','#9fd8ff',12);hitstop(.1);punch(.6);shake(5);
       burst(g.x,g.y,18,'#bfe4ff',130,.4,2,{add:true});Aud.S.hit();
       if(!hasT('silent'))lureNear(g.x,g.y,2*T,true);
