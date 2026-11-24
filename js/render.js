@@ -683,6 +683,12 @@ function visPoly(g,range,half){
 /* A flashlight-style beam: soft outer falloff, a brighter core, only a whisper of an outline. */
 function drawCones(){
   const c=ctx;
+  if(G.spawn){ // the starting cover: a faint ring, labelled while someone stands in it
+    const S=G.spawn,inside=[G.wren,G.ash.on?G.ash:null].some(a=>a&&Math.hypot(a.x-S.x,a.y-S.y)<S.r);
+    c.save();c.setLineDash([4,5]);c.strokeStyle=inside?'rgba(160,220,255,.55)':'rgba(160,220,255,.25)';c.lineWidth=1.5;c.beginPath();c.arc(S.x,S.y,S.r,0,6.283);c.stroke();
+    if(inside){c.setLineDash([]);c.fillStyle='rgba(190,230,255,.85)';c.font='bold 8px '+BODY;c.textAlign='center';c.fillText('COVER',S.x,S.y+S.r+9);}
+    c.restore();
+  }
   for(const g of G.guards){
     if(g.stun>0||g.dead||g.eng)continue;
     const range=5.2*T*G.rangeMul*(G.maskT>0?.65:1)*(g.rm||1)*(g.kr||1);
