@@ -333,6 +333,9 @@ function startPlay(){
   PT.length=0;
   attempts[lvl]=(attempts[lvl]||0)+1;
   G=loadLevel(lvl);
+  // the starting spot is cover: nobody sees or smells Shiloh or Ashling there, so a mission never opens in a guard's sight
+  // (set after loadLevel, so a Retry checkpoint such as the top of Ashfall's ladder is covered too)
+  if(!G.flight)G.spawn={x:G.wren.x,y:G.wren.y,r:1.15*T};
   setMode('play');
   Aud.S.confirm();
   Aud.setTheme(G.d.th.music);Aud.ambient(G.d.th.bg);
@@ -926,6 +929,7 @@ function update(dt){
     if(g.stun>0){g.was=false;continue;}
     if(g.groggy>0){g.groggy-=dt;g.was=false;continue;}
     for(const t of targets){
+      if(G.spawn&&!t.host&&Math.hypot(t.x-G.spawn.x,t.y-G.spawn.y)<G.spawn.r)continue; // in the starting cover
       const isActive=t.host?true:(t===G.wren)===(G.active==='wren');
       let mul=(t===G.ash?1.45:1)*(isActive?1:.6)*G.rangeMul*(G.maskT>0?.65:1);
       if(t!==G.ash){if(t._LT!==G.time){t._LT=G.time;t._L=lightAt(t.x,t.y)*(t===G.wren?1-Math.min(.6,equipBonus('shade')):1);}mul*=.78+.55*t._L;if(t===G.wren)G.expo=t._L;}
