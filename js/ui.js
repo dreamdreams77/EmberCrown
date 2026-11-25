@@ -41,6 +41,7 @@ const CTIPS=[
  'Hollow Husks block most damage from the front. Slip behind them, or wait for the slam recovery.',
  'Spend cinders at the Ember Forge: extra hearts and Ember Nova make fights far easier.'];
 // before Ashling has hatched (or while she is not with you) the lose screen must not have her speak or advise a swap
+const SOLODOWNQ=[['Shiloh: Ow.','Shiloh: Fine. I can fight. I would rather not.'],['Shiloh: Too many of them.','Shiloh: Next time, the dark way round.'],['Shiloh: Dodge.','Shiloh: The word is dodge.']];
 const SOLOQ=[['Shiloh: ...that went poorly.','Shiloh: Again. Slower. Out of the light.'],['Shiloh: Seen. Of course I was seen.','Shiloh: Cones first, then feet.'],['Shiloh: Again?','Shiloh: Again.']];
 const QUIPS=[['Shiloh: ...that went poorly.','Ashling: I said nothing. Loudly.'],['Shiloh: They saw the dragon.','Ashling: They saw a very small, very menacing dragon.'],['Shiloh: Again?','Ashling: I had a plan. It involved less running.']];
 
@@ -233,7 +234,7 @@ const UI=(()=>{
         const down=G&&G.defeat==='down';
         const solo=!!G&&!G.ash.on,pick=a=>a[Math.floor(Math.random()*a.length)];
         const tips=(down?CTIPS:TIPS).filter(t=>!solo||!/Ashling|partner|swap|dragon|Nova/i.test(t));
-        const q=solo?pick(SOLOQ):down?pick(DOWNQ):pick(QUIPS),tip=pick(tips.length?tips:(down?CTIPS:TIPS));
+        const q=down?(solo?pick(SOLODOWNQ):pick(DOWNQ)):solo?pick(SOLOQ):pick(QUIPS),tip=pick(tips.length?tips:(down?CTIPS:TIPS));
         screen('lose over','<h2 style="color:#ff6a5a">'+(down?'OVERWHELMED':'CAUGHT')+'</h2><p class="lead">'+q[0]+'<br>'+q[1]+'</p><p class="tip"><b>Tip.</b> '+tip+'</p>'+
         '<div class="row">'+btn('Retry mission','retry','primary big')+btn('Quit to title','title','ghost')+'</div><p class="foot">press <kbd>Enter</kbd></p>');
       },

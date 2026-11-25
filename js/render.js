@@ -489,6 +489,7 @@ function drawDarkness(){
   ctx.imageSmoothingEnabled=!em;
   blitVisible(LT.cv,1/k,k);
   ctx.globalCompositeOperation='lighter';blitVisible(GL.cv,1/k,k);ctx.globalCompositeOperation='source-over';
+  ctx.imageSmoothingEnabled=true; // Ember draws the light hard-edged; later passes expect smoothing back on
 }
 /* draw only the part of a baked layer that is on screen: src px per world unit = sc */
 function blitVisible(src,sc,upscale){
@@ -636,21 +637,41 @@ function drawGuest(s){
   for(let i=0;i<3;i++){c.fillStyle=['#fff','#ffd27a','#c8b4ff'][i];c.beginPath();c.moveTo(-2+i*2,-4.4);c.lineTo(-3+i*3,-9);c.lineTo(-1+i*2,-4.4);c.fill();}
   c.restore();
 }
+/* Gameplay markers shared by every art mode (the drawn art, pixel art and the Ember beta all call these). */
+function drawCoverRing(c){
+  if(!G.spawn)return;{ // the starting cover: a faint ring, labelled while someone stands in it
+    const S=G.spawn,inside=[G.wren,G.ash.on?G.ash:null].some(a=>a&&Math.hypot(a.x-S.x,a.y-S.y)<S.r);
+    c.save();c.setLineDash([4,5]);c.strokeStyle=inside?'rgba(160,220,255,.55)':'rgba(160,220,255,.25)';c.lineWidth=1.5;c.beginPath();c.arc(S.x,S.y,S.r,0,6.283);c.stroke();
+    if(inside){c.setLineDash([]);c.fillStyle='rgba(190,230,255,.85)';c.font='bold 8px '+BODY;c.textAlign='center';c.fillText('COVER',S.x,S.y+S.r+9);}
+    c.restore();
+  }
+}
+function drawScentRing(c,g){
+  if(g.kind!=='hound')return;
+  c.strokeStyle='rgba(255,150,80,.2)';c.setLineDash([3,4]);circ(c,g.x,g.y,2.5*T*G.rangeMul);c.stroke();c.setLineDash([]);
+}
+function drawKoRing(c,g){
+  const t=G.time;
+  if(g.ko&&g.koMax){ // takedown timer: the ring empties as he comes round, red for the last two seconds
+      const k=Math.max(0,Math.min(1,g.stun/g.koMax)),low=g.stun<2,cy=g.y-30;
+      c.save();c.lineWidth=2.5;c.strokeStyle='rgba(20,14,28,.6)';circ(c,g.x,cy,6);c.stroke();
+      c.strokeStyle=low?(Math.sin(t*14)>0?'#ff5a4a':'#ffb0a0'):'#9fd8ff';c.beginPath();c.arc(g.x,cy,6,-Math.PI/2,-Math.PI/2+k*Math.PI*2);c.stroke();c.restore();
+    }
+}
+function drawRunnerPath(c,g){
+  if(g.run&&typeof beaconItem==='function'){const B=beaconItem();if(B&&!B.done){c.save();c.setLineDash([6,6]);c.lineDashOffset=-G.time*30;c.strokeStyle='rgba(255,120,40,.55)';c.lineWidth=2;c.beginPath();c.moveTo(g.x,g.y);c.lineTo(B.x,B.y);c.stroke();c.restore();}} // where the runner is heading
+}
 function drawMarkers(g){
   const c=ctx;
   if(g.stun>0&&!g.dead){
     const t=G.time;
     for(let i=0;i<3;i++){const a=t*4+i*2.09;c.fillStyle='#ffe27a';c.beginPath();const sx=g.x+Math.cos(a)*9,sy=g.y-17+Math.sin(a)*3.5;
       c.moveTo(sx,sy-3);c.lineTo(sx+1.2,sy-1);c.lineTo(sx+3,sy);c.lineTo(sx+1.2,sy+1);c.lineTo(sx,sy+3);c.lineTo(sx-1.2,sy+1);c.lineTo(sx-3,sy);c.lineTo(sx-1.2,sy-1);c.fill();}
-    if(g.ko&&g.koMax){ // takedown timer: the ring empties as he comes round, red for the last two seconds
-      const k=Math.max(0,Math.min(1,g.stun/g.koMax)),low=g.stun<2,cy=g.y-30;
-      c.save();c.lineWidth=2.5;c.strokeStyle='rgba(20,14,28,.6)';circ(c,g.x,cy,6);c.stroke();
-      c.strokeStyle=low?(Math.sin(t*14)>0?'#ff5a4a':'#ffb0a0'):'#9fd8ff';c.beginPath();c.arc(g.x,cy,6,-Math.PI/2,-Math.PI/2+k*Math.PI*2);c.stroke();c.restore();
-    }
+    drawKoRing(c,g);
     return;
   }
   if(g.spin||g.eng)return;
-  if(g.run&&typeof beaconItem==='function'){const B=beaconItem();if(B&&!B.done){c.save();c.setLineDash([6,6]);c.lineDashOffset=-G.time*30;c.strokeStyle='rgba(255,120,40,.55)';c.lineWidth=2;c.beginPath();c.moveTo(g.x,g.y);c.lineTo(B.x,B.y);c.stroke();c.restore();}} // where the runner is heading
+  drawRunnerPath(c,g);
   if(g.run){c.save();c.strokeStyle='rgba(255,120,40,.9)';c.lineWidth=2;circ(c,g.x,g.y,16+Math.sin(G.time*10)*2);c.stroke();c.fillStyle='rgba(255,140,60,.9)';c.font='bold 9px '+BODY;c.textAlign='center';c.fillText('RUNNER',g.x,g.y+26);c.restore();}
   if(g.say){
     const k=Math.min(1,g.say.t/.3,(1.7-g.say.t)/.12+.01);
@@ -683,12 +704,7 @@ function visPoly(g,range,half){
 /* A flashlight-style beam: soft outer falloff, a brighter core, only a whisper of an outline. */
 function drawCones(){
   const c=ctx;
-  if(G.spawn){ // the starting cover: a faint ring, labelled while someone stands in it
-    const S=G.spawn,inside=[G.wren,G.ash.on?G.ash:null].some(a=>a&&Math.hypot(a.x-S.x,a.y-S.y)<S.r);
-    c.save();c.setLineDash([4,5]);c.strokeStyle=inside?'rgba(160,220,255,.55)':'rgba(160,220,255,.25)';c.lineWidth=1.5;c.beginPath();c.arc(S.x,S.y,S.r,0,6.283);c.stroke();
-    if(inside){c.setLineDash([]);c.fillStyle='rgba(190,230,255,.85)';c.font='bold 8px '+BODY;c.textAlign='center';c.fillText('COVER',S.x,S.y+S.r+9);}
-    c.restore();
-  }
+  drawCoverRing(c);
   for(const g of G.guards){
     if(g.stun>0||g.dead||g.eng)continue;
     const range=5.2*T*G.rangeMul*(G.maskT>0?.65:1)*(g.rm||1)*(g.kr||1);
@@ -710,8 +726,6 @@ function drawCones(){
       c.beginPath();pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.closePath();
       c.strokeStyle='rgba('+col+','+(seeing?.8:alert?.55:.4)+')';c.lineWidth=1;c.stroke();
     }else{c.strokeStyle='rgba('+col+','+(seeing?.5:.12)+')';c.lineWidth=seeing?1.4:1;c.stroke();}
-    if(g.kind==='hound'){ // scent radius
-      c.strokeStyle='rgba(255,150,80,.2)';c.setLineDash([3,4]);circ(c,g.x,g.y,2.5*T*G.rangeMul);c.stroke();c.setLineDash([]);
-    }
+    drawScentRing(c,g);
   }
 }

@@ -264,6 +264,7 @@ function activate(t){
   } else if(t.mk==='stairs'){
     if(r.entry&&t.to===r.b)window.EC_CP={lvl,retry:false}; // checkpoint for Retry (see the level setup above)
     travel(t.to,r);
+    if(!G.flight)G.spawn={x:G.wren.x,y:G.wren.y,r:1.15*T}; // a moment of cover at the other end, as at the start
   } else if(t.mk==='livery'){
     r.on=true;r.uses--;r.run=0;Aud.S.swap();burst(G.wren.x,G.wren.y,14,'#e8c060',50,.6,2,{add:true});
     toast('Servant livery','Walk (hold SNEAK) and nobody looks twice. Running, the steward or Ashling at your side give you away.','#e8c060');

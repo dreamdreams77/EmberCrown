@@ -993,6 +993,8 @@ function update(dt){
   stepCombat(dt);
   // timers
   stepTorches(dt);stepFeast(dt);stepAlarm(dt);stepPartner(dt);
+  // the starting cover is for the start only: it lapses a moment after Shiloh first steps out of it
+  if(G.spawn){const S=G.spawn,d=Math.hypot(G.wren.x-S.x,G.wren.y-S.y);if(d>S.r+4){S.out=(S.out||0)+dt;if(S.out>1.2)G.spawn=null;}}
   G.smoke=G.smoke.filter(s=>(s.t-=dt)>0);
   G.rings=G.rings.filter(r=>(r.t-=dt)>0);
   if(G.msgT>0)G.msgT-=dt;

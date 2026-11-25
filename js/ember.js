@@ -297,7 +297,7 @@ EM.env=(function(){
   /* doors and gates */
   function door(d){
     const c=ctx,x=d.x*T,y=d.y*T,R=ruin()?'ruin_':'';
-    if(d.open){const n=R&&M.set2.ruin_door_open?'ruin_door_open':'door_open';return s2(c,n,x,y);}
+    if(d.open&&!d.gate){const n=R&&M.set2.ruin_door_open?'ruin_door_open':'door_open';return s2(c,n,x,y);}
     if(d.gate){
       s2(c,d.open?'gate_open':'gate_closed',x,y);
       if(!d.open){const p=.5+.5*Math.sin(G.time*3);
@@ -373,7 +373,7 @@ EM.env=(function(){
   const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
   const LC=new Map();
   function stepped(kind,r,k,col){
-    const size=Math.max(8,Math.round(r*2/k)),key=kind+size+(col||'');let cv=LC.get(key);if(cv)return cv;
+    const size=Math.max(8,Math.round(r*2/k/4)*4),key=kind+size+(col||'');let cv=LC.get(key);if(cv)return cv;
     if(LC.size>120)LC.clear();
     cv=document.createElement('canvas');cv.width=cv.height=size;const g=cv.getContext('2d'),im=g.createImageData(size,size),d=im.data;
     const cr=col?col.split(',').map(Number):[255,255,255];
@@ -677,9 +677,9 @@ EM.fx=(function(){
   function markers(g,orig){
     if(!uiOn())return orig(g);
     const c=ctx,t=G.time;
-    if(g.stun>0&&!g.dead){for(let i=0;i<3;i++){const a=t*4+i*2.09;blit(c,'m_star',g.x+Math.cos(a)*9-3.5,g.y-17+Math.sin(a)*3.5-3.5,7,7);}return;}
+    if(g.stun>0&&!g.dead){for(let i=0;i<3;i++){const a=t*4+i*2.09;blit(c,'m_star',g.x+Math.cos(a)*9-3.5,g.y-17+Math.sin(a)*3.5-3.5,7,7);}drawKoRing(c,g);return;}
     if(g.spin||g.eng)return;
-    if(g.run){ring(c,g.x,g.y,16+Math.sin(t*10)*2,1,'#ff8a3c');}
+    if(g.run){drawRunnerPath(c,g);ring(c,g.x,g.y,16+Math.sin(t*10)*2,1,'#ff8a3c');}
     if(g.say){
       const k=Math.min(1,g.say.t/.3,(1.7-g.say.t)/.12+.01);
       c.save();c.globalAlpha=Math.max(0,k);c.font='italic 11px '+BODY;c.textAlign='center';
@@ -707,6 +707,7 @@ EM.fx=(function(){
   function cones(orig){
     if(!uiOn())return orig();
     const c=ctx;
+    drawCoverRing(c);
     for(const g of G.guards){
       if(g.stun>0||g.dead||g.eng)continue;
       const range=5.2*T*G.rangeMul*(G.maskT>0?.65:1)*(g.rm||1)*(g.kr||1);
@@ -716,6 +717,7 @@ EM.fx=(function(){
       c.save();c.beginPath();pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.closePath();c.clip();
       c.globalAlpha=seeing?.95:alert?.75:.55;c.drawImage(s,Math.round(g.x-s.width/2),Math.round(g.y-s.height/2));c.restore();
       c.globalAlpha=1;c.strokeStyle='rgba('+col+','+(seeing?.7:alert?.45:.28)+')';c.lineWidth=1;c.beginPath();pts.forEach((q,i)=>i?c.lineTo(Math.round(q[0])+.5,Math.round(q[1])+.5):c.moveTo(Math.round(q[0])+.5,Math.round(q[1])+.5));c.closePath();c.stroke();
+      drawScentRing(c,g);
     }
   }
   /* ---- particles: square pixels, not soft discs ---- */
