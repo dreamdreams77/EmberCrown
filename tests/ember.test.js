@@ -1,4 +1,4 @@
-// Ember art slice: assets load, the slice is Ashfall-only, the toggle restores the LPC art, every state of every character draws without error.
+// Ember art: assets load, every house but the flight gets it with its own tiles and guard colours, the toggle restores the LPC art, every state of every character draws without error.
 const {chromium}=require('playwright');
 (async()=>{
   const b=await chromium.launch();const errs=[];
@@ -27,7 +27,13 @@ const {chromium}=require('playwright');
     // the same frame with ember off must come from the LPC art
     settings.ember=false;EM.applyUI();G.dirty=true;await wait(200);o.offAshfall=EM.on();o.uiOff=document.body.classList.contains('ember-ui');
     settings.ember=true;EM.applyUI();
-    startBrief(1);startPlay();G.cine=null;G.grace=1e9;await wait(250);o.onGallowmere=EM.on();
+    settings.ember=true;EM.applyUI();startBrief(1);startPlay();G.cine=null;G.grace=1e9;await wait(400);o.onGallowmere=EM.on();
+    o.houseG=EM.house();o.tilesG=!!EM.ok.tiles_grell&&!!EM.M.tiles_grell;
+    {const g=G.guards.find(q=>!q.boss&&!q.spin&&(q.kind||'guard')==='guard');let used='';const ob=EM.blit;
+     o.guardSheet=EM.ok['pell_grell']&&EM.ok['gaunt_grell'];}
+    startBrief(2);startPlay();G.cine=null;await wait(200);o.onFlight=EM.on();
+    startBrief(6);startPlay();G.cine=null;await wait(300);o.houseH=EM.house();
+    settings.ember=false;EM.applyUI();
     for(let i=0;i<40;i++)update(1/60);await wait(200);
     return o;});
   const fail=[];
@@ -40,7 +46,11 @@ const {chromium}=require('playwright');
   if(!r.ui)fail.push('ember UI skin not applied');
   if(r.offAshfall)fail.push('toggle off did not disable');
   if(r.uiOff)fail.push('toggle off left the UI skin on');
-  if(r.onGallowmere)fail.push('ember art leaked outside Ashfall Keep');
+  if(!r.onGallowmere)fail.push('ember art missing in Gallowmere');
+  if(r.houseG!=='grell'||!r.tilesG)fail.push('Gallowmere does not use the Grell tiles');
+  if(!r.guardSheet)fail.push('Grell guard sheets missing');
+  if(r.onFlight)fail.push('ember art drawn over the flight mission');
+  if(r.houseH!=='hallow')fail.push('the finale is not on the Hallow palette');
   // a saved ember:false profile must reload with the original UI, and a removed guard must not change anyone's face
   const ctx2=await b.newContext({viewport:{width:900,height:560}});
   await ctx2.addInitScript(()=>{try{localStorage.setItem('embercrown.settings.v1',JSON.stringify({ember:false,lpc:true}));}catch(e){}});

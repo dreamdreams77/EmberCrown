@@ -3,14 +3,21 @@
    Sergeant Gaunt), and the Cinderling. Bodies are sprite sheets (assets/ember, built by tools/ember_art); faces are a
    separate atlas drawn on top at run time, so every character can blink, squint, gape and faint.
    Wraps the draw functions the same way js/lpc.js does and leaves them untouched. Toggle: settings.ember ("Ember art").
-   Active only on Ashfall Keep while pixel art is on; everything else keeps the LPC art. */
+   Active on every mission except the flight, in the Rookery and in the dungeons, while pixel art is on. Ashfall Keep
+   keeps its hand-built room materials; the other houses get their own floors, walls and guard colours
+   (tools/ember_art/houses.py: tiles_<house>, pell_<house>, gaunt_<house>). */
 'use strict';
 const EM=(function(){
   const IMG={},ok={};
-  const NAMES=['shiloh','pell','gaunt','cinder','faces_shiloh','faces_pell','faces_gaunt','tiles','props','ashling','set2','pip','hale','halefree','faces_pip','faces_hale','faces_halefree'];
+  const HOUSES=['grell','sable','kest','dunmoor','hallow','hub'];
+  const NAMES=['shiloh','pell','gaunt','cinder','faces_shiloh','faces_pell','faces_gaunt','tiles','props','ashling','set2','pip','hale','halefree','faces_pip','faces_hale','faces_halefree']
+    .concat(HOUSES.map(h=>'tiles_'+h),HOUSES.filter(h=>h!=='hub').flatMap(h=>['pell_'+h,'gaunt_'+h]));
   for(const n of NAMES){const i=new Image();i.onload=()=>{ok[n]=true;if(typeof G!=='undefined'&&G)G.dirty=true;};i.onerror=()=>{};i.src='assets/ember/'+n+'.png';IMG[n]=i;}
   const M=typeof EMBER_META!=='undefined'?EMBER_META:{};
-  function slice(){return typeof G!=='undefined'&&!!G&&!!G.d&&G.d===LEVELS[0]&&!G.d.hub&&!G.dng&&!G.flight;}
+  function slice(){return typeof G!=='undefined'&&!!G&&!!G.d&&!G.flight;}
+  function ashfall(){return typeof G!=='undefined'&&!!G&&!!G.d&&G.d===LEVELS[0]&&!G.d.hub&&!G.dng;}
+  // which house's palette: Marrow (Ashfall) uses the base sheets
+  function house(){const k=typeof TILES!=='undefined'&&TILES.key?TILES.key():'marrow';return HOUSES.includes(k)?k:'marrow';}
   function on(){return settings.ember!==false&&LPC.on()&&slice();}
   function ready(n){return !!ok[n]&&!!M[n.replace(/^faces_/,'')];}
   // facing angle -> view row (down,up,left) and whether to mirror
@@ -88,16 +95,16 @@ const EM=(function(){
   /* ---- the watch ---- */
   function who(g){if(!g._who)g._who=(G.guards.indexOf(g)%2===0)?'pell':'gaunt';return g._who;} // fixed once, so removing a guard never changes anyone's face
   function drawWatch(g){
-    const name=who(g),hit=G.time-(g.hitT===undefined?-9:g.hitT)<.09;
-    if(g.ko&&g.stun>0){shadowAt(g.x,g.y+6,15,5,.4);blit(name,'ko',0,0,g.x,g.y+3,{who:name,flash:hit});return;}
+    const face=who(g),hk=house(),hs=face+'_'+hk,name=hk!=='marrow'&&ok[hs]&&M[hs]?hs:face,hit=G.time-(g.hitT===undefined?-9:g.hitT)<.09;
+    if(g.ko&&g.stun>0){shadowAt(g.x,g.y+6,15,5,.4);blit(name,'ko',0,0,g.x,g.y+3,{who:face,flash:hit});return;}
     const moving=g._lx!=null&&Math.hypot(g.x-g._lx,g.y-g._ly)>.05;g._lx=g.x;g._ly=g.y;
     const V_=view(vfa(g));
     shadowAt(g.x,g.y+7,13,5,.4);
     let mood=guardMood(g);if((mood==='calm'||mood==='wary')&&blinking(g.ph))mood='blink';
     const line=g.seeing?'#ff5440':(g.lure||g.ret)?'#ffc060':null;
-    if(g.stun>0){blit(name,'hurt',V_.v,0,g.x,g.y,{flip:V_.flip,who:name,mood:'hurt',flash:hit});return;}
+    if(g.stun>0){blit(name,'hurt',V_.v,0,g.x,g.y,{flip:V_.flip,who:face,mood:'hurt',flash:hit});return;}
     const hu=g.hopT===undefined?1:(G.time-g.hopT)/.26,hop=hu>=0&&hu<1?Math.sin(hu*Math.PI)*6:0;
-    const o={flip:V_.flip,who:name,mood,line};
+    const o={flip:V_.flip,who:face,mood,line};
     if(moving)blit(name,'walk',V_.v,walkFrame(g.ph||0),g.x,g.y-hop,o);
     else blit(name,'idle',V_.v,0,g.x,g.y-hop+(Math.sin(G.time*1.8+(g.ph||0))>.7?-.5:0),o);
   }
@@ -136,7 +143,7 @@ const EM=(function(){
     if(fire||dashing){const c=ctx;c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,190,90,.28)';circ(c,a.x+Math.cos(f)*8,a.y-6+Math.sin(f)*8,10);c.fill();c.globalCompositeOperation='source-over';}
   }
   function applyUI(){try{document.body.classList.toggle('ember-ui',settings.ember!==false);}catch(e){}}
-  return{on,ready,blit,drawShiloh,drawWatch,drawCinder,drawAshling,view,IMG,M,ok,applyUI};
+  return{on,ready,blit,drawShiloh,drawWatch,drawCinder,drawAshling,view,IMG,M,ok,applyUI,house,ashfall};
 })();
 {
   const _drawWren=drawWren;
@@ -164,13 +171,14 @@ const EM=(function(){
 /* ---- Ashfall Keep: floors, walls, furniture, torches, doors, chests, pots, braziers, rugs, light ---- */
 EM.env=(function(){
   const IMG=EM.IMG,M=EM.M;
-  const T_=()=>M.tiles;
+  const tk=()=>{const h=EM.house(),k='tiles_'+h;return h!=='marrow'&&EM.ok[k]&&M[k]?k:'tiles';};
+  const T_=()=>M[tk()];
   function hash(x,y,s){let h=(x*374761393+y*668265263+(s||0)*2147483647)|0;h=(h^(h>>>13))*1274126177|0;return((h^(h>>>16))>>>0)/4294967296;}
-  function ready(){return EM.on()&&!!EM.ok.tiles&&!!T_()&&!!EM.ok.set2&&!!M.set2;}
+  function ready(){return EM.on()&&!!EM.ok[tk()]&&!!T_()&&!!EM.ok.set2&&!!M.set2;}
   const ruin=()=>G.state==='ruin';
   function tile(c,name,x,y){
     const t=T_()[name],sm=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
-    c.drawImage(IMG.tiles,t[0],t[1],32,32,x*T,y*T,T,T);c.imageSmoothingEnabled=sm;
+    c.drawImage(IMG[tk()],t[0],t[1],32,32,x*T,y*T,T,T);c.imageSmoothingEnabled=sm;
   }
   // set2: a second atlas (doors, chests, pots, braziers, rug kit, floor details, shadows, the ruined versions)
   function s2(c,n,x,y,flip){
@@ -198,7 +206,7 @@ EM.env=(function(){
     ['culvert',1,23,23,27,'culvert','culvert']];
   const FAM={kitchen:3,store:4,relic:3,barracks:4,yard:4,coal:3,ossuary:4,culvert:4};
   const WFAM={sooty:2,timber:3,relic:1,culvert:2,bone:2};
-  function roomAt(x,y){for(const r of ROOMS)if(x>=r[1]&&x<=r[3]&&y>=r[2]&&y<=r[4])return r;return null;}
+  function roomAt(x,y){if(!EM.ashfall())return null;for(const r of ROOMS)if(x>=r[1]&&x<=r[3]&&y>=r[2]&&y<=r[4])return r;return null;}
   const DETAIL=['drain','puddle','scorch','bones','crack','rune','rubble'];
   const RFLOOR=['pit','cracked','ash','char'];
   function floor(c,x,y){
@@ -430,7 +438,7 @@ if(typeof TILES!=='undefined'){
   if(typeof TILES!=='undefined'&&TILES.bannerSprite){
     const _bs=TILES.bannerSprite;let cv=null;
     TILES.bannerSprite=function(k){
-      if(EM.on()&&EM.ok.props&&M.props&&M.props.banner){
+      if(EM.on()&&EM.house()==='marrow'&&EM.ok.props&&M.props&&M.props.banner){ // Marrow's crescent; other houses keep their own heraldry
         if(!cv){const a=M.props.banner;cv=document.createElement('canvas');cv.width=a[2];cv.height=a[3];const g=cv.getContext('2d');g.drawImage(IMG.props,a[0],a[1],a[2],a[3],0,0,a[2],a[3]);}
         return cv;
       }
@@ -499,7 +507,7 @@ if(window.Portraits){const _pd=Portraits.draw;Portraits.draw=function(c,id,x,y,s
   const _pots=drawPots;drawPots=function(){if(!EM.env.ready())return _pots();const hold=G.pots;G.pots=[];try{_pots();}finally{G.pots=hold;}EM.env.pots();};
   const _braz=drawBraziers;drawBraziers=function(){if(!EM.env.ready())return _braz();const hold=G.braz;G.braz=[];try{_braz();}finally{G.braz=hold;}EM.env.braziers();};
   const _cl=collectLights;collectLights=function(){const L=_cl.apply(this,arguments);return EM.env.ready()&&!EM.env.ruin()?EM.env.lights(L):L;};
-  const _rugs=autoRugs;autoRugs=function(c,th,rnd){if(EM.env.ready())return EM.env.autoRugs(c,th,rnd);return _rugs(c,th,rnd);};
+  const _rugs=autoRugs;autoRugs=function(c,th,rnd){if(EM.env.ready()&&EM.house()==='marrow')return EM.env.autoRugs(c,th,rnd);return _rugs(c,th,rnd);}; // the rug medallion is Marrow's crescent
   if(window.drawNpcFigure){
     const _fig=window.drawNpcFigure,E=EM;
     window.drawNpcFigure=function(c,kind,x,y,t,face,o){
