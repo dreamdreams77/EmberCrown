@@ -8,7 +8,7 @@ const {chromium}=require('playwright');
   const r=await p.evaluate(async()=>{
     const o={};const wait=ms=>new Promise(r=>setTimeout(r,ms));
     o.ready=['shiloh','pell','gaunt','cinder','ashling','pip','hale','halefree','faces_shiloh','faces_pell','faces_gaunt','faces_pip','faces_hale'].every(n=>EM.ready(n))&&EM.ok.tiles&&EM.ok.props&&EM.ok.set2;
-    // a fresh profile starts with Ember art off (it is a beta, Ashfall only) and HD-2D on; the rest of this test opts in
+    // a fresh profile starts with Ember art on and HD-2D on
     o.defaults=settings.ember!==false&&settings.hd2d===true&&document.body.classList.contains('ember-ui');
     settings.ember=true;settings.hd2d=false;EM.applyUI();
     newGame();startBrief(0);startPlay();G.cine=null;G.grace=1e9;G.god=true;await wait(300);
@@ -27,10 +27,10 @@ const {chromium}=require('playwright');
     // the same frame with ember off must come from the LPC art
     settings.ember=false;EM.applyUI();G.dirty=true;await wait(200);o.offAshfall=EM.on();o.uiOff=document.body.classList.contains('ember-ui');
     settings.ember=true;EM.applyUI();
-    settings.ember=true;EM.applyUI();startBrief(1);startPlay();G.cine=null;G.grace=1e9;await wait(400);o.onGallowmere=EM.on();
+    startBrief(1);startPlay();G.cine=null;G.grace=1e9;await wait(400);o.onGallowmere=EM.on();
     o.houseG=EM.house();o.tilesG=!!EM.ok.tiles_grell&&!!EM.M.tiles_grell;
-    {const g=G.guards.find(q=>!q.boss&&!q.spin&&(q.kind||'guard')==='guard');let used='';const ob=EM.blit;
-     o.guardSheet=EM.ok['pell_grell']&&EM.ok['gaunt_grell'];}
+    {const g=G.guards.find(q=>!q.boss&&!q.spin&&(q.kind||'guard')==='guard');if(g)drawGuard(g);
+     o.guardSheet=!!g&&/^(pell|gaunt)_grell$/.test(g._sheet||'');}
     startBrief(2);startPlay();G.cine=null;await wait(200);o.onFlight=EM.on();
     startBrief(6);startPlay();G.cine=null;await wait(300);o.houseH=EM.house();
     settings.ember=false;EM.applyUI();

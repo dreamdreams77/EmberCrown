@@ -95,7 +95,7 @@ const EM=(function(){
   /* ---- the watch ---- */
   function who(g){if(!g._who)g._who=(G.guards.indexOf(g)%2===0)?'pell':'gaunt';return g._who;} // fixed once, so removing a guard never changes anyone's face
   function drawWatch(g){
-    const face=who(g),hk=house(),hs=face+'_'+hk,name=hk!=='marrow'&&ok[hs]&&M[hs]?hs:face,hit=G.time-(g.hitT===undefined?-9:g.hitT)<.09;
+    const face=who(g),hk=house(),hs=face+'_'+hk,name=hk!=='marrow'&&ok[hs]&&M[hs]?hs:face,hit=G.time-(g.hitT===undefined?-9:g.hitT)<.09;g._sheet=name;
     if(g.ko&&g.stun>0){shadowAt(g.x,g.y+6,15,5,.4);blit(name,'ko',0,0,g.x,g.y+3,{who:face,flash:hit});return;}
     const moving=g._lx!=null&&Math.hypot(g.x-g._lx,g.y-g._ly)>.05;g._lx=g.x;g._ly=g.y;
     const V_=view(vfa(g));
@@ -143,7 +143,9 @@ const EM=(function(){
     if(fire||dashing){const c=ctx;c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,190,90,.28)';circ(c,a.x+Math.cos(f)*8,a.y-6+Math.sin(f)*8,10);c.fill();c.globalCompositeOperation='source-over';}
   }
   function applyUI(){try{document.body.classList.toggle('ember-ui',settings.ember!==false);}catch(e){}}
-  return{on,ready,blit,drawShiloh,drawWatch,drawCinder,drawAshling,view,IMG,M,ok,applyUI,house,ashfall};
+  // the watch's sheets for this house are in (Marrow: the base pell/gaunt; elsewhere: pell_<house>/gaunt_<house>)
+  function guardsReady(){const h=house();if(h==='marrow')return ready('pell')&&ready('gaunt');return !!ok['pell_'+h]&&!!M['pell_'+h]&&!!ok['gaunt_'+h]&&!!M['gaunt_'+h]&&ready('pell')&&ready('gaunt');}
+  return{on,ready,blit,drawShiloh,drawWatch,drawCinder,drawAshling,view,IMG,M,ok,applyUI,house,ashfall,guardsReady};
 })();
 {
   const _drawWren=drawWren;
@@ -152,7 +154,7 @@ const EM=(function(){
   drawAsh=function(a,active){if(EM.on()&&EM.ready('ashling'))return EM.drawAshling(a,active);return _drawAsh(a,active);};
   const _drawGuard=drawGuard;
   drawGuard=function(g){
-    if(EM.on()&&EM.ready('pell')&&EM.ready('gaunt')&&!g.boss&&!g.spin&&(g.kind||'guard')==='guard')return EM.drawWatch(g);
+    if(EM.on()&&EM.guardsReady()&&!g.boss&&!g.spin&&(g.kind||'guard')==='guard')return EM.drawWatch(g);
     return _drawGuard(g);
   };
   const _drawFoe=drawFoe;
@@ -174,8 +176,8 @@ EM.env=(function(){
   const tk=()=>{const h=EM.house(),k='tiles_'+h;return h!=='marrow'&&EM.ok[k]&&M[k]?k:'tiles';};
   const T_=()=>M[tk()];
   function hash(x,y,s){let h=(x*374761393+y*668265263+(s||0)*2147483647)|0;h=(h^(h>>>13))*1274126177|0;return((h^(h>>>16))>>>0)/4294967296;}
-  function ready(){return EM.on()&&!!EM.ok[tk()]&&!!T_()&&!!EM.ok.set2&&!!M.set2;}
-  const ruin=()=>G.state==='ruin';
+  function ready(){const h=EM.house();if(h!=='marrow'&&tk()==='tiles')return false;return EM.on()&&!!EM.ok[tk()]&&!!T_()&&!!EM.ok.set2&&!!M.set2;}
+  const ruin=()=>G.state==='ruin'&&EM.ashfall(); // Ashfall's ruin art; Dunmoor's ruined era keeps its house tiles
   function tile(c,name,x,y){
     const t=T_()[name],sm=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
     c.drawImage(IMG[tk()],t[0],t[1],32,32,x*T,y*T,T,T);c.imageSmoothingEnabled=sm;
@@ -211,6 +213,7 @@ EM.env=(function(){
   const RFLOOR=['pit','cracked','ash','char'];
   function floor(c,x,y){
     const z=typeof TILES!=='undefined'&&TILES.zone?TILES.zone(x,y):'';if(z==='water'||z==='court')return false;
+    if(!EM.ashfall()&&/^(ball|arena|vault|battle|yard)$/.test(z))return false; // ballroom marble, arena sigils, vaults, yards keep their own floors
     const h=hash(x,y,1);
     if(ruin()){
       const r=hash(x,y,5);
@@ -395,7 +398,7 @@ EM.env=(function(){
     g.putImageData(im,0,0);LC.set(key,cv);return cv;
   }
   const AMB=[8,10,34];
-  function ambient(a){return ruin()?[34,12,18,Math.min(.8,Math.max(a[3],.68))]:[AMB[0],AMB[1],AMB[2],Math.min(.8,Math.max(a[3],.70))];} // the ruin is lit by embers: a warmer dark
+  function ambient(a){if(!EM.ashfall())return a;return ruin()?[34,12,18,Math.min(.8,Math.max(a[3],.68))]:[AMB[0],AMB[1],AMB[2],Math.min(.8,Math.max(a[3],.70))];} // the ruin is lit by embers: a warmer dark
   return{ready,floor,wall,prop,torch,door,chests,pots,braziers,autoRugs,stepped,ambient,s2,ruin,hash,hearths,lights,roomAt};
 })();
 if(typeof TILES!=='undefined'){
@@ -792,7 +795,7 @@ window.EMX={mech:(...a)=>EM.fx.mech(...a),story:(c,l,r)=>EM.fx.story(c,l,r),beam
     const hi=G.insp;G.insp=[];try{_chests2();}finally{G.insp=hi;}   // chests were already ours; now the story points
     EM.fx.insp();
   };
-  const _fg=TILES.fg;TILES.fg=function(c){if(EM.env.ready()&&!G.flight){EM.fx.fg(c);return;}return _fg.apply(this,arguments);};
+  const _fg=TILES.fg;TILES.fg=function(c){if(EM.env.ready()&&!G.flight&&EM.house()==='marrow'){EM.fx.fg(c);return;}return _fg.apply(this,arguments);};
   const _icon=icon;icon=function(c,name,x,y,s,col,dim){if(EM.fx.icon(c,name,x,y,s,col,dim))return;return _icon.apply(this,arguments);};
   const _cones=drawCones;drawCones=function(){return EM.fx.cones(_cones);};
   const _parts=drawParticles;drawParticles=function(){return EM.fx.particles(_parts);};
