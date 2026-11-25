@@ -57,9 +57,9 @@ Switch it with **Pixel art** in the pause menu to compare with the original draw
 
 **Feel.** A guard who spots you jumps while the frame holds for a beat and the screen blinks red; running, rolling and striking kick up dust (sneaking does not); guards flash white when hit.
 
-## Ember art (beta)
+## Ember art
 
-An original art style, drawn for this game, is being built to replace the LPC art. It is **off by default**: turn on **Ember (beta)** in the pause menu. It now covers every mission except the Drowned Spire flight, plus the Rookery and the dungeons.
+An original art style, drawn for this game, is being built to replace the LPC art. It is **the default look**: every mission except the Drowned Spire flight, plus the Rookery and the dungeons. Turn it off with **Ember art** in the pause menu to see the LPC pixel art instead (players who had the old beta switched off are moved to Ember once; a choice made with the toggle after that is kept).
 
 - **Characters**: Shiloh, two Marrow guards (Pell the pikeman, Sergeant Gaunt), the Cinderling, Ashling, Pip and Hale. Faces are a separate atlas drawn on the head every frame, so characters blink and react: calm, wary, alarmed, hurt, knocked out.
 - **Ashfall Keep**: furnished room by room (`set:` in `LEVELS[0]`, checked by `tests/layout_ashfall.test.js`), its own floors, walls, rugs, doors, chests, braziers and mission mechanisms, and pixel-stepped light pools.
@@ -132,7 +132,7 @@ The full story is playable, seven missions ending in three possible endings (cro
 
 **Testing so far.** Mission 1's tutorial and the entrance to the keep were played with real keyboard and touch input, and the problems found there are fixed. Missions 2-7, both bosses and the three endings have been checked by the automated suites but have not had a full human playthrough yet. If you play it, the most useful feedback is where you got stuck or confused, anything that felt unfair, and whether your choices for the houses felt like they mattered.
 
-**Art.** The look is still mixed: LPC pixel art by default, some figures still drawn in code, and the original Ember art as an opt-in beta in mission 1. The plan is to replace everything with the Ember style, one house at a time.
+**Art.** The look is still mixed: LPC pixel art by default, some figures still drawn in code, and the original Ember art, now the default on every mission but the flight. The plan is to replace everything with the Ember style, one house at a time.
 
 ## Licence
 

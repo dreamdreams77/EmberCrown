@@ -84,10 +84,12 @@ const BREAK_GEMS=Math.round(BASE_GEMS*.6);
 
 /* ---------- save / settings ---------- */
 const SAVE_KEY='embercrown.save.v2',SET_KEY='embercrown.settings.v1';
-const settings={sfx:true,music:true,minimap:true,shake:true,lpc:true,ember:false,hd2d:true,hints:true,cinema:'full',seen:{}};
+const settings={sfx:true,music:true,minimap:true,shake:true,lpc:true,ember:true,emberPick:false,hd2d:true,hints:true,cinema:'full',seen:{}};
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function loadSettings(){const s=lsGet(SET_KEY);if(s)Object.assign(settings,s);
+  // Ember art became the default: profiles saved while it was an opt-in beta switch to it once; a choice made with the toggle since then is kept
+  if(!settings.emberPick){settings.ember=true;}
   Aud.set.sfx=settings.sfx;Aud.set.music=settings.music;}
 function saveSettings(){lsSet(SET_KEY,settings);}
 let saved=null,runStage=null;

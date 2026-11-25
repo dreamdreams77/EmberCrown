@@ -9,7 +9,7 @@ const {chromium}=require('playwright');
     const o={};const wait=ms=>new Promise(r=>setTimeout(r,ms));
     o.ready=['shiloh','pell','gaunt','cinder','ashling','pip','hale','halefree','faces_shiloh','faces_pell','faces_gaunt','faces_pip','faces_hale'].every(n=>EM.ready(n))&&EM.ok.tiles&&EM.ok.props&&EM.ok.set2;
     // a fresh profile starts with Ember art off (it is a beta, Ashfall only) and HD-2D on; the rest of this test opts in
-    o.defaults=settings.ember===false&&settings.hd2d===true&&!document.body.classList.contains('ember-ui');
+    o.defaults=settings.ember!==false&&settings.hd2d===true&&document.body.classList.contains('ember-ui');
     settings.ember=true;settings.hd2d=false;EM.applyUI();
     newGame();startBrief(0);startPlay();G.cine=null;G.grace=1e9;G.god=true;await wait(300);
     o.onAshfall=EM.on();o.envReady=EM.env.ready();o.ui=document.body.classList.contains('ember-ui');
@@ -41,7 +41,7 @@ const {chromium}=require('playwright');
   if(!r.envReady)fail.push('Ashfall environment art not ready');
   if(!r.ruinDraws)fail.push('ruined state missing art');
   if(!r.lightK)fail.push('stepped light not active');
-  if(!r.defaults)fail.push('defaults: ember off, hd2d on, original UI skin');
+  if(!r.defaults)fail.push('defaults: ember on, hd2d on, Ember UI skin');
   if(!r.onAshfall)fail.push('ember art not active in Ashfall Keep');
   if(!r.ui)fail.push('ember UI skin not applied');
   if(r.offAshfall)fail.push('toggle off did not disable');
@@ -51,9 +51,9 @@ const {chromium}=require('playwright');
   if(!r.guardSheet)fail.push('Grell guard sheets missing');
   if(r.onFlight)fail.push('ember art drawn over the flight mission');
   if(r.houseH!=='hallow')fail.push('the finale is not on the Hallow palette');
-  // a saved ember:false profile must reload with the original UI, and a removed guard must not change anyone's face
+  // a player who turned Ember off keeps it off after a reload (an old beta-era ember:false switches on once), and a removed guard must not change anyone's face
   const ctx2=await b.newContext({viewport:{width:900,height:560}});
-  await ctx2.addInitScript(()=>{try{localStorage.setItem('embercrown.settings.v1',JSON.stringify({ember:false,lpc:true}));}catch(e){}});
+  await ctx2.addInitScript(()=>{try{localStorage.setItem('embercrown.settings.v1',JSON.stringify({ember:false,emberPick:true,lpc:true}));}catch(e){}});
   const p2=await ctx2.newPage();p2.on('pageerror',e=>errs.push('PAGEERR '+e.message));
   await p2.goto('http://localhost:8123/index.html');await p2.waitForTimeout(900);
   r.reloadOff=await p2.evaluate(()=>!document.body.classList.contains('ember-ui')&&settings.ember===false);
@@ -64,7 +64,10 @@ const {chromium}=require('playwright');
     const b=document.querySelector('[data-a="ember"]');if(b)b.click();return on&&!document.body.classList.contains('ember-ui');});
   if(!r.menuToggle)fail.push('pause-menu Ember art toggle did not restore the original UI skin');
   r.stableWho=await p.evaluate(()=>{const a=G.guards.filter(g=>!g.boss&&!g.spin&&(g.kind||'guard')==='guard');const before=a.map(g=>{drawGuard(g);return g._who;});G.guards.splice(G.guards.indexOf(a[0]),1);const after=a.slice(1).map(g=>{drawGuard(g);return g._who;});return JSON.stringify(before.slice(1))===JSON.stringify(after);});
-  if(!r.reloadOff)fail.push('saved ember:false came back with the Ember UI skin');
+  if(!r.reloadOff)fail.push('a chosen ember:false came back with the Ember UI skin');
+  {const c3=await b.newContext({viewport:{width:900,height:560}});await c3.addInitScript(()=>{try{localStorage.setItem('embercrown.settings.v1',JSON.stringify({ember:false,lpc:true}));}catch(e){}});
+   const p3=await c3.newPage();await p3.goto('http://localhost:8123/index.html');await p3.waitForTimeout(600);
+   if(!(await p3.evaluate(()=>settings.ember===true&&document.body.classList.contains('ember-ui'))))fail.push('an old beta-era ember:false profile did not switch to Ember');await c3.close();}
   if(!r.stableWho)fail.push('guard faces changed after another guard was removed');
   console.log(JSON.stringify(r));console.log(fail.length?'FAIL '+fail.join('; '):'ok');console.log(errs.length?errs.join('\n'):'no errors');
   await b.close();
