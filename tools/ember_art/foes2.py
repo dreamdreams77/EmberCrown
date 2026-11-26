@@ -154,7 +154,7 @@ def chanter(view='down', anim='walk', f=0, big=False, robe=ROBE, hood=HOOD, W=CW
         for k2, sx in enumerate((-1, 1)):
             if view == 'left' and k2 == 1: continue
             x = hx + sx * 2 * k + (-2 if view == 'left' else 0)
-            cv.flat(rect_mask(W, H, x - .5, top + 6.5 * k, x + 1.5 if not bright else x + 1.5, top + 8 * k + (1 if bright else 0)), GHOST if not bright else WHITE)
+            cv.flat(rect_mask(W, H, x - .5, top + 6.5 * k, x + 1.5 if not bright else x + 2.5, top + 8 * k + (1 if bright else 0)), GHOST if not bright else WHITE)
     # hands and the bell
     up = anim in ('cast', 'sing')
     for sx in (-1, 1):
@@ -176,13 +176,6 @@ ASHHOOD = ramp('#8a7c70', '#241820', '#e8dccc')
 def cantor(view='down', anim='walk', f=0):
     a = {'sing': 'sing', 'recover': 'recover'}.get(anim, anim)
     return chanter(view, a, f, robe=ASHROBE, hood=ASHHOOD, W=KW, H=KH, FOOT=KFOOT)
-
-if __name__ == '__main__':
-    tiles = []
-    for fn, n, w, h in ((wisp, 'hover', WW, WH), (husk, 'walk', HW, HH), (mite, 'walk', MW, MH), (chanter, 'walk', CWD, CHT), (cantor, 'walk', KW, KH)):
-        row = [fn(v, n, 0).img() for v in ('down', 'up', 'left')]
-        for im in row: tiles.append(im.resize((64, 64)))
-    sh = sheet(tiles, 6, 64, 64); preview(sh, sys.argv[1] if len(sys.argv) > 1 else '/tmp/foes2_prev.png', scale=3)
 
 # ------------------------------------------------------------------ the Bell-Warden (boss)
 BWW, BWH, BWFOOT = 64, 72, 70
@@ -262,3 +255,10 @@ def candlemaker(view='down', anim='float', f=0):
             cv.flat(rect_mask(CMW, CMH, x - 1, y - 3, x + 1, y + 1), WAXR[3])
             cv.put(x, y - 4 - (f + i) % 2, hexc('#ffb040')); cv.put(x, y - 5 - (f + i) % 2, hexc('#fff0c0'))
     return cv
+
+if __name__ == '__main__':
+    tiles = []
+    for fn, n, w, h in ((wisp, 'hover', WW, WH), (husk, 'walk', HW, HH), (mite, 'walk', MW, MH), (chanter, 'walk', CWD, CHT), (cantor, 'walk', KW, KH), (warden, 'walk', BWW, BWH), (candlemaker, 'float', CMW, CMH)):
+        row = [fn(v, n, 0).img() for v in ('down', 'up', 'left')]
+        for im in row: tiles.append(im.resize((64, 64)))
+    sh = sheet(tiles, 6, 64, 64); preview(sh, sys.argv[1] if len(sys.argv) > 1 else '/tmp/foes2_prev.png', scale=3)

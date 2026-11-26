@@ -162,6 +162,7 @@ const EM=(function(){
     if(EM.on()&&f.kind==='cinder'&&EM.ready('cinder')){
       const c=ctx;
       EM.drawCinder(f);
+      if(typeof drawFoeOver==='function')drawFoeOver(f); // ward ring and tether, burning
       if(f.state==='recover'||f.state==='stagger'){for(let i=0;i<3;i++){const a=G.time*4+i*2.09;c.fillStyle='#ffe27a';circ(c,f.x+Math.cos(a)*8,f.y-18+Math.sin(a)*3,1.6);c.fill();}}
       if(f.hp<f.max&&f.state!=='dead'&&f.state!=='spawn'){c.fillStyle='rgba(0,0,0,.55)';c.fillRect(f.x-11,f.y-foeBarY(f),22,3.4);c.fillStyle='#e05050';c.fillRect(f.x-10.5,f.y-foeBarY(f)+.5,21*Math.max(0,f.hp)/f.max,2.4);}
       return;
